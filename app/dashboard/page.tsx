@@ -84,7 +84,7 @@ export default function DashboardPage() {
               </button>
               <button
                 className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors ml-2"
-                onClick={() => router.push('/proveedores?action=create')}
+                onClick={() => router.push('/proveedores/nuevo')}
               >
                 ➕ Crear Proveedor
               </button>
