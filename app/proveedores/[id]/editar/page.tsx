@@ -72,34 +72,41 @@ export default function EditarProveedorPage() {
     setSubmitting(true)
 
     try {
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 10000)
-
-      const response = await fetch('/api/proveedores/update', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: params.id,
-          ...formData,
-        }),
-        signal: controller.signal,
+      // Usar XMLHttpRequest en lugar de fetch
+      const xhr = new XMLHttpRequest()
+      xhr.open('POST', '/api/proveedores/update', true)
+      xhr.setRequestHeader('Content-Type', 'application/json')
+      
+      const data = JSON.stringify({
+        id: params.id,
+        ...formData,
       })
 
-      clearTimeout(timeoutId)
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error)
+      xhr.onload = function() {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          // Éxito - actualizar localStorage para que la página principal lo use
+          localStorage.setItem('proveedor_actualizado', JSON.stringify({
+            id: params.id,
+            ...formData,
+            actualizado_at: new Date().toISOString()
+          }))
+          alert('Proveedor actualizado exitosamente. Los cambios se mostrarán en la lista.')
+          router.push('/proveedores')
+        } else {
+          const errorData = JSON.parse(xhr.responseText)
+          setError(errorData.error || 'Error al actualizar proveedor')
+        }
+        setSubmitting(false)
       }
 
-      router.push('/proveedores')
+      xhr.onerror = function() {
+        setError('Error de red al actualizar proveedor')
+        setSubmitting(false)
+      }
+
+      xhr.send(data)
     } catch (err: any) {
-      if (err.name === 'AbortError') {
-        setError('La operación tardó demasiado. Inténtalo de nuevo.')
-      } else {
-        setError(err.message)
-      }
-    } finally {
+      setError(err.message)
       setSubmitting(false)
     }
   }

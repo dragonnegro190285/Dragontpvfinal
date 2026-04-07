@@ -1,8 +1,24 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabaseAdmin'
+import { createClient } from '@supabase/supabase-js'
 
-export async function PUT(request: Request) {
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+
+export async function POST(request: Request) {
   try {
+    // Crear cliente con configuración específica para evitar caché
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      },
+      global: {
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      }
+    })
+
     const body = await request.json()
     console.log('Datos recibidos en update:', body)
     const { id, ...data } = body
@@ -10,7 +26,7 @@ export async function PUT(request: Request) {
     console.log('ID:', id)
     console.log('Data a actualizar:', data)
 
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from('proveedores')
       .update({
         ...data,

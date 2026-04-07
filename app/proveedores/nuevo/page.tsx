@@ -48,7 +48,7 @@ export default function NuevoProveedorPage() {
         throw new Error(data.error)
       }
 
-      router.push('/proveedores')
+      window.location.href = '/proveedores'
     } catch (err: any) {
       if (err.name === 'AbortError') {
         setError('La operación tardó demasiado. Inténtalo de nuevo.')

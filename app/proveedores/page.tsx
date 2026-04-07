@@ -18,7 +18,20 @@ export default function ProveedoresPage() {
     try {
       const response = await fetch(`/api/proveedores?t=${Date.now()}&r=${Math.random().toString(36).substring(7)}`)
       const data = await response.json()
-      setProveedores(data.proveedores || [])
+      let proveedoresList = data.proveedores || []
+      
+      // Verificar si hay un proveedor actualizado en localStorage
+      const actualizado = localStorage.getItem('proveedor_actualizado')
+      if (actualizado) {
+        const proveedorActualizado = JSON.parse(actualizado)
+        proveedoresList = proveedoresList.map((p: Proveedor) => 
+          p.id === proveedorActualizado.id ? { ...p, ...proveedorActualizado } : p
+        )
+        // Limpiar localStorage después de usarlo
+        localStorage.removeItem('proveedor_actualizado')
+      }
+      
+      setProveedores(proveedoresList)
     } catch (err) {
       console.error('Error al cargar proveedores:', err)
     } finally {
