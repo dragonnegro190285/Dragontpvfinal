@@ -155,6 +155,14 @@ export default function UsuariosPage() {
       setShowModal(false)
       setEditingUser(null)
       setError('')
+      setFormData({
+        email: '',
+        password: '',
+        nombre: '',
+        apellido: '',
+        rol_id: '',
+        activo: true,
+      })
       await loadUsuarios()
     } catch (err: any) {
       setError(err.message)
