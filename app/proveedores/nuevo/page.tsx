@@ -111,15 +111,15 @@ export default function NuevoProveedorPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Código Proveedor *
+                    Código Proveedor
                   </label>
                   <input
                     type="text"
-                    value={formData.codigo_proveedor}
-                    onChange={(e) => setFormData({ ...formData, codigo_proveedor: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                    required
+                    value="Se generará automáticamente"
+                    disabled
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500"
                   />
+                  <p className="text-xs text-gray-500 mt-1">El código se generará automáticamente al guardar</p>
                 </div>
 
                 <div>
