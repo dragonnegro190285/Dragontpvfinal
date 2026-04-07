@@ -34,7 +34,7 @@ export default function UsuariosPage() {
 
   const loadUsuarios = async () => {
     try {
-      const response = await fetch('/api/usuarios')
+      const response = await fetch(`/api/usuarios?t=${Date.now()}`)
       const data = await response.json()
       setUsuarios(data.usuarios || [])
     } catch (err) {
@@ -46,7 +46,7 @@ export default function UsuariosPage() {
 
   const loadRoles = async () => {
     try {
-      const response = await fetch('/api/roles')
+      const response = await fetch(`/api/roles?t=${Date.now()}`)
       const data = await response.json()
       setRoles(data.roles || [])
     } catch (err) {
