@@ -22,7 +22,6 @@ export default function NuevoProveedorPage() {
     constancia_situacion_fiscal: '',
     datos_bancarios: '',
     opinion_cumplimiento: '',
-    saldo: 0,
     activo: true,
   })
 
@@ -268,21 +267,6 @@ export default function NuevoProveedorPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                     rows={2}
                   />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Saldo ($)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.saldo}
-                    onChange={(e) => setFormData({ ...formData, saldo: parseFloat(e.target.value) || 0 })}
-                    disabled
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Se actualizará automáticamente con compras y pagos</p>
                 </div>
 
                 <div className="flex items-center">
