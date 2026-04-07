@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 
@@ -8,8 +8,26 @@ export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [nombre, setNombre] = useState('')
+  const [apellido, setApellido] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [hasAdmin, setHasAdmin] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    checkAdminExists()
+  }, [])
+
+  const checkAdminExists = async () => {
+    try {
+      const response = await fetch('/api/check-admin')
+      const data = await response.json()
+      setHasAdmin(data.hasAdmin)
+    } catch (err) {
+      console.error('Error al verificar admin:', err)
+      setHasAdmin(true) // Por defecto asumimos que hay admin
+    }
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,10 +50,56 @@ export default function LoginPage() {
     }
   }
 
+  const handleCreateAdmin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+
+    try {
+      const response = await fetch('/api/create-admin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, nombre, apellido }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al crear administrador')
+      }
+
+      // Iniciar sesión automáticamente después de crear el admin
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (authError) throw authError
+
+      router.push('/dashboard')
+    } catch (err: any) {
+      setError(err.message || 'Error al crear administrador')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (hasAdmin === null) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-xl">Cargando...</div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold text-center mb-6">TPV Online - Login</h1>
+        <h1 className="text-2xl font-bold text-center mb-6">
+          {hasAdmin ? 'TPV Online - Login' : 'Crear Primer Administrador'}
+        </h1>
         
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -43,7 +107,37 @@ export default function LoginPage() {
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={hasAdmin ? handleLogin : handleCreateAdmin} className="space-y-4">
+          {!hasAdmin && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nombre
+                </label>
+                <input
+                  type="text"
+                  value={nombre}
+                  onChange={(e) => setNombre(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Apellido
+                </label>
+                <input
+                  type="text"
+                  value={apellido}
+                  onChange={(e) => setApellido(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+            </>
+          )}
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Email
@@ -75,16 +169,15 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
           >
-            {loading ? 'Cargando...' : 'Iniciar Sesión'}
+            {loading ? 'Cargando...' : (hasAdmin ? 'Iniciar Sesión' : 'Crear Administrador')}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-600 mt-4">
-          ¿No tienes cuenta?{' '}
-          <a href="/register" className="text-blue-600 hover:underline">
-            Regístrate
-          </a>
-        </p>
+        {hasAdmin && (
+          <p className="text-center text-sm text-gray-600 mt-4">
+            ¿No tienes cuenta? Contacta al administrador.
+          </p>
+        )}
       </div>
     </div>
   )
