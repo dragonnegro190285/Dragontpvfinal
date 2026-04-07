@@ -89,6 +89,9 @@ export default function ProveedoresPage() {
                     RFC
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Saldo
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Estado
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -102,6 +105,9 @@ export default function ProveedoresPage() {
                     <td className="px-6 py-4 whitespace-nowrap">{proveedor.codigo_proveedor}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{proveedor.razon_social}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{proveedor.rfc || '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap font-semibold">
+                      ${proveedor.saldo?.toFixed(2) || '0.00'}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`px-2 py-1 rounded text-xs ${

@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS proveedores (
     constancia_situacion_fiscal TEXT,
     datos_bancarios TEXT,
     opinion_cumplimiento TEXT,
+    saldo DECIMAL(15,2) DEFAULT 0.00,
     activo BOOLEAN DEFAULT true,
     creado_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     actualizado_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
