@@ -74,6 +74,12 @@ export default function DashboardPage() {
         <div className="p-4">
           <h2 className="text-xl font-bold mb-6">Menú</h2>
           <nav className="space-y-2">
+            <button
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+              onClick={() => router.push('/proveedores')}
+            >
+              📦 Gestión de Proveedores
+            </button>
             {isAdmin && (
               <button
                 className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"

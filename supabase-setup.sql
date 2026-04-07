@@ -64,7 +64,39 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- 8. Crear triggers para actualizar timestamp
+-- Tabla de proveedores
+CREATE TABLE IF NOT EXISTS proveedores (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    razon_social VARCHAR(255) NOT NULL,
+    nombre_comercial VARCHAR(255),
+    codigo_proveedor VARCHAR(50) UNIQUE NOT NULL,
+    rfc VARCHAR(13),
+    direccion_fiscal TEXT,
+    telefono VARCHAR(20),
+    correo_electronico VARCHAR(255),
+    persona_contacto VARCHAR(255),
+    condiciones_pago TEXT,
+    tiempos_entrega TEXT,
+    categoria_suministro VARCHAR(100),
+    constancia_situacion_fiscal TEXT,
+    datos_bancarios TEXT,
+    opinion_cumplimiento TEXT,
+    activo BOOLEAN DEFAULT true,
+    creado_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    actualizado_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Índice para código de proveedor
+CREATE INDEX IF NOT EXISTS idx_proveedores_codigo ON proveedores(codigo_proveedor);
+
+-- Índice para RFC
+CREATE INDEX IF NOT EXISTS idx_proveedores_rfc ON proveedores(rfc);
+
+-- Trigger para actualizar timestamp
+CREATE TRIGGER trigger_actualizar_proveedores
+    BEFORE UPDATE ON proveedores
+    FOR EACH ROW
+    EXECUTE FUNCTION actualizar_timestamp();
 CREATE TRIGGER trigger_actualizar_roles
     BEFORE UPDATE ON roles
     FOR EACH ROW
