@@ -37,7 +37,7 @@ export interface Proveedor {
   constancia_situacion_fiscal?: string
   datos_bancarios?: string
   opinion_cumplimiento?: string
-  saldo?: number
+  saldo: number
   activo: boolean
   creado_at: string
   actualizado_at: string

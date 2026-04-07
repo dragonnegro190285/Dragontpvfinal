@@ -3,11 +3,9 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin'
 
 export async function GET() {
   try {
-    // Usar query normal por ahora hasta que se agregue la columna saldo
+    // Usar RPC para evitar caché de Supabase
     const { data: proveedores, error } = await supabaseAdmin
-      .from('proveedores')
-      .select('*')
-      .order('creado_at', { ascending: false })
+      .rpc('get_proveedores')
 
     if (error) {
       console.error('Error en query de proveedores:', error)
