@@ -3,10 +3,9 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin'
 
 export async function GET() {
   try {
+    // Usar RPC para evitar caché de Supabase
     const { data: proveedores, error } = await supabaseAdmin
-      .from('proveedores')
-      .select('*')
-      .order('creado_at', { ascending: false })
+      .rpc('get_proveedores')
 
     if (error) {
       console.error('Error en query de proveedores:', error)
@@ -14,6 +13,7 @@ export async function GET() {
     }
 
     console.log('Proveedores obtenidos:', proveedores?.length || 0)
+    console.log('Datos de proveedores:', JSON.stringify(proveedores, null, 2))
 
     return NextResponse.json(
       { proveedores },

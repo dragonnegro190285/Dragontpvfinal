@@ -98,6 +98,38 @@ CREATE TRIGGER trigger_actualizar_proveedores
     BEFORE UPDATE ON proveedores
     FOR EACH ROW
     EXECUTE FUNCTION actualizar_timestamp();
+
+-- Función RPC para obtener proveedores
+CREATE OR REPLACE FUNCTION get_proveedores()
+RETURNS TABLE (
+    id UUID,
+    razon_social VARCHAR(255),
+    nombre_comercial VARCHAR(255),
+    codigo_proveedor VARCHAR(50),
+    rfc VARCHAR(13),
+    direccion_fiscal TEXT,
+    telefono VARCHAR(20),
+    correo_electronico VARCHAR(255),
+    persona_contacto VARCHAR(255),
+    condiciones_pago TEXT,
+    tiempos_entrega TEXT,
+    categoria_suministro VARCHAR(100),
+    constancia_situacion_fiscal TEXT,
+    datos_bancarios TEXT,
+    opinion_cumplimiento TEXT,
+    saldo DECIMAL(15,2),
+    activo BOOLEAN,
+    creado_at TIMESTAMP WITH TIME ZONE,
+    actualizado_at TIMESTAMP WITH TIME ZONE
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT * FROM proveedores
+  ORDER BY creado_at DESC;
+END;
+$$;
 CREATE TRIGGER trigger_actualizar_roles
     BEFORE UPDATE ON roles
     FOR EACH ROW
