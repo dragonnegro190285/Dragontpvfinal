@@ -77,7 +77,7 @@ export default function DashboardPage() {
             {isAdmin && (
               <button
                 className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
-                onClick={() => console.log('Gestión de usuarios')}
+                onClick={() => router.push('/usuarios')}
               >
                 👥 Gestión de Usuarios
               </button>

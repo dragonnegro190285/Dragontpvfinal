@@ -1,17 +1,31 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabaseAdmin'
 
 export async function GET() {
   try {
-    // Verificar si existe algún usuario con rol de admin usando join
-    const { data: usuarios, error } = await supabase
+    // Paso 1: Obtener el ID del rol admin
+    const { data: role, error: roleError } = await supabaseAdmin
+      .from('roles')
+      .select('id')
+      .eq('nombre', 'admin')
+      .single()
+
+    if (roleError || !role) {
+      console.error('Error obteniendo rol admin:', roleError)
+      return NextResponse.json({ hasAdmin: false })
+    }
+
+    console.log('Rol admin ID:', role.id)
+
+    // Paso 2: Verificar si existe algún usuario con ese rol_id
+    const { data: usuarios, error: userError } = await supabaseAdmin
       .from('usuarios')
-      .select('id, roles(nombre)')
-      .eq('roles.nombre', 'admin')
+      .select('id')
+      .eq('rol_id', role.id)
       .limit(1)
 
-    if (error) {
-      console.error('Error verificando admin:', error)
+    if (userError) {
+      console.error('Error verificando usuarios:', userError)
       return NextResponse.json({ hasAdmin: false })
     }
 

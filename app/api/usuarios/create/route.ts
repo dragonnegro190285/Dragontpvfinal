@@ -4,7 +4,7 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin'
 
 export async function POST(request: Request) {
   try {
-    const { email, password, nombre, apellido } = await request.json()
+    const { email, password, nombre, apellido, rol_id } = await request.json()
 
     // Crear usuario en Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -20,24 +20,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Error al crear usuario' }, { status: 500 })
     }
 
-    // Obtener el rol de admin
-    const { data: role } = await supabaseAdmin
-      .from('roles')
-      .select('id')
-      .eq('nombre', 'admin')
-      .single()
-
-    if (!role) {
-      return NextResponse.json({ error: 'Rol de admin no encontrado' }, { status: 500 })
-    }
-
     // Crear registro en la tabla usuarios
     const { error: userError } = await supabaseAdmin.from('usuarios').insert({
       auth_id: authData.user.id,
       email,
       nombre,
       apellido,
-      rol_id: role.id,
+      rol_id,
       activo: true,
     })
 
@@ -45,8 +34,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: userError.message }, { status: 500 })
     }
 
-    return NextResponse.json({ success: true, message: 'Administrador creado exitosamente' })
+    return NextResponse.json({ success: true, message: 'Usuario creado exitosamente' })
   } catch (error) {
+    console.error('Error al crear usuario:', error)
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })
   }
 }
