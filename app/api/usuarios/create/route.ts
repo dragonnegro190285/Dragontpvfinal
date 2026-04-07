@@ -17,6 +17,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'La contraseña debe tener al menos 6 caracteres' }, { status: 400 })
     }
 
+    // Validar rol_id
+    if (!rol_id) {
+      return NextResponse.json({ error: 'Debe seleccionar un rol' }, { status: 400 })
+    }
+
     // Verificar si el email ya existe en auth.users
     const { data: existingUser } = await supabaseAdmin.auth.admin.listUsers()
     const userExists = existingUser.users.find(u => u.email === email)
@@ -40,15 +45,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Error al crear usuario en auth' }, { status: 500 })
     }
 
-    // Obtener el rol de admin
+    // Verificar que el rol existe
     const { data: role } = await supabaseAdmin
       .from('roles')
       .select('id')
-      .eq('nombre', 'admin')
+      .eq('id', rol_id)
       .single()
 
     if (!role) {
-      return NextResponse.json({ error: 'Rol de admin no encontrado' }, { status: 500 })
+      return NextResponse.json({ error: 'Rol no encontrado' }, { status: 400 })
     }
 
     // Crear registro en la tabla usuarios
