@@ -3,26 +3,23 @@ import { supabase } from '@/lib/supabase'
 
 export async function GET() {
   try {
-    // Verificar si existe algún usuario con rol de admin
-    const { data: roles } = await supabase
-      .from('roles')
-      .select('id')
-      .eq('nombre', 'admin')
-      .single()
+    // Verificar si existe algún usuario con rol de admin usando join
+    const { data: usuarios, error } = await supabase
+      .from('usuarios')
+      .select('id, roles(nombre)')
+      .eq('roles.nombre', 'admin')
+      .limit(1)
 
-    if (!roles) {
+    if (error) {
+      console.error('Error verificando admin:', error)
       return NextResponse.json({ hasAdmin: false })
     }
 
-    const { data: usuarios } = await supabase
-      .from('usuarios')
-      .select('id')
-      .eq('rol_id', roles.id)
-      .limit(1)
-
     const hasAdmin = usuarios && usuarios.length > 0
+    console.log('HasAdmin:', hasAdmin, 'Usuarios:', usuarios)
     return NextResponse.json({ hasAdmin })
   } catch (error) {
+    console.error('Error en check-admin:', error)
     return NextResponse.json({ hasAdmin: false })
   }
 }
