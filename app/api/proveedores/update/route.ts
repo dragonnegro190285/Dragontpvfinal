@@ -3,7 +3,12 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin'
 
 export async function PUT(request: Request) {
   try {
-    const { id, ...data } = await request.json()
+    const body = await request.json()
+    console.log('Datos recibidos en update:', body)
+    const { id, ...data } = body
+
+    console.log('ID:', id)
+    console.log('Data a actualizar:', data)
 
     const { error } = await supabaseAdmin
       .from('proveedores')
@@ -12,6 +17,9 @@ export async function PUT(request: Request) {
         actualizado_at: new Date().toISOString(),
       })
       .eq('id', id)
+      .select()
+
+    console.log('Error de Supabase:', error)
 
     if (error) {
       console.error('Error al actualizar proveedor:', error)

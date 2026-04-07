@@ -16,7 +16,7 @@ export default function ProveedoresPage() {
 
   const loadProveedores = async () => {
     try {
-      const response = await fetch(`/api/proveedores?t=${Date.now()}`)
+      const response = await fetch(`/api/proveedores?t=${Date.now()}&r=${Math.random().toString(36).substring(7)}`)
       const data = await response.json()
       setProveedores(data.proveedores || [])
     } catch (err) {
