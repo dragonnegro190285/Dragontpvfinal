@@ -176,7 +176,15 @@ export default function UsuariosPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">Gestión de Usuarios</h1>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
+              >
+                ← Volver
+              </button>
+              <h1 className="text-2xl font-bold">Gestión de Usuarios</h1>
+            </div>
             <button
               onClick={handleCreate}
               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
