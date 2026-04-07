@@ -3,9 +3,10 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin'
 
 export async function GET() {
   try {
+    // Obtener usuarios sin join
     const { data: usuarios, error } = await supabaseAdmin
       .from('usuarios')
-      .select('*, roles(*)')
+      .select('*')
       .order('creado_at', { ascending: false })
 
     if (error) {
@@ -13,10 +14,20 @@ export async function GET() {
       throw error
     }
 
-    console.log('Usuarios obtenidos:', usuarios?.length || 0)
-    console.log('Usuarios:', JSON.stringify(usuarios, null, 2))
+    // Obtener roles
+    const { data: roles } = await supabaseAdmin
+      .from('roles')
+      .select('*')
 
-    return NextResponse.json({ usuarios })
+    // Combinar usuarios con roles
+    const usuariosConRoles = usuarios?.map(usuario => ({
+      ...usuario,
+      roles: roles?.find(rol => rol.id === usuario.rol_id) || null
+    })) || []
+
+    console.log('Usuarios obtenidos:', usuariosConRoles.length)
+
+    return NextResponse.json({ usuarios: usuariosConRoles })
   } catch (error) {
     console.error('Error al obtener usuarios:', error)
     return NextResponse.json({ error: 'Error al obtener usuarios' }, { status: 500 })
