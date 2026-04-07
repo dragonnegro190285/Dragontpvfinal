@@ -121,6 +121,23 @@ export default function UsuariosPage() {
           const data = await response.json()
           throw new Error(data.error)
         }
+
+        // Si se proporcionó una nueva contraseña, actualizarla
+        if (formData.password) {
+          const passwordResponse = await fetch('/api/usuarios/change-password', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: editingUser.id,
+              newPassword: formData.password,
+            }),
+          })
+
+          if (!passwordResponse.ok) {
+            const data = await passwordResponse.json()
+            throw new Error(data.error)
+          }
+        }
       } else {
         // Crear usuario
         const response = await fetch('/api/usuarios/create', {
@@ -291,29 +308,28 @@ export default function UsuariosPage() {
                 />
               </div>
 
-              {!editingUser && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Contraseña
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md pr-10"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                    >
-                      {showPassword ? '🙈' : '👁️'}
-                    </button>
-                  </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Contraseña {editingUser && '(opcional - dejar vacío para mantener actual)'}
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md pr-10"
+                    required={!editingUser}
+                    placeholder={editingUser ? 'Dejar vacío para no cambiar' : ''}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? '🙈' : '👁️'}
+                  </button>
                 </div>
-              )}
+              </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
