@@ -5,7 +5,9 @@ export async function GET() {
   try {
     // Usar RPC para evitar caché de Supabase
     const { data: usuarios, error } = await supabaseAdmin
-      .rpc('get_usuarios_with_roles')
+      .rpc('get_usuarios_with_roles', { 
+        _timestamp: Date.now()
+      })
 
     if (error) {
       console.error('Error en query de usuarios:', error)
