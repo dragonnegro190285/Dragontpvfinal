@@ -108,6 +108,9 @@ export default function UsuariosPage() {
     try {
       if (editingUser) {
         // Actualizar usuario
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 segundos timeout
+
         const response = await fetch('/api/usuarios/update', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -115,7 +118,10 @@ export default function UsuariosPage() {
             id: editingUser.id,
             ...formData,
           }),
+          signal: controller.signal,
         })
+
+        clearTimeout(timeoutId)
 
         if (!response.ok) {
           const data = await response.json()
@@ -124,6 +130,9 @@ export default function UsuariosPage() {
 
         // Si se proporcionó una nueva contraseña, actualizarla
         if (formData.password) {
+          const passwordController = new AbortController()
+          const passwordTimeoutId = setTimeout(() => passwordController.abort(), 10000)
+
           const passwordResponse = await fetch('/api/usuarios/change-password', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -131,7 +140,10 @@ export default function UsuariosPage() {
               userId: editingUser.id,
               newPassword: formData.password,
             }),
+            signal: passwordController.signal,
           })
+
+          clearTimeout(passwordTimeoutId)
 
           if (!passwordResponse.ok) {
             const data = await passwordResponse.json()
@@ -140,11 +152,17 @@ export default function UsuariosPage() {
         }
       } else {
         // Crear usuario
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 15000) // 15 segundos timeout para creación
+
         const response = await fetch('/api/usuarios/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
+          signal: controller.signal,
         })
+
+        clearTimeout(timeoutId)
 
         if (!response.ok) {
           const data = await response.json()
@@ -165,7 +183,11 @@ export default function UsuariosPage() {
       })
       await loadUsuarios()
     } catch (err: any) {
-      setError(err.message)
+      if (err.name === 'AbortError') {
+        setError('La operación tardó demasiado. Inténtalo de nuevo.')
+      } else {
+        setError(err.message)
+      }
     } finally {
       setLoading(false)
     }
