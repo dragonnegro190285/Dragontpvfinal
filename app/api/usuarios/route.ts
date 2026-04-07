@@ -26,6 +26,7 @@ export async function GET() {
     })) || []
 
     console.log('Usuarios obtenidos:', usuariosConRoles.length)
+    console.log('Datos de usuarios:', JSON.stringify(usuariosConRoles, null, 2))
 
     return NextResponse.json({ usuarios: usuariosConRoles })
   } catch (error) {
