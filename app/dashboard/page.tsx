@@ -45,8 +45,16 @@ export default function DashboardPage() {
   }
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.push('/login')
+    try {
+      await supabase.auth.signOut()
+      router.push('/login')
+      // Forzar recarga para limpiar el estado
+      window.location.href = '/login'
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error)
+      // En caso de error, forzar redirección
+      window.location.href = '/login'
+    }
   }
 
   const isAdmin = usuario?.roles?.nombre === 'admin'
