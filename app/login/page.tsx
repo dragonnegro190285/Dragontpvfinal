@@ -4,6 +4,14 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 
+interface Usuario {
+  id: string
+  email: string
+  nombre: string
+  apellido?: string
+  roles?: { nombre: string }
+}
+
 export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
@@ -13,10 +21,15 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [hasAdmin, setHasAdmin] = useState<boolean | null>(null)
+  const [usuarios, setUsuarios] = useState<Usuario[]>([])
+  const [selectedUser, setSelectedUser] = useState<Usuario | null>(null)
 
   useEffect(() => {
     checkAdminExists()
-  }, [])
+    if (hasAdmin) {
+      loadUsuarios()
+    }
+  }, [hasAdmin])
 
   const checkAdminExists = async () => {
     try {
@@ -26,6 +39,25 @@ export default function LoginPage() {
     } catch (err) {
       console.error('Error al verificar admin:', err)
       setHasAdmin(true) // Por defecto asumimos que hay admin
+    }
+  }
+
+  const loadUsuarios = async () => {
+    try {
+      const response = await fetch('/api/usuarios')
+      const data = await response.json()
+      setUsuarios(data.usuarios || [])
+    } catch (err) {
+      console.error('Error al cargar usuarios:', err)
+    }
+  }
+
+  const handleUserSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const userId = e.target.value
+    const user = usuarios.find(u => u.id === userId)
+    if (user) {
+      setSelectedUser(user)
+      setEmail(user.email)
     }
   }
 
@@ -138,6 +170,32 @@ export default function LoginPage() {
             </>
           )}
 
+          {hasAdmin && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Seleccionar Usuario
+              </label>
+              <select
+                value={selectedUser?.id || ''}
+                onChange={handleUserSelect}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              >
+                <option value="">Selecciona un usuario</option>
+                {usuarios.map((usuario) => (
+                  <option key={usuario.id} value={usuario.id}>
+                    {usuario.nombre} {usuario.apellido} - {usuario.email}
+                  </option>
+                ))}
+              </select>
+              {selectedUser && selectedUser.roles && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Rol: <span className="font-semibold">{selectedUser.roles.nombre}</span>
+                </p>
+              )}
+            </div>
+          )}
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Email
@@ -148,6 +206,8 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
+              disabled={hasAdmin}
+              readOnly={hasAdmin}
             />
           </div>
 
