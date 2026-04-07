@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Proveedor } from '@/lib/types'
 
 export default function ProveedoresPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const action = searchParams.get('action')
   const [proveedores, setProveedores] = useState<Proveedor[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -32,6 +34,12 @@ export default function ProveedoresPage() {
   useEffect(() => {
     loadProveedores()
   }, [])
+
+  useEffect(() => {
+    if (action === 'create') {
+      handleCreate()
+    }
+  }, [action])
 
   const loadProveedores = async () => {
     try {

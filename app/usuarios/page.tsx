@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Usuario } from '@/lib/types'
 
 interface Role {
@@ -11,6 +11,8 @@ interface Role {
 
 export default function UsuariosPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const action = searchParams.get('action')
   const [usuarios, setUsuarios] = useState<(Usuario & { roles: Role })[]>([])
   const [roles, setRoles] = useState<Role[]>([])
   const [loading, setLoading] = useState(true)
@@ -31,6 +33,12 @@ export default function UsuariosPage() {
     loadUsuarios()
     loadRoles()
   }, [])
+
+  useEffect(() => {
+    if (action === 'create') {
+      handleCreate()
+    }
+  }, [action])
 
   const loadUsuarios = async () => {
     try {

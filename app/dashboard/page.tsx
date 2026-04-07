@@ -74,19 +74,37 @@ export default function DashboardPage() {
         <div className="p-4">
           <h2 className="text-xl font-bold mb-6">Menú</h2>
           <nav className="space-y-2">
-            <button
-              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
-              onClick={() => router.push('/proveedores')}
-            >
-              📦 Gestión de Proveedores
-            </button>
-            {isAdmin && (
+            <div>
+              <h3 className="text-sm font-semibold text-gray-400 mb-2 px-4">Proveedores</h3>
               <button
-                className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
-                onClick={() => router.push('/usuarios')}
+                className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors ml-2"
+                onClick={() => router.push('/proveedores')}
               >
-                👥 Gestión de Usuarios
+                📦 Ver Proveedores
               </button>
+              <button
+                className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors ml-2"
+                onClick={() => router.push('/proveedores?action=create')}
+              >
+                ➕ Crear Proveedor
+              </button>
+            </div>
+            {isAdmin && (
+              <div>
+                <h3 className="text-sm font-semibold text-gray-400 mb-2 px-4">Usuarios</h3>
+                <button
+                  className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors ml-2"
+                  onClick={() => router.push('/usuarios')}
+                >
+                  👥 Ver Usuarios
+                </button>
+                <button
+                  className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors ml-2"
+                  onClick={() => router.push('/usuarios?action=create')}
+                >
+                  ➕ Crear Usuario
+                </button>
+              </div>
             )}
           </nav>
         </div>
