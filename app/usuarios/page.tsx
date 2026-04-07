@@ -136,7 +136,9 @@ export default function UsuariosPage() {
       }
 
       setShowModal(false)
-      loadUsuarios()
+      setEditingUser(null)
+      setError('')
+      await loadUsuarios()
     } catch (err: any) {
       setError(err.message)
     } finally {
