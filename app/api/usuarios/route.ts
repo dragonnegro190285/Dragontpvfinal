@@ -8,7 +8,13 @@ export async function GET() {
       .select('*, roles(*)')
       .order('creado_at', { ascending: false })
 
-    if (error) throw error
+    if (error) {
+      console.error('Error en query de usuarios:', error)
+      throw error
+    }
+
+    console.log('Usuarios obtenidos:', usuarios?.length || 0)
+    console.log('Usuarios:', JSON.stringify(usuarios, null, 2))
 
     return NextResponse.json({ usuarios })
   } catch (error) {
