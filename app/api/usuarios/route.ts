@@ -28,7 +28,16 @@ export async function GET() {
     console.log('Usuarios obtenidos:', usuariosConRoles.length)
     console.log('Datos de usuarios:', JSON.stringify(usuariosConRoles, null, 2))
 
-    return NextResponse.json({ usuarios: usuariosConRoles })
+    return NextResponse.json(
+      { usuarios: usuariosConRoles },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
+      }
+    )
   } catch (error) {
     console.error('Error al obtener usuarios:', error)
     return NextResponse.json({ error: 'Error al obtener usuarios' }, { status: 500 })
