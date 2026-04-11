@@ -47,7 +47,7 @@ SELECT modulo, accion, descripcion FROM (
   ('permisos', 'ver', 'Ver permisos'),
   ('permisos', 'gestionar', 'Gestionar permisos'),
   
-  -- Permisos adicionales para llegar a 40 (9 nuevos)
+  -- Permisos adicionales para llegar a 56 (16 nuevos)
   ('inventario', 'ver', 'Ver inventario'),
   ('inventario', 'ajustar', 'Ajustar inventario'),
   ('inventario', 'movimientos', 'Ver movimientos de inventario'),
@@ -56,7 +56,16 @@ SELECT modulo, accion, descripcion FROM (
   ('sistema', 'backup', 'Realizar backup'),
   ('sistema', 'restaurar', 'Restaurar backup'),
   ('auditoria', 'ver', 'Ver auditoría'),
-  ('auditoria', 'exportar', 'Exportar auditoría')
+  ('auditoria', 'exportar', 'Exportar auditoría'),
+  ('categorias', 'crear', 'Crear categorías'),
+  ('categorias', 'modificar', 'Modificar categorías'),
+  ('categorias', 'ver', 'Ver categorías'),
+  ('categorias', 'eliminar', 'Eliminar categorías'),
+  ('promociones', 'crear', 'Crear promociones'),
+  ('promociones', 'modificar', 'Modificar promociones'),
+  ('promociones', 'ver', 'Ver promociones'),
+  ('promociones', 'eliminar', 'Eliminar promociones'),
+  ('promociones', 'exportar', 'Exportar promociones')
 ) AS permisos_data(modulo, accion, descripcion)
 WHERE NOT EXISTS (
   SELECT 1 FROM permisos 
@@ -70,7 +79,7 @@ SELECT COUNT(*) as total_permisos FROM permisos;
 -- Ver todos los permisos disponibles
 SELECT modulo, accion, descripcion FROM permisos ORDER BY modulo, accion;
 
--- Asignar TODOS los permisos al rol admin (40 permisos)
+-- Asignar TODOS los permisos al rol admin (56 permisos)
 INSERT INTO roles_permisos (rol_id, permiso_id)
 SELECT 
   r.id,
@@ -84,7 +93,7 @@ AND NOT EXISTS (
   AND rp.permiso_id = p.id
 );
 
--- Asignar permisos al rol cajero (10 permisos)
+-- Asignar permisos al rol cajero (12 permisos)
 INSERT INTO roles_permisos (rol_id, permiso_id)
 SELECT 
   r.id,
@@ -92,7 +101,7 @@ SELECT
 FROM roles r
 CROSS JOIN permisos p
 WHERE r.nombre = 'cajero'
-AND p.modulo IN ('ventas', 'clientes', 'productos')
+AND p.modulo IN ('ventas', 'clientes', 'productos', 'promociones')
 AND p.accion IN ('ver', 'crear', 'modificar')
 AND NOT EXISTS (
   SELECT 1 FROM roles_permisos rp 
@@ -100,7 +109,7 @@ AND NOT EXISTS (
   AND rp.permiso_id = p.id
 );
 
--- Asignar permisos al rol gerente (42 permisos - casi todos)
+-- Asignar permisos al rol gerente (54 permisos - casi todos)
 INSERT INTO roles_permisos (rol_id, permiso_id)
 SELECT 
   r.id,
