@@ -123,8 +123,8 @@ export default function PermisosPage() {
       setData(finalData)
       
       if (finalData.roles.length > 0) {
+        console.log('Datos establecidos, seleccionando rol...')
         setSelectedRol(finalData.roles[0].id)
-        console.log('Rol seleccionado:', finalData.roles[0].id)
         
         // Mostrar resumen de permisos cargados
         const rolActual = finalData.roles[0]
@@ -132,11 +132,15 @@ export default function PermisosPage() {
           sum + Object.values(mod).filter(Boolean).length, 0)
         console.log(`Resumen - Rol: ${rolActual.nombre}, Permisos: ${totalPermisos}`)
         
-        // Forzar actualización de React para que los checkboxes se activen
+        // Forzar actualización inmediata de React para que los checkboxes se activen
+        setCheckboxKey(prev => prev + 1)
+        
+        // Forzar actualización adicional después de un pequeño retraso
         setTimeout(() => {
+          console.log('Forzando segunda actualización...')
           setSelectedRol(finalData.roles[0].id)
-          setCheckboxKey(prev => prev + 1) // Forzar re-render de checkboxes
-        }, 100)
+          setCheckboxKey(prev => prev + 1)
+        }, 200)
       }
     } catch (err: any) {
       console.error('Error al cargar permisos:', err)
@@ -393,19 +397,32 @@ export default function PermisosPage() {
   // Debug: Log cuando cambia el rol seleccionado
   useEffect(() => {
     if (selectedRolData) {
-      console.log('Rol seleccionado cambiado:', selectedRolData.nombre)
-      console.log('Permisos del rol:', selectedRolData.permisos)
+      console.log('=== ROL SELECCIONADO CAMBIADO ===')
+      console.log('Rol:', selectedRolData.nombre)
+      console.log('ID:', selectedRolData.id)
+      console.log('CheckboxKey:', checkboxKey)
       
       // Contar permisos activos
       const totalActivos = Object.values(selectedRolData.permisos).reduce((sum: number, mod: any) => 
         sum + Object.values(mod).filter(Boolean).length, 0)
       console.log('Total permisos activos:', totalActivos)
       
+      // Verificar estructura de permisos
+      console.log('Estructura de permisos:', Object.keys(selectedRolData.permisos))
+      
       // Verificar permisos específicos
       console.log('Permiso usuarios:crear:', selectedRolData.permisos['usuarios']?.['crear'])
       console.log('Permiso productos:ver:', selectedRolData.permisos['productos']?.['ver'])
+      console.log('Permiso empresa:ver:', selectedRolData.permisos['empresa']?.['ver'])
+      console.log('=====================================')
+      
+      // Forzar re-renderizado de checkboxes
+      setTimeout(() => {
+        setCheckboxKey(prev => prev + 1)
+        console.log('Forzando re-render de checkboxes por cambio de rol')
+      }, 50)
     }
-  }, [selectedRolData])
+  }, [selectedRolData, checkboxKey])
 
   if (loading) {
     return (
@@ -540,9 +557,19 @@ export default function PermisosPage() {
                                 disabled={saving}
                                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                               />
-                              {/* Debug info */}
-                              {modulo === 'usuarios' && accion === 'crear' && (
-                                <span className="text-xs text-red-500 ml-2">
+                              {/* Debug info para varios módulos */}
+                              {(modulo === 'usuarios' && accion === 'crear') && (
+                                <span className="text-xs text-red-500 ml-1">
+                                  {isChecked ? 'ON' : 'OFF'}
+                                </span>
+                              )}
+                              {(modulo === 'empresa' && accion === 'ver') && (
+                                <span className="text-xs text-green-500 ml-1">
+                                  {isChecked ? 'ON' : 'OFF'}
+                                </span>
+                              )}
+                              {(modulo === 'productos' && accion === 'ver') && (
+                                <span className="text-xs text-blue-500 ml-1">
                                   {isChecked ? 'ON' : 'OFF'}
                                 </span>
                               )}
