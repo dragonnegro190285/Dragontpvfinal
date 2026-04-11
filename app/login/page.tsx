@@ -74,6 +74,20 @@ export default function LoginPage() {
 
       if (error) throw error
 
+      // Guardar información del usuario en localStorage para persistencia
+      if (selectedUser) {
+        const usuarioData = {
+          id: selectedUser.id,
+          email: selectedUser.email,
+          nombre: selectedUser.nombre,
+          apellido: selectedUser.apellido,
+          rol: selectedUser.roles?.nombre || 'cajero'
+        }
+        
+        localStorage.setItem('usuario-actual', JSON.stringify(usuarioData))
+        console.log('Usuario guardado en localStorage:', usuarioData)
+      }
+
       router.push('/dashboard')
     } catch (err: any) {
       setError(err.message || 'Error al iniciar sesión')
@@ -110,6 +124,18 @@ export default function LoginPage() {
 
       if (authError) throw authError
 
+      // Guardar información del usuario en localStorage para persistencia
+      const usuarioData = {
+        id: data.usuario?.id || 'admin-id',
+        email: email,
+        nombre: nombre,
+        apellido: apellido,
+        rol: 'admin'
+      }
+      
+      localStorage.setItem('usuario-actual', JSON.stringify(usuarioData))
+      console.log('Usuario admin guardado en localStorage:', usuarioData)
+
       router.push('/dashboard')
     } catch (err: any) {
       setError(err.message || 'Error al crear administrador')
@@ -127,9 +153,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold text-center mb-6">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <div className="bg-white p-6 md:p-8 rounded-lg shadow-md w-full max-w-md">
+        <h1 className="text-xl md:text-2xl font-bold text-center mb-6">
           {hasAdmin ? 'TPV Online - Login' : 'Crear Primer Administrador'}
         </h1>
         
