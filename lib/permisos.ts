@@ -43,10 +43,25 @@ function obtenerPermisosGlobales(): any[] {
 
 export async function verificarPermiso(usuarioId: string, modulo: string, accion: string): Promise<boolean> {
   try {
-    // PRIMERO: Verificar en localStorage
-    const permisosLocales = obtenerPermisosDesdeLocalStorage(usuarioId)
-    if (permisosLocales.includes(`${modulo}:${accion}`)) {
-      return true
+    // PRIMERO: Intentar verificar en API (100% online)
+    try {
+      const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+        auth: { autoRefreshToken: false, persistSession: false }
+      })
+
+      const { data, error } = await supabase
+        .rpc('verificar_permiso', {
+          usuario_id: usuarioId,
+          modulo: modulo,
+          accion: accion
+        })
+
+      if (!error && data) {
+        console.log('Permiso verificado desde API:', { usuarioId, modulo, accion, resultado: data })
+        return data
+      }
+    } catch (apiError) {
+      console.log('Error en API, usando fallback:', apiError)
     }
 
     // SEGUNDO: Verificar en permisos globales (sistema de gestión)
@@ -55,10 +70,11 @@ export async function verificarPermiso(usuarioId: string, modulo: string, accion
     if (usuarioActual) {
       try {
         const usuario = JSON.parse(usuarioActual)
-        const rolUsuario = usuario.rol || 'cajero' // rol por defecto
+        const rolUsuario = usuario.rol || 'cajero'
         
         const rolPermisos = permisosGlobales.find((r: any) => r.nombre === rolUsuario)
         if (rolPermisos && rolPermisos.permisos[modulo] && rolPermisos.permisos[modulo][accion]) {
+          console.log('Permiso verificado desde permisos globales:', { usuarioId, rol: rolUsuario, modulo, accion })
           return true
         }
       } catch (error) {
@@ -66,24 +82,15 @@ export async function verificarPermiso(usuarioId: string, modulo: string, accion
       }
     }
 
-    // TERCERO: Verificar en API si todo lo demás falla
-    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: { autoRefreshToken: false, persistSession: false }
-    })
-
-    const { data, error } = await supabase
-      .rpc('verificar_permiso', {
-        usuario_id: usuarioId,
-        modulo: modulo,
-        accion: accion
-      })
-
-    if (error) {
-      console.error('Error al verificar permiso:', error)
-      return false
+    // TERCERO: Verificar en localStorage (backup final)
+    const permisosLocales = obtenerPermisosDesdeLocalStorage(usuarioId)
+    if (permisosLocales.includes(`${modulo}:${accion}`)) {
+      console.log('Permiso verificado desde localStorage (backup):', { usuarioId, modulo, accion })
+      return true
     }
 
-    return data || false
+    console.log('Permiso denegado:', { usuarioId, modulo, accion })
+    return false
   } catch (error) {
     console.error('Error al verificar permiso:', error)
     return false
@@ -92,10 +99,42 @@ export async function verificarPermiso(usuarioId: string, modulo: string, accion
 
 export async function obtenerPermisosUsuario(usuarioId: string): Promise<string[]> {
   try {
-    // PRIMERO: Intentar obtener desde localStorage
-    const permisosLocales = obtenerPermisosDesdeLocalStorage(usuarioId)
-    if (permisosLocales.length > 0) {
-      return permisosLocales
+    // PRIMERO: Intentar obtener desde API (100% online)
+    try {
+      const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+        auth: { autoRefreshToken: false, persistSession: false }
+      })
+
+      const { data, error } = await supabase
+        .from('usuarios')
+        .select(`
+          roles (
+            roles_permisos (
+              permisos (modulo, accion)
+            )
+          )
+        `)
+        .eq('id', usuarioId)
+        .single()
+
+      if (!error && data) {
+        const permisos: string[] = []
+        const roles = data.roles as any
+        if (roles && roles.roles_permisos) {
+          roles.roles_permisos.forEach((rp: any) => {
+            if (rp.permisos) {
+              permisos.push(`${rp.permisos.modulo}:${rp.permisos.accion}`)
+            }
+          })
+        }
+        
+        // Guardar en localStorage como backup
+        guardarPermisosEnLocalStorage(usuarioId, permisos)
+        console.log('Permisos cargados desde API:', { usuarioId, total: permisos.length })
+        return permisos
+      }
+    } catch (apiError) {
+      console.log('Error en API, usando fallback:', apiError)
     }
 
     // SEGUNDO: Obtener desde permisos globales
@@ -119,6 +158,7 @@ export async function obtenerPermisosUsuario(usuarioId: string): Promise<string[
           
           // Guardar en localStorage para futuras consultas
           guardarPermisosEnLocalStorage(usuarioId, permisos)
+          console.log('Permisos cargados desde globales:', { usuarioId, rol: rolUsuario, total: permisos.length })
           return permisos
         }
       } catch (error) {
@@ -126,41 +166,15 @@ export async function obtenerPermisosUsuario(usuarioId: string): Promise<string[
       }
     }
 
-    // TERCERO: Obtener desde API
-    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: { autoRefreshToken: false, persistSession: false }
-    })
-
-    const { data, error } = await supabase
-      .from('usuarios')
-      .select(`
-        roles (
-          roles_permisos (
-            permisos (modulo, accion)
-          )
-        )
-      `)
-      .eq('id', usuarioId)
-      .single()
-
-    if (error) {
-      console.error('Error al obtener permisos:', error)
-      return []
+    // TERCERO: Obtener desde localStorage (backup final)
+    const permisosLocales = obtenerPermisosDesdeLocalStorage(usuarioId)
+    if (permisosLocales.length > 0) {
+      console.log('Permisos cargados desde localStorage (backup):', { usuarioId, total: permisosLocales.length })
+      return permisosLocales
     }
 
-    const permisos: string[] = []
-    const roles = data.roles as any
-    if (roles && roles.roles_permisos) {
-      roles.roles_permisos.forEach((rp: any) => {
-        if (rp.permisos) {
-          permisos.push(`${rp.permisos.modulo}:${rp.permisos.accion}`)
-        }
-      })
-    }
-
-    // Guardar en localStorage
-    guardarPermisosEnLocalStorage(usuarioId, permisos)
-    return permisos
+    console.log('No se encontraron permisos para el usuario:', usuarioId)
+    return []
   } catch (error) {
     console.error('Error al obtener permisos:', error)
     return []
