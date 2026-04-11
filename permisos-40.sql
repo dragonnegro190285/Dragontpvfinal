@@ -79,7 +79,7 @@ SELECT COUNT(*) as total_permisos FROM permisos;
 -- Ver todos los permisos disponibles
 SELECT modulo, accion, descripcion FROM permisos ORDER BY modulo, accion;
 
--- Asignar TODOS los permisos al rol admin (44 permisos)
+-- Asignar TODOS los permisos al rol admin (53 permisos)
 INSERT INTO roles_permisos (rol_id, permiso_id)
 SELECT 
   r.id,
@@ -109,7 +109,7 @@ AND NOT EXISTS (
   AND rp.permiso_id = p.id
 );
 
--- Asignar permisos al rol gerente (44 permisos - mismo que admin)
+-- Asignar permisos al rol gerente (53 permisos - mismo que admin)
 INSERT INTO roles_permisos (rol_id, permiso_id)
 SELECT 
   r.id,

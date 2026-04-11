@@ -153,7 +153,7 @@ export default function PermisosPage() {
           } else if (rol.nombre === 'cajero') {
             rol.permisos[modulo][accion] = ['ventas', 'clientes', 'productos'].includes(modulo) && ['ver', 'crear', 'modificar'].includes(accion)
           } else if (rol.nombre === 'gerente') {
-            rol.permisos[modulo][accion] = true // Gerente tiene todos los permisos (44)
+            rol.permisos[modulo][accion] = true // Gerente tiene todos los permisos (53)
           }
         })
       })
