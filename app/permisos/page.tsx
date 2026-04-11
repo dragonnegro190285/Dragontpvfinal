@@ -30,6 +30,7 @@ export default function PermisosPage() {
   const [selectedRol, setSelectedRol] = useState<string>('')
   const [saving, setSaving] = useState(false)
   const [offlineMode, setOfflineMode] = useState(false)
+  const [checkboxKey, setCheckboxKey] = useState(0) // Forzar re-render
 
   useEffect(() => {
     loadPermisos()
@@ -130,6 +131,12 @@ export default function PermisosPage() {
         const totalPermisos = Object.values(rolActual.permisos).reduce((sum: number, mod: any) => 
           sum + Object.values(mod).filter(Boolean).length, 0)
         console.log(`Resumen - Rol: ${rolActual.nombre}, Permisos: ${totalPermisos}`)
+        
+        // Forzar actualización de React para que los checkboxes se activen
+        setTimeout(() => {
+          setSelectedRol(finalData.roles[0].id)
+          setCheckboxKey(prev => prev + 1) // Forzar re-render de checkboxes
+        }, 100)
       }
     } catch (err: any) {
       console.error('Error al cargar permisos:', err)
@@ -526,6 +533,7 @@ export default function PermisosPage() {
                           return (
                             <td key={accion} className="px-6 py-4 whitespace-nowrap text-center">
                               <input
+                                key={`${modulo}-${accion}-${checkboxKey}`} // Forzar re-render
                                 type="checkbox"
                                 checked={isChecked}
                                 onChange={(e) => handlePermisoChange(selectedRol, modulo, accion, e.target.checked)}
