@@ -84,7 +84,7 @@ AND NOT EXISTS (
   AND rp.permiso_id = p.id
 );
 
--- Asignar permisos básicos al rol cajero (15 permisos)
+-- Asignar permisos al rol cajero (10 permisos)
 INSERT INTO roles_permisos (rol_id, permiso_id)
 SELECT 
   r.id,
@@ -92,7 +92,7 @@ SELECT
 FROM roles r
 CROSS JOIN permisos p
 WHERE r.nombre = 'cajero'
-AND p.modulo IN ('ventas', 'clientes', 'productos', 'inventario')
+AND p.modulo IN ('ventas', 'clientes', 'productos')
 AND p.accion IN ('ver', 'crear', 'modificar')
 AND NOT EXISTS (
   SELECT 1 FROM roles_permisos rp 
@@ -100,7 +100,7 @@ AND NOT EXISTS (
   AND rp.permiso_id = p.id
 );
 
--- Asignar permisos al rol gerente (35 permisos - casi todos menos backup/restaurar)
+-- Asignar permisos al rol gerente (42 permisos - casi todos)
 INSERT INTO roles_permisos (rol_id, permiso_id)
 SELECT 
   r.id,
@@ -108,7 +108,6 @@ SELECT
 FROM roles r
 CROSS JOIN permisos p
 WHERE r.nombre = 'gerente'
-AND p.modulo != 'sistema'
 AND NOT EXISTS (
   SELECT 1 FROM roles_permisos rp 
   WHERE rp.rol_id = r.id 
