@@ -31,6 +31,7 @@ export default function PermisosPage() {
   const [saving, setSaving] = useState(false)
   const [offlineMode, setOfflineMode] = useState(false)
   const [forceRender, setForceRender] = useState(0) // Forzar re-render completo
+  const [checkboxStates, setCheckboxStates] = useState<Record<string, boolean>>({}) // Estado directo
 
   useEffect(() => {
     loadPermisos()
@@ -394,7 +395,7 @@ export default function PermisosPage() {
 
   const selectedRolData = data?.roles.find(rol => rol.id === selectedRol)
 
-  // Debug: Log cuando cambia el rol seleccionado
+  // Debug: Log cuando cambia el rol seleccionado y sincronizar checkboxes
   useEffect(() => {
     if (selectedRolData) {
       console.log('=== ROL SELECCIONADO CAMBIADO ===')
@@ -402,13 +403,23 @@ export default function PermisosPage() {
       console.log('ID:', selectedRolData.id)
       console.log('ForceRender:', forceRender)
       
+      // Sincronizar estado directo de checkboxes
+      const newCheckboxStates: Record<string, boolean> = {}
+      data?.modulos.forEach(modulo => {
+        data?.acciones.forEach(accion => {
+          const key = `${modulo}-${accion}`
+          const isChecked = selectedRolData.permisos[modulo]?.[accion] || false
+          newCheckboxStates[key] = isChecked
+        })
+      })
+      
+      setCheckboxStates(newCheckboxStates)
+      console.log('Checkbox states sincronizados:', Object.keys(newCheckboxStates).length)
+      
       // Contar permisos activos
       const totalActivos = Object.values(selectedRolData.permisos).reduce((sum: number, mod: any) => 
         sum + Object.values(mod).filter(Boolean).length, 0)
       console.log('Total permisos activos:', totalActivos)
-      
-      // Verificar estructura de permisos
-      console.log('Estructura de permisos:', Object.keys(selectedRolData.permisos))
       
       // Verificar permisos específicos
       console.log('Permiso usuarios:crear:', selectedRolData.permisos['usuarios']?.['crear'])
@@ -416,13 +427,13 @@ export default function PermisosPage() {
       console.log('Permiso empresa:ver:', selectedRolData.permisos['empresa']?.['ver'])
       console.log('=====================================')
       
-      // Forzar re-renderizado de checkboxes
+      // Forzar re-renderizado completo
       setTimeout(() => {
         setForceRender(prev => prev + 1)
-        console.log('Forzando re-render de checkboxes por cambio de rol')
+        console.log('Forzando re-render completo')
       }, 50)
     }
-  }, [selectedRolData])
+  }, [selectedRolData, data])
 
   if (loading) {
     return (
@@ -546,7 +557,8 @@ export default function PermisosPage() {
                           {modulo.charAt(0).toUpperCase() + modulo.slice(1)}
                         </td>
                         {data.acciones.map(accion => {
-                          const isChecked = selectedRolData.permisos[modulo]?.[accion] || false
+                          const checkboxKey = `${modulo}-${accion}`
+                          const isChecked = checkboxStates[checkboxKey] || false
                           return (
                             <td key={accion} className="px-6 py-4 whitespace-nowrap text-center">
                               <input
