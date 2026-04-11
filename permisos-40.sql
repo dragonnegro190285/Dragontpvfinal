@@ -79,7 +79,7 @@ SELECT COUNT(*) as total_permisos FROM permisos;
 -- Ver todos los permisos disponibles
 SELECT modulo, accion, descripcion FROM permisos ORDER BY modulo, accion;
 
--- Asignar TODOS los permisos al rol admin (56 permisos)
+-- Asignar TODOS los permisos al rol admin (44 permisos)
 INSERT INTO roles_permisos (rol_id, permiso_id)
 SELECT 
   r.id,
@@ -93,7 +93,7 @@ AND NOT EXISTS (
   AND rp.permiso_id = p.id
 );
 
--- Asignar permisos al rol cajero (12 permisos)
+-- Asignar permisos al rol cajero (10 permisos)
 INSERT INTO roles_permisos (rol_id, permiso_id)
 SELECT 
   r.id,
@@ -101,7 +101,7 @@ SELECT
 FROM roles r
 CROSS JOIN permisos p
 WHERE r.nombre = 'cajero'
-AND p.modulo IN ('ventas', 'clientes', 'productos', 'promociones')
+AND p.modulo IN ('ventas', 'clientes', 'productos')
 AND p.accion IN ('ver', 'crear', 'modificar')
 AND NOT EXISTS (
   SELECT 1 FROM roles_permisos rp 
@@ -109,7 +109,7 @@ AND NOT EXISTS (
   AND rp.permiso_id = p.id
 );
 
--- Asignar permisos al rol gerente (54 permisos - casi todos)
+-- Asignar permisos al rol gerente (44 permisos - mismo que admin)
 INSERT INTO roles_permisos (rol_id, permiso_id)
 SELECT 
   r.id,
