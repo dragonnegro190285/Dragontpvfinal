@@ -39,7 +39,7 @@ export default function PermisosPage() {
     try {
       console.log('Cargando permisos...')
       
-      // PRIMERO: Verificar si hay datos guardados en localStorage (prioridad máxima)
+      // PRIMERO: Verificar si hay datos guardados en localStorage (prioridad absoluta)
       const savedData = localStorage.getItem('permisos-data')
       const savedPermisos = localStorage.getItem('permisos-guardados')
       
@@ -48,15 +48,20 @@ export default function PermisosPage() {
       if (savedData) {
         try {
           finalData = JSON.parse(savedData)
-          console.log('Datos cargados desde localStorage:', finalData)
+          console.log('Estructura cargada desde localStorage:', finalData)
           
-          // Si hay permisos guardados, aplicarlos
+          // SIEMPRE aplicar permisos guardados si existen
           if (savedPermisos) {
             const permisosGuardados = JSON.parse(savedPermisos)
+            console.log('Permisos guardados encontrados:', permisosGuardados)
+            
             finalData.roles = finalData.roles.map((rol: Rol) => {
               const rolGuardado = permisosGuardados.find((r: any) => r.id === rol.id)
               if (rolGuardado) {
-                console.log(`Aplicando permisos guardados para ${rol.nombre}:`, rolGuardado.permisos)
+                console.log(`Aplicando permisos guardados para ${rol.nombre}:`, {
+                  totalPermisos: Object.values(rolGuardado.permisos).reduce((sum: number, mod: any) => 
+                    sum + Object.values(mod).filter(Boolean).length, 0)
+                })
                 return { ...rol, permisos: rolGuardado.permisos }
               }
               return rol
@@ -64,13 +69,18 @@ export default function PermisosPage() {
           }
           
           setOfflineMode(true)
+          console.log('Modo offline activado - usando localStorage')
         } catch (parseError) {
-          console.log('Error al parsear localStorage, intentando API:', parseError)
+          console.error('Error al parsear localStorage:', parseError)
+          // Limpiar localStorage corrupto
+          localStorage.removeItem('permisos-data')
+          localStorage.removeItem('permisos-guardados')
         }
       }
       
-      // SEGUNDO: Si no hay datos en localStorage, intentar APIs
+      // SEGUNDO: Solo intentar APIs si NO hay nada en localStorage
       if (!finalData) {
+        console.log('No hay datos en localStorage, intentando APIs...')
         let apiData = null
         
         try {
@@ -98,14 +108,14 @@ export default function PermisosPage() {
             finalData = apiData
           }
         } catch (apiError) {
-          console.log('Error al cargar desde API:', apiError)
+          console.error('Error al cargar desde API:', apiError)
         }
       }
       
-      // TERCERO: Si no hay datos de ningún lado, usar datos por defecto
+      // TERCERO: Si no hay datos de ningún lugar, usar datos por defecto
       if (!finalData) {
+        console.log('Usando datos por defecto...')
         finalData = getDefaultData()
-        console.log('Usando datos por defecto:', finalData)
         setOfflineMode(true)
       }
       
@@ -114,6 +124,12 @@ export default function PermisosPage() {
       if (finalData.roles.length > 0) {
         setSelectedRol(finalData.roles[0].id)
         console.log('Rol seleccionado:', finalData.roles[0].id)
+        
+        // Mostrar resumen de permisos cargados
+        const rolActual = finalData.roles[0]
+        const totalPermisos = Object.values(rolActual.permisos).reduce((sum: number, mod: any) => 
+          sum + Object.values(mod).filter(Boolean).length, 0)
+        console.log(`Resumen - Rol: ${rolActual.nombre}, Permisos: ${totalPermisos}`)
       }
     } catch (err: any) {
       console.error('Error al cargar permisos:', err)
