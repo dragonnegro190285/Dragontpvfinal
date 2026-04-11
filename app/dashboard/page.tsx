@@ -10,6 +10,19 @@ export default function DashboardPage() {
   const [usuario, setUsuario] = useState<Usuario | null>(null)
   const [loading, setLoading] = useState(true)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [expandedSections, setExpandedSections] = useState({
+    productos: false,
+    proveedores: false,
+    clientes: false,
+    usuarios: false
+  })
+
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section as keyof typeof prev]
+    }))
+  }
 
   useEffect(() => {
     checkAuth()
@@ -75,35 +88,105 @@ export default function DashboardPage() {
           <h2 className="text-xl font-bold mb-6">Menú</h2>
           <nav className="space-y-2">
             <div>
-              <h3 className="text-sm font-semibold text-gray-400 mb-2 px-4">Proveedores</h3>
               <button
-                className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors ml-2"
-                onClick={() => router.push('/proveedores')}
+                onClick={() => toggleSection('productos')}
+                className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors flex items-center justify-between"
               >
-                📦 Ver Proveedores
+                <h3 className="text-sm font-semibold text-gray-400">Productos</h3>
+                <span>{expandedSections.productos ? '▼' : '▶'}</span>
               </button>
+              {expandedSections.productos && (
+                <div className="ml-2 space-y-1">
+                  <button
+                    className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+                    onClick={() => router.push('/productos')}
+                  >
+                    📦 Ver Productos
+                  </button>
+                  <button
+                    className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+                    onClick={() => router.push('/productos/nuevo')}
+                  >
+                    ➕ Crear Producto
+                  </button>
+                </div>
+              )}
+            </div>
+            <div>
               <button
-                className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors ml-2"
-                onClick={() => router.push('/proveedores/nuevo')}
+                onClick={() => toggleSection('proveedores')}
+                className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors flex items-center justify-between"
               >
-                ➕ Crear Proveedor
+                <h3 className="text-sm font-semibold text-gray-400">Proveedores</h3>
+                <span>{expandedSections.proveedores ? '▼' : '▶'}</span>
               </button>
+              {expandedSections.proveedores && (
+                <div className="ml-2 space-y-1">
+                  <button
+                    className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+                    onClick={() => router.push('/proveedores')}
+                  >
+                    📦 Ver Proveedores
+                  </button>
+                  <button
+                    className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+                    onClick={() => router.push('/proveedores/nuevo')}
+                  >
+                    ➕ Crear Proveedor
+                  </button>
+                </div>
+              )}
+            </div>
+            <div>
+              <button
+                onClick={() => toggleSection('clientes')}
+                className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors flex items-center justify-between"
+              >
+                <h3 className="text-sm font-semibold text-gray-400">Clientes</h3>
+                <span>{expandedSections.clientes ? '▼' : '▶'}</span>
+              </button>
+              {expandedSections.clientes && (
+                <div className="ml-2 space-y-1">
+                  <button
+                    className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+                    onClick={() => router.push('/clientes')}
+                  >
+                    👤 Ver Clientes
+                  </button>
+                  <button
+                    className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+                    onClick={() => router.push('/clientes/nuevo')}
+                  >
+                    ➕ Crear Cliente
+                  </button>
+                </div>
+              )}
             </div>
             {isAdmin && (
               <div>
-                <h3 className="text-sm font-semibold text-gray-400 mb-2 px-4">Usuarios</h3>
                 <button
-                  className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors ml-2"
-                  onClick={() => router.push('/usuarios')}
+                  onClick={() => toggleSection('usuarios')}
+                  className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors flex items-center justify-between"
                 >
-                  👥 Ver Usuarios
+                  <h3 className="text-sm font-semibold text-gray-400">Usuarios</h3>
+                  <span>{expandedSections.usuarios ? '▼' : '▶'}</span>
                 </button>
-                <button
-                  className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors ml-2"
-                  onClick={() => router.push('/usuarios?action=create')}
-                >
-                  ➕ Crear Usuario
-                </button>
+                {expandedSections.usuarios && (
+                  <div className="ml-2 space-y-1">
+                    <button
+                      className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+                      onClick={() => router.push('/usuarios')}
+                    >
+                      👥 Ver Usuarios
+                    </button>
+                    <button
+                      className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+                      onClick={() => router.push('/usuarios?action=create')}
+                    >
+                      ➕ Crear Usuario
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </nav>

@@ -152,6 +152,7 @@ export default function LoginPage() {
                   onChange={(e) => setNombre(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
+                  aria-label="Nombre"
                 />
               </div>
 
@@ -165,6 +166,7 @@ export default function LoginPage() {
                   onChange={(e) => setApellido(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
+                  aria-label="Apellido"
                 />
               </div>
             </>
@@ -180,6 +182,7 @@ export default function LoginPage() {
                 onChange={handleUserSelect}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
+                aria-label="Seleccionar Usuario"
               >
                 <option value="">Selecciona un usuario</option>
                 {usuarios.map((usuario) => (
@@ -208,6 +211,7 @@ export default function LoginPage() {
               required
               disabled={hasAdmin}
               readOnly={hasAdmin}
+              aria-label="Email"
             />
           </div>
 
@@ -221,6 +225,7 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
+              aria-label="Contraseña"
             />
           </div>
 

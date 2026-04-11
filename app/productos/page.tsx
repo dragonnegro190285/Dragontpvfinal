@@ -2,39 +2,38 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { Proveedor } from '@/lib/types'
+import { Producto } from '@/lib/types'
 
-export default function ProveedoresPage() {
+export default function ProductosPage() {
   const router = useRouter()
-  const [proveedores, setProveedores] = useState<Proveedor[]>([])
+  const [productos, setProductos] = useState<Producto[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    loadProveedores()
+    loadProductos()
   }, [])
 
-  const loadProveedores = async () => {
+  const loadProductos = async () => {
     try {
-      const response = await fetch(`/api/proveedores?t=${Date.now()}&r=${Math.random().toString(36).substring(7)}`)
+      const response = await fetch(`/api/productos?t=${Date.now()}&r=${Math.random().toString(36).substring(7)}`)
       const data = await response.json()
       
-      const proveedoresList = data.proveedores || []
-      setProveedores(proveedoresList)
+      const productosList = data.productos || []
+      setProductos(productosList)
     } catch (err) {
-      console.error('Error al cargar proveedores:', err)
-      setProveedores([])
+      console.error('Error al cargar productos:', err)
+      setProductos([])
     } finally {
       setLoading(false)
     }
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('¿Estás seguro de eliminar este proveedor?')) return
+    if (!confirm('¿Estás seguro de eliminar este producto?')) return
 
     try {
-      const response = await fetch(`/api/proveedores/delete?id=${id}`, {
+      const response = await fetch(`/api/productos/delete?id=${id}`, {
         method: 'DELETE',
       })
 
@@ -43,7 +42,7 @@ export default function ProveedoresPage() {
         throw new Error(data.error)
       }
 
-      loadProveedores()
+      loadProductos()
     } catch (err: any) {
       setError(err.message)
     }
@@ -69,8 +68,14 @@ export default function ProveedoresPage() {
               >
                 ← Volver
               </button>
-              <h1 className="text-2xl font-bold">Gestión de Proveedores</h1>
+              <h1 className="text-2xl font-bold">Gestión de Productos</h1>
             </div>
+            <button
+              onClick={() => router.push('/productos/nuevo')}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              + Nuevo Producto
+            </button>
           </div>
 
           {error && (
@@ -87,13 +92,25 @@ export default function ProveedoresPage() {
                     Código
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Razón Social
+                    Nombre
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    RFC
+                    Categoría
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Saldo
+                    Unidad
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Precio Base
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Existencias
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Vende Granel
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Báscula
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Estado
@@ -104,34 +121,52 @@ export default function ProveedoresPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {proveedores.map((proveedor) => (
-                  <tr key={proveedor.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">{proveedor.codigo_proveedor}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{proveedor.razon_social}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{proveedor.rfc || '-'}</td>
+                {productos.map((producto) => (
+                  <tr key={producto.id}>
+                    <td className="px-6 py-4 whitespace-nowrap font-semibold">{producto.codigo_producto}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{producto.nombre}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{producto.categoria || '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{producto.unidad_medida}</td>
                     <td className="px-6 py-4 whitespace-nowrap font-semibold">
-                      ${proveedor.saldo?.toFixed(2) || '0.00'}
+                      ${producto.precio_venta_base.toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap font-semibold">
+                      {producto.existencias.toFixed(3)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {producto.vende_granel ? (
+                        <span className="text-green-600 font-semibold">✓</span>
+                      ) : (
+                        <span className="text-gray-400">-</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {producto.articulo_bascula ? (
+                        <span className="text-green-600 font-semibold">✓</span>
+                      ) : (
+                        <span className="text-gray-400">-</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`px-2 py-1 rounded text-xs ${
-                          proveedor.activo
+                          producto.activo
                             ? 'bg-green-100 text-green-800'
                             : 'bg-red-100 text-red-800'
                         }`}
                       >
-                        {proveedor.activo ? 'Activo' : 'Inactivo'}
+                        {producto.activo ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap space-x-2">
                       <button
-                        onClick={() => router.push(`/proveedores/${proveedor.id}/editar`)}
+                        onClick={() => router.push(`/productos/${producto.id}/editar`)}
                         className="text-blue-600 hover:text-blue-800"
                       >
                         Editar
                       </button>
                       <button
-                        onClick={() => handleDelete(proveedor.id)}
+                        onClick={() => handleDelete(producto.id)}
                         className="text-red-600 hover:text-red-800"
                       >
                         Eliminar
@@ -142,6 +177,12 @@ export default function ProveedoresPage() {
               </tbody>
             </table>
           </div>
+
+          {productos.length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              No hay productos registrados
+            </div>
+          )}
         </div>
       </div>
     </div>

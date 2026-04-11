@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 
+// Deshabilitar caché de Next.js
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function GET() {
   try {
     // Usar RPC para evitar caché de Supabase
@@ -39,7 +43,7 @@ export async function GET() {
       { usuarios: usuariosFormateados },
       {
         headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate',
+          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0, s-maxage=0',
           'Pragma': 'no-cache',
           'Expires': '0',
         },

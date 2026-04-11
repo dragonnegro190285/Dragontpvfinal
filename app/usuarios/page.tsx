@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Usuario } from '@/lib/types'
 
@@ -9,7 +9,7 @@ interface Role {
   nombre: string
 }
 
-export default function UsuariosPage() {
+function UsuariosContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const action = searchParams.get('action')
@@ -325,6 +325,7 @@ export default function UsuariosPage() {
                   onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
+                  aria-label="Nombre"
                 />
               </div>
 
@@ -337,6 +338,7 @@ export default function UsuariosPage() {
                   value={formData.apellido}
                   onChange={(e) => setFormData({ ...formData, apellido: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  aria-label="Apellido"
                 />
               </div>
 
@@ -351,6 +353,7 @@ export default function UsuariosPage() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
                   disabled={!!editingUser}
+                  aria-label="Email"
                 />
               </div>
 
@@ -366,6 +369,7 @@ export default function UsuariosPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md pr-10"
                     required={!editingUser}
                     placeholder={editingUser ? 'Dejar vacío para no cambiar' : ''}
+                    aria-label="Contraseña"
                   />
                   <button
                     type="button"
@@ -386,6 +390,7 @@ export default function UsuariosPage() {
                   onChange={(e) => setFormData({ ...formData, rol_id: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
+                  aria-label="Rol"
                 >
                   <option value="">Seleccionar rol</option>
                   {roles.map((rol) => (
@@ -402,6 +407,7 @@ export default function UsuariosPage() {
                   checked={formData.activo}
                   onChange={(e) => setFormData({ ...formData, activo: e.target.checked })}
                   className="mr-2"
+                  aria-label="Activo"
                 />
                 <label className="text-sm font-medium text-gray-700">Activo</label>
               </div>
@@ -427,5 +433,13 @@ export default function UsuariosPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function UsuariosPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-100 flex items-center justify-center">Cargando...</div>}>
+      <UsuariosContent />
+    </Suspense>
   )
 }

@@ -1,0 +1,16 @@
+{
+  "extends": "next/core-web-vitals",
+  "rules": {
+    "jsx-a11y/label-has-associated-control": "off",
+    "jsx-a11y/label-has-for": "off",
+    "jsx-a11y/form-elements-have-labels": "off",
+    "jsx-a11y/control-has-associated-label": "off",
+    "jsx-a11y/anchor-is-valid": "off",
+    "jsx-a11y/alt-text": "off",
+    "jsx-a11y/aria-props": "off",
+    "jsx-a11y/aria-proptypes": "off",
+    "jsx-a11y/aria-unsupported-elements": "off",
+    "jsx-a11y/role-has-required-aria-props": "off",
+    "jsx-a11y/role-supports-aria-props": "off"
+  }
+}

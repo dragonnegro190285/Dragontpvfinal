@@ -42,3 +42,63 @@ export interface Proveedor {
   creado_at: string
   actualizado_at: string
 }
+
+export interface Cliente {
+  id: string
+  codigo_cliente: string
+  nombre: string
+  apellido_paterno?: string
+  apellido_materno?: string
+  rfc?: string
+  telefono?: string
+  correo_electronico?: string
+  direccion?: string
+  ciudad?: string
+  estado?: string
+  codigo_postal?: string
+  saldo?: number
+  limite_credito?: number
+  notas?: string
+  activo: boolean
+  creado_at: string
+  actualizado_at: string
+}
+
+export interface Producto {
+  id: string
+  codigo_producto: string
+  nombre: string
+  descripcion?: string
+  categoria?: string
+  marca?: string
+  modelo?: string
+  talla?: string
+  color?: string
+  unidad_medida: string
+  precio_venta_base: number
+  precio_venta_minimo: number
+  precio_venta_maximo: number
+  existencias: number
+  stock_minimo?: number
+  stock_maximo?: number
+  fecha_caducidad?: string
+  requiere_caducidad: boolean
+  vende_granel: boolean
+  articulo_bascula: boolean
+  activo: boolean
+  creado_at: string
+  actualizado_at: string
+}
+
+export interface PrecioVentaCliente {
+  id: string
+  producto_id: string
+  cliente_id: string
+  precio_especial: number
+  descuento_porcentaje: number
+  fecha_inicio?: string
+  fecha_fin?: string
+  activo: boolean
+  creado_at: string
+  actualizado_at: string
+}

@@ -17,6 +17,18 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error('Error al crear proveedor:', error)
+      
+      // Manejar errores de duplicados específicos
+      if (error.message.includes('duplicate key') || error.message.includes('unique constraint')) {
+        if (error.message.includes('rfc')) {
+          return NextResponse.json({ error: 'Ya existe un proveedor con este RFC' }, { status: 409 })
+        }
+        if (error.message.includes('razon_social')) {
+          return NextResponse.json({ error: 'Ya existe un proveedor con esta razón social' }, { status: 409 })
+        }
+        return NextResponse.json({ error: 'Ya existe un registro con estos datos' }, { status: 409 })
+      }
+      
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 

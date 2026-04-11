@@ -4,9 +4,14 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
+// Deshabilitar caché de Next.js
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function GET() {
   try {
-    // Crear cliente con configuración específica para evitar caché
+    console.log('Iniciando query de proveedores sin caché...')
+    
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
@@ -14,12 +19,12 @@ export async function GET() {
       },
       global: {
         headers: {
-          'Cache-Control': 'no-cache'
+          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0, s-maxage=0',
+          'Pragma': 'no-cache',
+          'Expires': '0'
         }
       }
     })
-
-    console.log('Iniciando query con cliente específico de proveedores...')
     
     const { data: proveedores, error } = await supabase
       .from('proveedores')
@@ -35,7 +40,13 @@ export async function GET() {
       throw error
     }
 
-    return NextResponse.json({ proveedores })
+    return NextResponse.json({ proveedores }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0, s-maxage=0',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    })
   } catch (error) {
     console.error('Error al obtener proveedores:', error)
     return NextResponse.json({ error: 'Error al obtener proveedores' }, { status: 500 })

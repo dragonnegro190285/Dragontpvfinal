@@ -68,6 +68,24 @@ export async function POST(request: Request) {
 
     if (userError) {
       console.error('Error insertando usuario:', userError)
+      
+      // Manejar errores de duplicados específicos
+      if (userError.message.includes('duplicate key') || userError.message.includes('unique constraint')) {
+        if (userError.message.includes('email')) {
+          // Si falla la inserción, eliminar el usuario de auth
+          await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
+          return NextResponse.json({ error: 'El email ya está registrado' }, { status: 409 })
+        }
+        if (userError.message.includes('nombre') || userError.message.includes('apellido')) {
+          // Si falla la inserción, eliminar el usuario de auth
+          await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
+          return NextResponse.json({ error: 'Ya existe un usuario con este nombre completo' }, { status: 409 })
+        }
+        // Si falla la inserción, eliminar el usuario de auth
+        await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
+        return NextResponse.json({ error: 'Ya existe un registro con estos datos' }, { status: 409 })
+      }
+      
       // Si falla la inserción, eliminar el usuario de auth
       await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
       return NextResponse.json({ error: userError.message }, { status: 500 })

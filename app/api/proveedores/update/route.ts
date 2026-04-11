@@ -26,23 +26,40 @@ export async function POST(request: Request) {
     console.log('ID:', id)
     console.log('Data a actualizar:', data)
 
-    const { error } = await supabase
+    // Actualizar y devolver los datos actualizados
+    const { error: updateError } = await supabase
       .from('proveedores')
       .update({
         ...data,
         actualizado_at: new Date().toISOString(),
       })
       .eq('id', id)
-      .select()
 
-    console.log('Error de Supabase:', error)
+    console.log('Error de Supabase en update:', updateError)
 
-    if (error) {
-      console.error('Error al actualizar proveedor:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+    if (updateError) {
+      console.error('Error al actualizar proveedor:', updateError)
+      return NextResponse.json({ error: updateError.message }, { status: 500 })
     }
 
-    return NextResponse.json({ success: true, message: 'Proveedor actualizado exitosamente' })
+    // Esperar un momento para asegurar que Supabase procese el cambio
+    await new Promise(resolve => setTimeout(resolve, 500))
+
+    // Hacer consulta fresca para obtener los datos actualizados
+    const { data: proveedorActualizado, error: selectError } = await supabase
+      .from('proveedores')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    console.log('Datos actualizados devueltos (consulta fresca):', proveedorActualizado)
+    console.log('Error en select:', selectError)
+
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Proveedor actualizado exitosamente',
+      proveedor: proveedorActualizado
+    })
   } catch (error) {
     console.error('Error al actualizar proveedor:', error)
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })
