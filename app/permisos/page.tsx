@@ -30,7 +30,7 @@ export default function PermisosPage() {
   const [selectedRol, setSelectedRol] = useState<string>('')
   const [saving, setSaving] = useState(false)
   const [offlineMode, setOfflineMode] = useState(false)
-  const [checkboxKey, setCheckboxKey] = useState(0) // Forzar re-render
+  const [forceRender, setForceRender] = useState(0) // Forzar re-render completo
 
   useEffect(() => {
     loadPermisos()
@@ -133,13 +133,13 @@ export default function PermisosPage() {
         console.log(`Resumen - Rol: ${rolActual.nombre}, Permisos: ${totalPermisos}`)
         
         // Forzar actualización inmediata de React para que los checkboxes se activen
-        setCheckboxKey(prev => prev + 1)
+        setForceRender(prev => prev + 1)
         
         // Forzar actualización adicional después de un pequeño retraso
         setTimeout(() => {
           console.log('Forzando segunda actualización...')
           setSelectedRol(finalData.roles[0].id)
-          setCheckboxKey(prev => prev + 1)
+          setForceRender(prev => prev + 1)
         }, 200)
       }
     } catch (err: any) {
@@ -400,7 +400,7 @@ export default function PermisosPage() {
       console.log('=== ROL SELECCIONADO CAMBIADO ===')
       console.log('Rol:', selectedRolData.nombre)
       console.log('ID:', selectedRolData.id)
-      console.log('CheckboxKey:', checkboxKey)
+      console.log('ForceRender:', forceRender)
       
       // Contar permisos activos
       const totalActivos = Object.values(selectedRolData.permisos).reduce((sum: number, mod: any) => 
@@ -418,11 +418,11 @@ export default function PermisosPage() {
       
       // Forzar re-renderizado de checkboxes
       setTimeout(() => {
-        setCheckboxKey(prev => prev + 1)
+        setForceRender(prev => prev + 1)
         console.log('Forzando re-render de checkboxes por cambio de rol')
       }, 50)
     }
-  }, [selectedRolData, checkboxKey])
+  }, [selectedRolData])
 
   if (loading) {
     return (
@@ -550,7 +550,7 @@ export default function PermisosPage() {
                           return (
                             <td key={accion} className="px-6 py-4 whitespace-nowrap text-center">
                               <input
-                                key={`${modulo}-${accion}-${checkboxKey}`} // Forzar re-render
+                                key={`${modulo}-${accion}-${forceRender}`} // Forzar re-render
                                 type="checkbox"
                                 checked={isChecked}
                                 onChange={(e) => handlePermisoChange(selectedRol, modulo, accion, e.target.checked)}
