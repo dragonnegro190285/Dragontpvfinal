@@ -231,34 +231,73 @@ export default function PermisosPage() {
     setSuccess('')
 
     try {
-      // Actualizar estado local inmediatamente
+      // PRIMERO: Actualizar estado directo de checkboxes inmediatamente
+      const checkboxKey = `${modulo}-${accion}`
+      setCheckboxStates(prev => ({
+        ...prev,
+        [checkboxKey]: checked
+      }))
+      console.log('Estado directo actualizado:', checkboxKey, checked)
+
+      // SEGUNDO: Actualizar datos del rol en el estado
       if (data) {
-        const newData = {
-          ...data,
-          roles: data.roles.map(rol => {
-            if (rol.id === rolId) {
-              const newPermisos = {
-                ...rol.permisos,
-                [modulo]: {
-                  ...rol.permisos[modulo],
-                  [accion]: checked
-                }
+        const updatedRoles = data.roles.map(rol => {
+          if (rol.id === rolId) {
+            const updatedPermisos = {
+              ...rol.permisos,
+              [modulo]: {
+                ...rol.permisos[modulo],
+                [accion]: checked
               }
-              return { ...rol, permisos: newPermisos }
             }
-            return rol
-          })
-        }
-        
-        setData(newData)
-        saveToLocalStorage(newData.roles)
+            console.log('Permisos del rol actualizados:', updatedPermisos)
+            return { ...rol, permisos: updatedPermisos }
+          }
+          return rol
+        })
+
+        setData({ ...data, roles: updatedRoles })
+        saveToLocalStorage(updatedRoles)
       }
-      
-      setSuccess('Permiso actualizado exitosamente')
+
+      // TERCERO: Intentar guardar en API (si funciona)
+      try {
+        const response = await fetch('/api/permisos-simple', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rol_id: rolId, modulo, accion, checked })
+        })
+
+        if (response.ok) {
+          console.log('Permiso guardado en API:', { rolId, modulo, accion, checked })
+          setSuccess(`Permiso ${checked ? 'activado' : 'desactivado'} correctamente`)
+        } else {
+          console.log('API no disponible, usando localStorage')
+          setSuccess(`Permiso ${checked ? 'activado' : 'desactivado'} (offline)`)
+        }
+      } catch (apiError) {
+        console.log('Error en API, persistiendo en localStorage:', apiError)
+        setSuccess(`Permiso ${checked ? 'activado' : 'desactivado'} (offline)`)
+      }
+
+      // CUARTO: Forzar re-render para asegurar consistencia
+      setTimeout(() => {
+        setForceRender(prev => prev + 1)
+      }, 50)
+
       setTimeout(() => setSuccess(''), 3000)
     } catch (err: any) {
       console.error('Error al cambiar permiso:', err)
-      setError(err.message)
+      setError('Error al cambiar permiso')
+      
+      // Revertir estado directo si hay error
+      const checkboxKey = `${modulo}-${accion}`
+      setCheckboxStates(prev => ({
+        ...prev,
+        [checkboxKey]: !checked
+      }))
+      
+      setTimeout(() => setError(''), 3000)
     } finally {
       setSaving(false)
     }
@@ -350,6 +389,17 @@ export default function PermisosPage() {
   const handleSelectAll = () => {
     if (!selectedRol || !data) return
 
+    // PRIMERO: Actualizar estado directo de todos los checkboxes
+    const newCheckboxStates: Record<string, boolean> = {}
+    data.modulos.forEach(modulo => {
+      data.acciones.forEach(accion => {
+        const checkboxKey = `${modulo}-${accion}`
+        newCheckboxStates[checkboxKey] = true
+      })
+    })
+    setCheckboxStates(newCheckboxStates)
+    console.log('Todos los checkboxes activados en estado directo')
+
     const updatedRoles = data.roles.map(rol => {
       if (rol.id === selectedRol) {
         const newPermisos: Record<string, Record<string, boolean>> = {}
@@ -372,6 +422,17 @@ export default function PermisosPage() {
 
   const handleDeselectAll = () => {
     if (!selectedRol || !data) return
+
+    // PRIMERO: Actualizar estado directo de todos los checkboxes
+    const newCheckboxStates: Record<string, boolean> = {}
+    data.modulos.forEach(modulo => {
+      data.acciones.forEach(accion => {
+        const checkboxKey = `${modulo}-${accion}`
+        newCheckboxStates[checkboxKey] = false
+      })
+    })
+    setCheckboxStates(newCheckboxStates)
+    console.log('Todos los checkboxes desactivados en estado directo')
 
     const updatedRoles = data.roles.map(rol => {
       if (rol.id === selectedRol) {
