@@ -383,6 +383,23 @@ export default function PermisosPage() {
 
   const selectedRolData = data?.roles.find(rol => rol.id === selectedRol)
 
+  // Debug: Log cuando cambia el rol seleccionado
+  useEffect(() => {
+    if (selectedRolData) {
+      console.log('Rol seleccionado cambiado:', selectedRolData.nombre)
+      console.log('Permisos del rol:', selectedRolData.permisos)
+      
+      // Contar permisos activos
+      const totalActivos = Object.values(selectedRolData.permisos).reduce((sum: number, mod: any) => 
+        sum + Object.values(mod).filter(Boolean).length, 0)
+      console.log('Total permisos activos:', totalActivos)
+      
+      // Verificar permisos específicos
+      console.log('Permiso usuarios:crear:', selectedRolData.permisos['usuarios']?.['crear'])
+      console.log('Permiso productos:ver:', selectedRolData.permisos['productos']?.['ver'])
+    }
+  }, [selectedRolData])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -504,17 +521,26 @@ export default function PermisosPage() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           {modulo.charAt(0).toUpperCase() + modulo.slice(1)}
                         </td>
-                        {data.acciones.map(accion => (
-                          <td key={accion} className="px-6 py-4 whitespace-nowrap text-center">
-                            <input
-                              type="checkbox"
-                              checked={selectedRolData.permisos[modulo]?.[accion] || false}
-                              onChange={(e) => handlePermisoChange(selectedRol, modulo, accion, e.target.checked)}
-                              disabled={saving}
-                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                            />
-                          </td>
-                        ))}
+                        {data.acciones.map(accion => {
+                          const isChecked = selectedRolData.permisos[modulo]?.[accion] || false
+                          return (
+                            <td key={accion} className="px-6 py-4 whitespace-nowrap text-center">
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={(e) => handlePermisoChange(selectedRol, modulo, accion, e.target.checked)}
+                                disabled={saving}
+                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                              />
+                              {/* Debug info */}
+                              {modulo === 'usuarios' && accion === 'crear' && (
+                                <span className="text-xs text-red-500 ml-2">
+                                  {isChecked ? 'ON' : 'OFF'}
+                                </span>
+                              )}
+                            </td>
+                          )
+                        })}
                       </tr>
                     ))}
                   </tbody>
