@@ -105,6 +105,7 @@ export default function EmpresaPage() {
   const loadPermisos = async () => {
     setLoadingPermisos(true)
     try {
+      console.log('=== CARGANDO PERMISOS - TAB PERMISOS ===')
       console.log('Cargando permisos - 100% ONLINE')
       
       // SIEMPRE usar APIs reales (sin localStorage)
@@ -114,6 +115,8 @@ export default function EmpresaPage() {
         body: JSON.stringify({ action: 'get_all' })
       })
 
+      console.log('API test response status:', response.status)
+
       if (!response.ok) {
         console.log('API test no disponible, intentando API pública...')
         response = await fetch('/api/permisos-public', {
@@ -121,14 +124,21 @@ export default function EmpresaPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'get_all' })
         })
+        console.log('API pública response status:', response.status)
       }
 
       if (response.ok) {
         const result = await response.json()
         console.log('✅ Datos cargados desde API online:', result)
+        console.log('Roles:', result.roles)
+        console.log('Modulos:', result.modulos)
+        console.log('Acciones:', result.acciones)
         setPermisosData(result)
         if (result.roles && result.roles.length > 0) {
           setSelectedRol(result.roles[0].id)
+          console.log('Rol seleccionado:', result.roles[0].id, result.roles[0].nombre)
+        } else {
+          console.error('No hay roles en la respuesta')
         }
       } else {
         console.log('APIs reales fallando, usando API simple como fallback...')
