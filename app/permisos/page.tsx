@@ -479,7 +479,37 @@ export default function PermisosPage() {
               onClick={() => router.push('/empresa')}
               className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
             >
-              🏢 Empresa
+              📋 Datos Generales
+            </button>
+            <button
+              onClick={() => router.push('/empresa')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              📍 Dirección
+            </button>
+            <button
+              onClick={() => router.push('/empresa')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              📞 Contacto
+            </button>
+            <button
+              onClick={() => router.push('/empresa')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              💰 Fiscal
+            </button>
+            <button
+              onClick={() => router.push('/empresa')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              � Bancaria
+            </button>
+            <button
+              onClick={() => router.push('/empresa')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              📝 Mensajes
             </button>
             <button
               onClick={() => router.push('/permisos')}

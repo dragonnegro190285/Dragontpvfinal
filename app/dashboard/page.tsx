@@ -9,21 +9,7 @@ export default function DashboardPage() {
   const router = useRouter()
   const [usuario, setUsuario] = useState<Usuario | null>(null)
   const [loading, setLoading] = useState(true)
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [expandedSections, setExpandedSections] = useState({
-    productos: false,
-    proveedores: false,
-    clientes: false,
-    usuarios: false,
-    configuracion: false
-  })
-
-  const toggleSection = (section: string) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [section]: !prev[section as keyof typeof prev]
-    }))
-  }
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   useEffect(() => {
     checkAuth()
@@ -83,165 +69,88 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
-      {/* Sidebar */}
+      {/* Sidebar colapsable */}
       <div className={`${sidebarOpen ? 'w-64' : 'w-0'} bg-gray-800 text-white transition-all duration-300 overflow-hidden`}>
         <div className="p-4">
-          <h2 className="text-xl font-bold mb-6">Menú</h2>
+          <h2 className="text-xl font-bold mb-4">Menú Principal</h2>
           <nav className="space-y-2">
-            <div>
-              <button
-                onClick={() => toggleSection('productos')}
-                className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors flex items-center justify-between"
-              >
-                <h3 className="text-sm font-semibold text-gray-400">Productos</h3>
-                <span>{expandedSections.productos ? '▼' : '▶'}</span>
-              </button>
-              {expandedSections.productos && (
-                <div className="ml-2 space-y-1">
-                  <button
-                    className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
-                    onClick={() => router.push('/productos')}
-                  >
-                    📦 Ver Productos
-                  </button>
-                  <button
-                    className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
-                    onClick={() => router.push('/productos/nuevo')}
-                  >
-                    ➕ Crear Producto
-                  </button>
-                </div>
-              )}
-            </div>
-            <div>
-              <button
-                onClick={() => toggleSection('proveedores')}
-                className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors flex items-center justify-between"
-              >
-                <h3 className="text-sm font-semibold text-gray-400">Proveedores</h3>
-                <span>{expandedSections.proveedores ? '▼' : '▶'}</span>
-              </button>
-              {expandedSections.proveedores && (
-                <div className="ml-2 space-y-1">
-                  <button
-                    className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
-                    onClick={() => router.push('/proveedores')}
-                  >
-                    📦 Ver Proveedores
-                  </button>
-                  <button
-                    className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
-                    onClick={() => router.push('/proveedores/nuevo')}
-                  >
-                    ➕ Crear Proveedor
-                  </button>
-                </div>
-              )}
-            </div>
-            <div>
-              <button
-                onClick={() => toggleSection('clientes')}
-                className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors flex items-center justify-between"
-              >
-                <h3 className="text-sm font-semibold text-gray-400">Clientes</h3>
-                <span>{expandedSections.clientes ? '▼' : '▶'}</span>
-              </button>
-              {expandedSections.clientes && (
-                <div className="ml-2 space-y-1">
-                  <button
-                    className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
-                    onClick={() => router.push('/clientes')}
-                  >
-                    👤 Ver Clientes
-                  </button>
-                  <button
-                    className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
-                    onClick={() => router.push('/clientes/nuevo')}
-                  >
-                    ➕ Crear Cliente
-                  </button>
-                </div>
-              )}
-            </div>
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors bg-gray-700"
+            >
+              🏠 Dashboard
+            </button>
+            <button
+              onClick={() => router.push('/productos')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              📦 Productos
+            </button>
+            <button
+              onClick={() => router.push('/proveedores')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              📦 Proveedores
+            </button>
+            <button
+              onClick={() => router.push('/clientes')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              👤 Clientes
+            </button>
             {isAdmin && (
-              <div>
-                <button
-                  onClick={() => toggleSection('usuarios')}
-                  className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors flex items-center justify-between"
-                >
-                  <h3 className="text-sm font-semibold text-gray-400">Usuarios</h3>
-                  <span>{expandedSections.usuarios ? '▼' : '▶'}</span>
-                </button>
-                {expandedSections.usuarios && (
-                  <div className="ml-2 space-y-1">
-                    <button
-                      className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
-                      onClick={() => router.push('/usuarios')}
-                    >
-                      👥 Ver Usuarios
-                    </button>
-                    <button
-                      className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
-                      onClick={() => router.push('/usuarios?action=create')}
-                    >
-                      ➕ Crear Usuario
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-            <div>
               <button
-                onClick={() => toggleSection('configuracion')}
-                className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors flex items-center justify-between"
+                onClick={() => router.push('/usuarios')}
+                className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
               >
-                <h3 className="text-sm font-semibold text-gray-400">Configuración</h3>
-                <span>{expandedSections.configuracion ? '▼' : '▶'}</span>
+                👥 Usuarios
               </button>
-              {expandedSections.configuracion && (
-                <div className="ml-2 space-y-1">
-                  <button
-                    className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
-                    onClick={() => router.push('/empresa')}
-                  >
-                    🏢 Empresa
-                  </button>
-                  <button
-                    className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
-                    onClick={() => router.push('/permisos')}
-                  >
-                    🔐 Permisos
-                  </button>
-                </div>
-              )}
-            </div>
+            )}
+            <button
+              onClick={() => router.push('/empresa')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              🏢 Empresa
+            </button>
+            <button
+              onClick={() => router.push('/permisos')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              🔐 Permisos
+            </button>
           </nav>
+          <div className="mt-8 pt-4 border-t border-gray-700">
+            <button
+              onClick={handleLogout}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              � Cerrar Sesión
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="bg-white shadow px-4 py-4 flex justify-between items-center">
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="bg-gray-200 px-3 py-2 rounded hover:bg-gray-300 transition-colors"
-          >
-            {sidebarOpen ? '◀' : '▶'}
-          </button>
-          <button
-            onClick={handleLogout}
-            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-          >
-            Cerrar Sesión
-          </button>
-        </header>
+        {/* Header con botón de toggle */}
+        <div className="bg-white shadow p-4">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="text-gray-600 hover:text-gray-800 focus:outline-none"
+            >
+              {sidebarOpen ? '◀' : '▶'} Menú
+            </button>
+            <h1 className="text-2xl font-bold">Dashboard</h1>
+            <div className="w-16"></div> {/* Espaciador para centrar */}
+          </div>
+        </div>
 
-        {/* Content */}
-        <div className="container mx-auto px-4 py-8 flex-1">
-          <div className="bg-white rounded-lg shadow p-6">
+        {/* Contenido */}
+        <div className="flex-1 p-4 md:p-8">
+          <div className="bg-white rounded-lg shadow p-4 md:p-6">
             <h2 className="text-xl font-semibold mb-4">Bienvenido</h2>
-            
+
             {usuario ? (
               <div className="space-y-2">
                 <p><strong>Nombre:</strong> {usuario.nombre} {usuario.apellido || ''}</p>
@@ -254,7 +163,7 @@ export default function DashboardPage() {
             )}
           </div>
 
-          <div className="mt-6 bg-white rounded-lg shadow p-6">
+          <div className="mt-6 bg-white rounded-lg shadow p-4 md:p-6">
             <h2 className="text-xl font-semibold mb-4">Dashboard Vacío</h2>
             <p className="text-gray-600">
               Este es un dashboard vacío listo para que agregues funcionalidades.
