@@ -77,62 +77,62 @@ export default function EmpresaPage() {
   const loadPermisos = async () => {
     setLoadingPermisos(true)
     try {
-      console.log('Cargando permisos - PRIORIDAD ONLINE')
+      console.log('Cargando permisos - SINCRONIZACIÓN ENTRE VISTAS')
       
       let finalData = null
       
-      // PRIMERO: Intentar APIs reales (prioridad online)
-      console.log('Intentando APIs reales primero (modo online)...')
+      // PRIMERO: Siempre cargar desde localStorage (fuente de verdad para sincronización)
+      const savedPermisos = localStorage.getItem('permisos-guardados')
       
-      let response = await fetch('/api/permisos-test', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'get_all' })
-      })
-
-      if (!response.ok) {
-        console.log('API test no disponible, intentando API pública...')
-        response = await fetch('/api/permisos-public', {
+      if (savedPermisos) {
+        try {
+          const permisosGuardados = JSON.parse(savedPermisos)
+          console.log('✅ Datos cargados desde localStorage (sincronización entre vistas):', permisosGuardados)
+          
+          finalData = {
+            modulos: ['usuarios', 'proveedores', 'productos', 'compras', 'ventas', 
+                     'clientes', 'marcas', 'empresa', 'reportes', 'permisos',
+                     'inventario', 'configuracion', 'sistema', 'auditoria'],
+            acciones: ['crear', 'modificar', 'ver', 'eliminar', 'ajustar', 'exportar', 'gestionar'],
+            roles: permisosGuardados,
+            permisos: []
+          }
+        } catch (parseError) {
+          console.error('Error al parsear localStorage:', parseError)
+        }
+      }
+      
+      // SEGUNDO: Solo intentar APIs si no hay datos en localStorage (primera carga)
+      if (!finalData) {
+        console.log('No hay datos en localStorage, intentando APIs...')
+        
+        let response = await fetch('/api/permisos-test', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'get_all' })
         })
-      }
 
-      if (response.ok) {
-        const result = await response.json()
-        console.log('✅ Datos cargados desde API online:', result)
-        finalData = result
-      } else {
-        console.log('APIs reales no disponibles, intentando API simple...')
-        // Fallback inmediato a API simple (siempre funciona)
-        response = await fetch('/api/permisos-simple')
+        if (!response.ok) {
+          response = await fetch('/api/permisos-public', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'get_all' })
+          })
+        }
+
         if (response.ok) {
           const result = await response.json()
-          console.log('✅ Datos cargados desde API simple (fallback):', result)
+          console.log('✅ Datos cargados desde API online:', result)
           finalData = result
-        }
-      }
-
-      // SEGUNDO: Solo usar localStorage si APIs fallan (fallback)
-      if (!finalData) {
-        const savedPermisos = localStorage.getItem('permisos-guardados')
-        
-        if (savedPermisos) {
-          try {
-            const permisosGuardados = JSON.parse(savedPermisos)
-            console.log('⚠️ Usando datos de localStorage (modo offline - APIs no disponibles)')
-            
-            finalData = {
-              modulos: ['usuarios', 'proveedores', 'productos', 'compras', 'ventas', 
-                       'clientes', 'marcas', 'empresa', 'reportes', 'permisos',
-                       'inventario', 'configuracion', 'sistema', 'auditoria'],
-              acciones: ['crear', 'modificar', 'ver', 'eliminar', 'ajustar', 'exportar', 'gestionar'],
-              roles: permisosGuardados,
-              permisos: []
-            }
-          } catch (parseError) {
-            console.error('Error al parsear localStorage:', parseError)
+          // Guardar en localStorage para sincronización
+          localStorage.setItem('permisos-data', JSON.stringify(finalData))
+        } else {
+          response = await fetch('/api/permisos-simple')
+          if (response.ok) {
+            const result = await response.json()
+            console.log('✅ Datos cargados desde API simple:', result)
+            finalData = result
+            localStorage.setItem('permisos-data', JSON.stringify(finalData))
           }
         }
       }
@@ -171,6 +171,11 @@ export default function EmpresaPage() {
 
     // Guardar en localStorage inmediatamente (sin await)
     localStorage.setItem('permisos-guardados', JSON.stringify(updatedRoles))
+    // También guardar estructura completa para sincronización
+    if (permisosData) {
+      const updatedData = { ...permisosData, roles: updatedRoles }
+      localStorage.setItem('permisos-data', JSON.stringify(updatedData))
+    }
     console.log('Permisos guardados en localStorage (inmediato):', { rolId, modulo, accion, checked })
 
     // LLAMADAS API EN PARALELO (sin bloquear UI)
@@ -225,6 +230,11 @@ export default function EmpresaPage() {
     // Guardar en localStorage como backup (igual que en /permisos)
     try {
       localStorage.setItem('permisos-guardados', JSON.stringify(updatedRoles))
+      // También guardar estructura completa para sincronización
+      if (permisosData) {
+        const updatedData = { ...permisosData, roles: updatedRoles }
+        localStorage.setItem('permisos-data', JSON.stringify(updatedData))
+      }
       console.log('Permisos guardados en localStorage (toggleAll):', updatedRoles)
     } catch (error) {
       console.error('Error al guardar en localStorage:', error)

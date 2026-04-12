@@ -39,78 +39,76 @@ export default function PermisosPage() {
 
   const loadPermisos = async () => {
     try {
-      console.log('Cargando permisos - PRIORIDAD ONLINE')
+      console.log('Cargando permisos - SINCRONIZACIÓN ENTRE VISTAS')
       
       let finalData = null
       
-      // PRIMERO: Intentar APIs reales (prioridad online)
-      console.log('Intentando APIs reales primero (modo online)...')
+      // PRIMERO: Siempre cargar desde localStorage (fuente de verdad para sincronización)
+      const savedData = localStorage.getItem('permisos-data')
+      const savedPermisos = localStorage.getItem('permisos-guardados')
       
-      let response = await fetch('/api/permisos-test', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'get_all' })
-      })
-
-      if (!response.ok) {
-        console.log('API test no disponible, intentando API pública...')
-        response = await fetch('/api/permisos-public', {
+      if (savedData) {
+        try {
+          finalData = JSON.parse(savedData)
+          console.log('✅ Datos cargados desde localStorage (sincronización entre vistas):', finalData)
+          
+          // Aplicar permisos guardados si existen
+          if (savedPermisos) {
+            const permisosGuardados = JSON.parse(savedPermisos)
+            console.log('Permisos guardados encontrados:', permisosGuardados)
+            
+            finalData.roles = finalData.roles.map((rol: Rol) => {
+              const rolGuardado = permisosGuardados.find((r: any) => r.id === rol.id)
+              if (rolGuardado) {
+                console.log(`Aplicando permisos guardados para ${rol.nombre}:`, {
+                  totalPermisos: Object.values(rolGuardado.permisos).reduce((sum: number, mod: any) => 
+                    sum + Object.values(mod).filter(Boolean).length, 0)
+                })
+                return { ...rol, permisos: rolGuardado.permisos }
+              }
+              return rol
+            })
+          }
+          
+          setOfflineMode(false)
+        } catch (parseError) {
+          console.error('Error al parsear localStorage:', parseError)
+          localStorage.removeItem('permisos-data')
+          localStorage.removeItem('permisos-guardados')
+        }
+      }
+      
+      // SEGUNDO: Solo intentar APIs si no hay datos en localStorage (primera carga)
+      if (!finalData) {
+        console.log('No hay datos en localStorage, intentando APIs...')
+        
+        let response = await fetch('/api/permisos-test', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'get_all' })
         })
-      }
 
-      if (response.ok) {
-        const apiData = await response.json()
-        console.log('✅ Datos cargados desde API online:', apiData)
-        finalData = apiData
-        setOfflineMode(false)
-      } else {
-        console.log('APIs reales no disponibles, intentando API simple...')
-        // Fallback inmediato a API simple (siempre funciona)
-        response = await fetch('/api/permisos-simple')
+        if (!response.ok) {
+          response = await fetch('/api/permisos-public', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'get_all' })
+          })
+        }
+
         if (response.ok) {
           const apiData = await response.json()
-          console.log('✅ Datos cargados desde API simple (fallback):', apiData)
+          console.log('✅ Datos cargados desde API online:', apiData)
           finalData = apiData
-          setOfflineMode(false)
-        }
-      }
-
-      // SEGUNDO: Solo usar localStorage si APIs fallan (fallback)
-      if (!finalData) {
-        const savedData = localStorage.getItem('permisos-data')
-        const savedPermisos = localStorage.getItem('permisos-guardados')
-        
-        if (savedData) {
-          try {
-            finalData = JSON.parse(savedData)
-            console.log('⚠️ Usando datos de localStorage (modo offline - APIs no disponibles):', finalData)
-            
-            // Aplicar permisos guardados si existen
-            if (savedPermisos) {
-              const permisosGuardados = JSON.parse(savedPermisos)
-              console.log('Permisos guardados encontrados:', permisosGuardados)
-              
-              finalData.roles = finalData.roles.map((rol: Rol) => {
-                const rolGuardado = permisosGuardados.find((r: any) => r.id === rol.id)
-                if (rolGuardado) {
-                  console.log(`Aplicando permisos guardados para ${rol.nombre}:`, {
-                    totalPermisos: Object.values(rolGuardado.permisos).reduce((sum: number, mod: any) => 
-                      sum + Object.values(mod).filter(Boolean).length, 0)
-                  })
-                  return { ...rol, permisos: rolGuardado.permisos }
-                }
-                return rol
-              })
-            }
-            
-            setOfflineMode(true)
-          } catch (parseError) {
-            console.error('Error al parsear localStorage:', parseError)
-            localStorage.removeItem('permisos-data')
-            localStorage.removeItem('permisos-guardados')
+          // Guardar en localStorage para sincronización
+          localStorage.setItem('permisos-data', JSON.stringify(finalData))
+        } else {
+          response = await fetch('/api/permisos-simple')
+          if (response.ok) {
+            const apiData = await response.json()
+            console.log('✅ Datos cargados desde API simple:', apiData)
+            finalData = apiData
+            localStorage.setItem('permisos-data', JSON.stringify(finalData))
           }
         }
       }
@@ -119,24 +117,16 @@ export default function PermisosPage() {
       if (!finalData) {
         console.log('Usando datos por defecto...')
         finalData = getDefaultData()
-        setOfflineMode(true)
+        localStorage.setItem('permisos-data', JSON.stringify(finalData))
       }
       
       setData(finalData)
       
       if (finalData.roles.length > 0) {
-        console.log('Datos establecidos, seleccionando rol...')
         setSelectedRol(finalData.roles[0].id)
-        
-        const rolActual = finalData.roles[0]
-        const totalPermisos = Object.values(rolActual.permisos).reduce((sum: number, mod: any) => 
-          sum + Object.values(mod).filter(Boolean).length, 0)
-        console.log(`Resumen - Rol: ${rolActual.nombre}, Permisos: ${totalPermisos}`)
-        
         setForceRender(prev => prev + 1)
         
         setTimeout(() => {
-          console.log('Forzando segunda actualización...')
           setSelectedRol(finalData.roles[0].id)
           setForceRender(prev => prev + 1)
         }, 200)
