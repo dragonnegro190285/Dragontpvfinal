@@ -1,6 +1,14 @@
-import Link from 'next/link'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
+  const router = useRouter()
+
+  useEffect(() => {
+    // Redirigir directamente a la página de login
+    router.push('/login')
+  }, [router])
+
   return (
     <main className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="container mx-auto p-8 text-center">
@@ -8,12 +16,7 @@ export default function Home() {
         <p className="text-gray-600 mb-8">
           Sistema de Punto de Venta - Configuración inicial completada
         </p>
-        <Link 
-          href="/login"
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors inline-block"
-        >
-          Ir a Login
-        </Link>
+        <p className="text-gray-600">Redirigiendo al login...</p>
       </div>
     </main>
   )
