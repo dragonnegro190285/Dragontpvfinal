@@ -111,7 +111,7 @@ export default function PermisosPage() {
       'categorias', 'promociones'
     ]
     
-    const acciones = ['crear', 'modificar', 'ver', 'eliminar', 'ajustar', 'exportar', 'gestionar']
+    const acciones = ['crear', 'modificar', 'ver', 'eliminar', 'ajustar', 'exportar', 'gestionar', 'movimientos', 'backup', 'restaurar']
     
     const roles: Rol[] = [
       {

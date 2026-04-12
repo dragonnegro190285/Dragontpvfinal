@@ -9,10 +9,11 @@ export async function GET() {
     const modulos = [
       'usuarios', 'proveedores', 'productos', 'compras', 'ventas', 
       'clientes', 'marcas', 'empresa', 'reportes', 'permisos',
-      'inventario', 'configuracion', 'sistema', 'auditoria'
+      'inventario', 'configuracion', 'sistema', 'auditoria',
+      'categorias', 'promociones'
     ]
     
-    const acciones = ['crear', 'modificar', 'ver', 'eliminar', 'ajustar', 'exportar', 'gestionar']
+    const acciones = ['crear', 'modificar', 'ver', 'eliminar', 'ajustar', 'exportar', 'gestionar', 'movimientos', 'backup', 'restaurar']
     
     // Roles con IDs reales (si existen en Supabase)
     const roles: any[] = [
