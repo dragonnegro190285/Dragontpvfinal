@@ -68,7 +68,7 @@ export default function EmpresaPage() {
   const [selectedRol, setSelectedRol] = useState<string>('')
   const [loadingPermisos, setLoadingPermisos] = useState(false)
   const pathname = usePathname()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   // Recargar al abrir la página o cuando cambia la ruta
   useEffect(() => {

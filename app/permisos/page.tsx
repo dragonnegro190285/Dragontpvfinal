@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 interface Permiso {
   id: string
@@ -24,6 +24,7 @@ interface PermisosData {
 }
 
 export default function PermisosPage() {
+  const router = useRouter()
   const [data, setData] = useState<PermisosData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -34,6 +35,7 @@ export default function PermisosPage() {
   const [forceRender, setForceRender] = useState(0) // Forzar re-render completo
   const [checkboxStates, setCheckboxStates] = useState<Record<string, boolean>>({}) // Estado directo
   const pathname = usePathname()
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   // Recargar permisos al abrir la página o cuando cambia la ruta
   useEffect(() => {
@@ -462,16 +464,60 @@ export default function PermisosPage() {
   }
 
   return (
-    <div className="p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Gestión de Permisos</h1>
-          {offlineMode && (
-            <div className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
-              Modo Offline
-            </div>
-          )}
+    <div className="flex min-h-screen bg-gray-100">
+      {/* Sidebar colapsable */}
+      <div className={`${sidebarOpen ? 'w-64' : 'w-0'} bg-gray-800 text-white transition-all duration-300 overflow-hidden`}>
+        <div className="p-4">
+          <h2 className="text-xl font-bold mb-4">Configuración</h2>
+          <nav className="space-y-2">
+            <button
+              onClick={() => router.push('/empresa')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              🏢 Empresa
+            </button>
+            <button
+              onClick={() => router.push('/permisos')}
+              className="w-full text-left px-4 py-2 rounded bg-gray-700 transition-colors"
+            >
+              🔐 Permisos
+            </button>
+          </nav>
+          <div className="mt-8 pt-4 border-t border-gray-700">
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              🏠 Volver al Dashboard
+            </button>
+          </div>
         </div>
+      </div>
+
+      {/* Contenido principal */}
+      <div className="flex-1 flex flex-col">
+        {/* Header con botón de toggle */}
+        <div className="bg-white shadow p-4">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="text-gray-600 hover:text-gray-800 focus:outline-none"
+            >
+              {sidebarOpen ? '◀' : '▶'} Menú
+            </button>
+            <h1 className="text-2xl font-bold">Gestión de Permisos</h1>
+            <div className="w-16"></div> {/* Espaciador para centrar */}
+          </div>
+        </div>
+
+        {/* Contenido */}
+        <div className="flex-1 p-6">
+          <div className="max-w-7xl mx-auto">
+            {offlineMode && (
+              <div className="mb-4 px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
+                Modo Offline
+              </div>
+            )}
 
         {success && (
           <div className="mb-4 p-4 bg-green-100 text-green-700 rounded">
@@ -606,6 +652,8 @@ export default function PermisosPage() {
               </div>
             </>
           )}
+        </div>
+          </div>
         </div>
       </div>
     </div>
