@@ -13,7 +13,7 @@ export default function Home() {
         const { data: { session } } = await supabase.auth.getSession()
         if (session) {
           // Si está logueado, ir a dashboard
-          router.push('/dashboard')
+          window.location.href = '/dashboard'
         } else {
           // Si no está logueado, ir a login
           router.push('/login')

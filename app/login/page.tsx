@@ -77,7 +77,8 @@ export default function LoginPage() {
       // Sistema 100% online - sin localStorage
       // La sesión se mantiene vía cookies de Supabase
 
-      router.push('/dashboard')
+      // Forzar recarga completa para establecer cookies
+      window.location.href = '/dashboard'
     } catch (err: any) {
       setError(err.message || 'Error al iniciar sesión')
     } finally {
@@ -116,7 +117,8 @@ export default function LoginPage() {
       // Sistema 100% online - sin localStorage
       // La sesión se mantiene vía cookies de Supabase
 
-      router.push('/dashboard')
+      // Forzar recarga completa para establecer cookies
+      window.location.href = '/dashboard'
     } catch (err: any) {
       setError(err.message || 'Error al crear administrador')
     } finally {
