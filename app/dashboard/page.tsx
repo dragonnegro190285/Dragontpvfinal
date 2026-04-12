@@ -60,13 +60,13 @@ export default function DashboardPage() {
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut()
-      router.push('/login')
+      router.push('/empresa')
       // Forzar recarga para limpiar el estado
-      window.location.href = '/login'
+      window.location.href = '/empresa'
     } catch (error) {
       console.error('Error al cerrar sesión:', error)
       // En caso de error, forzar redirección
-      window.location.href = '/login'
+      window.location.href = '/empresa'
     }
   }
 
