@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 
 interface Permiso {
   id: string
@@ -32,10 +33,13 @@ export default function PermisosPage() {
   const [offlineMode, setOfflineMode] = useState(false)
   const [forceRender, setForceRender] = useState(0) // Forzar re-render completo
   const [checkboxStates, setCheckboxStates] = useState<Record<string, boolean>>({}) // Estado directo
+  const pathname = usePathname()
 
+  // Recargar permisos al abrir la página o cuando cambia la ruta
   useEffect(() => {
+    console.log('Página de permisos abierta, recargando desde Supabase...')
     loadPermisos()
-  }, [])
+  }, [pathname])
 
   // Recargar permisos cuando la página gana foco (cuando el usuario regresa de otra vista)
   useEffect(() => {

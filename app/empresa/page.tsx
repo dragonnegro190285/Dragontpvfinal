@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 
 interface Empresa {
@@ -66,13 +67,15 @@ export default function EmpresaPage() {
   const [permisosData, setPermisosData] = useState<any>(null)
   const [selectedRol, setSelectedRol] = useState<string>('')
   const [loadingPermisos, setLoadingPermisos] = useState(false)
+  const pathname = usePathname()
 
+  // Recargar al abrir la página o cuando cambia la ruta
   useEffect(() => {
     loadEmpresa()
     if (activeTab === 'permisos') {
       loadPermisos()
     }
-  }, [activeTab])
+  }, [pathname, activeTab])
 
   // Recargar permisos cuando la página gana foco (cuando el usuario regresa de otra vista)
   useEffect(() => {
