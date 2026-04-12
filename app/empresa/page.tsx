@@ -74,6 +74,31 @@ export default function EmpresaPage() {
     }
   }, [activeTab])
 
+  // Recargar permisos cuando la página gana foco (cuando el usuario regresa de otra vista)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && activeTab === 'permisos') {
+        console.log('Página visible, recargando permisos...')
+        loadPermisos()
+      }
+    }
+
+    const handleFocus = () => {
+      if (activeTab === 'permisos') {
+        console.log('Página ganó foco, recargando permisos...')
+        loadPermisos()
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    window.addEventListener('focus', handleFocus)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('focus', handleFocus)
+    }
+  }, [activeTab])
+
   const loadPermisos = async () => {
     setLoadingPermisos(true)
     try {

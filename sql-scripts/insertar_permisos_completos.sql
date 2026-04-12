@@ -17,6 +17,9 @@ SELECT modulo, accion, descripcion FROM (
 ('usuarios', 'ajustar', 'Ajustar usuarios'),
 ('usuarios', 'exportar', 'Exportar usuarios'),
 ('usuarios', 'gestionar', 'Gestionar usuarios'),
+('usuarios', 'movimientos', 'Ver movimientos de usuarios'),
+('usuarios', 'backup', 'Realizar backup de usuarios'),
+('usuarios', 'restaurar', 'Restaurar backup de usuarios'),
 
 -- Proveedores
 ('proveedores', 'crear', 'Crear proveedores'),
@@ -26,6 +29,9 @@ SELECT modulo, accion, descripcion FROM (
 ('proveedores', 'ajustar', 'Ajustar proveedores'),
 ('proveedores', 'exportar', 'Exportar proveedores'),
 ('proveedores', 'gestionar', 'Gestionar proveedores'),
+('proveedores', 'movimientos', 'Ver movimientos de proveedores'),
+('proveedores', 'backup', 'Realizar backup de proveedores'),
+('proveedores', 'restaurar', 'Restaurar backup de proveedores'),
 
 -- Productos
 ('productos', 'crear', 'Crear productos'),
@@ -35,6 +41,9 @@ SELECT modulo, accion, descripcion FROM (
 ('productos', 'ajustar', 'Ajustar productos'),
 ('productos', 'exportar', 'Exportar productos'),
 ('productos', 'gestionar', 'Gestionar productos'),
+('productos', 'movimientos', 'Ver movimientos de productos'),
+('productos', 'backup', 'Realizar backup de productos'),
+('productos', 'restaurar', 'Restaurar backup de productos'),
 
 -- Compras
 ('compras', 'crear', 'Crear compras'),
@@ -44,6 +53,9 @@ SELECT modulo, accion, descripcion FROM (
 ('compras', 'ajustar', 'Ajustar compras'),
 ('compras', 'exportar', 'Exportar compras'),
 ('compras', 'gestionar', 'Gestionar compras'),
+('compras', 'movimientos', 'Ver movimientos de compras'),
+('compras', 'backup', 'Realizar backup de compras'),
+('compras', 'restaurar', 'Restaurar backup de compras'),
 
 -- Ventas
 ('ventas', 'crear', 'Crear ventas'),
@@ -53,6 +65,9 @@ SELECT modulo, accion, descripcion FROM (
 ('ventas', 'ajustar', 'Ajustar ventas'),
 ('ventas', 'exportar', 'Exportar ventas'),
 ('ventas', 'gestionar', 'Gestionar ventas'),
+('ventas', 'movimientos', 'Ver movimientos de ventas'),
+('ventas', 'backup', 'Realizar backup de ventas'),
+('ventas', 'restaurar', 'Restaurar backup de ventas'),
 
 -- Clientes
 ('clientes', 'crear', 'Crear clientes'),
@@ -62,6 +77,9 @@ SELECT modulo, accion, descripcion FROM (
 ('clientes', 'ajustar', 'Ajustar clientes'),
 ('clientes', 'exportar', 'Exportar clientes'),
 ('clientes', 'gestionar', 'Gestionar clientes'),
+('clientes', 'movimientos', 'Ver movimientos de clientes'),
+('clientes', 'backup', 'Realizar backup de clientes'),
+('clientes', 'restaurar', 'Restaurar backup de clientes'),
 
 -- Marcas
 ('marcas', 'crear', 'Crear marcas'),
@@ -71,6 +89,9 @@ SELECT modulo, accion, descripcion FROM (
 ('marcas', 'ajustar', 'Ajustar marcas'),
 ('marcas', 'exportar', 'Exportar marcas'),
 ('marcas', 'gestionar', 'Gestionar marcas'),
+('marcas', 'movimientos', 'Ver movimientos de marcas'),
+('marcas', 'backup', 'Realizar backup de marcas'),
+('marcas', 'restaurar', 'Restaurar backup de marcas'),
 
 -- Empresa
 ('empresa', 'crear', 'Crear empresa'),
@@ -80,6 +101,9 @@ SELECT modulo, accion, descripcion FROM (
 ('empresa', 'ajustar', 'Ajustar empresa'),
 ('empresa', 'exportar', 'Exportar empresa'),
 ('empresa', 'gestionar', 'Gestionar empresa'),
+('empresa', 'movimientos', 'Ver movimientos de empresa'),
+('empresa', 'backup', 'Realizar backup de empresa'),
+('empresa', 'restaurar', 'Restaurar backup de empresa'),
 
 -- Reportes
 ('reportes', 'crear', 'Crear reportes'),
@@ -89,6 +113,9 @@ SELECT modulo, accion, descripcion FROM (
 ('reportes', 'ajustar', 'Ajustar reportes'),
 ('reportes', 'exportar', 'Exportar reportes'),
 ('reportes', 'gestionar', 'Gestionar reportes'),
+('reportes', 'movimientos', 'Ver movimientos de reportes'),
+('reportes', 'backup', 'Realizar backup de reportes'),
+('reportes', 'restaurar', 'Restaurar backup de reportes'),
 
 -- Permisos
 ('permisos', 'crear', 'Crear permisos'),
@@ -98,6 +125,9 @@ SELECT modulo, accion, descripcion FROM (
 ('permisos', 'ajustar', 'Ajustar permisos'),
 ('permisos', 'exportar', 'Exportar permisos'),
 ('permisos', 'gestionar', 'Gestionar permisos'),
+('permisos', 'movimientos', 'Ver movimientos de permisos'),
+('permisos', 'backup', 'Realizar backup de permisos'),
+('permisos', 'restaurar', 'Restaurar backup de permisos'),
 
 -- Inventario
 ('inventario', 'crear', 'Crear inventario'),
@@ -107,6 +137,9 @@ SELECT modulo, accion, descripcion FROM (
 ('inventario', 'ajustar', 'Ajustar inventario'),
 ('inventario', 'exportar', 'Exportar inventario'),
 ('inventario', 'gestionar', 'Gestionar inventario'),
+('inventario', 'movimientos', 'Ver movimientos de inventario'),
+('inventario', 'backup', 'Realizar backup de inventario'),
+('inventario', 'restaurar', 'Restaurar backup de inventario'),
 
 -- Configuración
 ('configuracion', 'crear', 'Crear configuración'),
@@ -116,6 +149,9 @@ SELECT modulo, accion, descripcion FROM (
 ('configuracion', 'ajustar', 'Ajustar configuración'),
 ('configuracion', 'exportar', 'Exportar configuración'),
 ('configuracion', 'gestionar', 'Gestionar configuración'),
+('configuracion', 'movimientos', 'Ver movimientos de configuración'),
+('configuracion', 'backup', 'Realizar backup de configuración'),
+('configuracion', 'restaurar', 'Restaurar backup de configuración'),
 
 -- Sistema
 ('sistema', 'crear', 'Crear sistema'),
@@ -125,6 +161,9 @@ SELECT modulo, accion, descripcion FROM (
 ('sistema', 'ajustar', 'Ajustar sistema'),
 ('sistema', 'exportar', 'Exportar sistema'),
 ('sistema', 'gestionar', 'Gestionar sistema'),
+('sistema', 'movimientos', 'Ver movimientos de sistema'),
+('sistema', 'backup', 'Realizar backup'),
+('sistema', 'restaurar', 'Restaurar backup'),
 
 -- Auditoría
 ('auditoria', 'crear', 'Crear auditoría'),
@@ -134,13 +173,9 @@ SELECT modulo, accion, descripcion FROM (
 ('auditoria', 'ajustar', 'Ajustar auditoría'),
 ('auditoria', 'exportar', 'Exportar auditoría'),
 ('auditoria', 'gestionar', 'Gestionar auditoría'),
-
--- Inventario - acciones adicionales
-('inventario', 'movimientos', 'Ver movimientos de inventario'),
-
--- Sistema - acciones adicionales
-('sistema', 'backup', 'Realizar backup'),
-('sistema', 'restaurar', 'Restaurar backup'),
+('auditoria', 'movimientos', 'Ver movimientos de auditoría'),
+('auditoria', 'backup', 'Realizar backup de auditoría'),
+('auditoria', 'restaurar', 'Restaurar backup de auditoría'),
 
 -- Categorías
 ('categorias', 'crear', 'Crear categorías'),
@@ -150,6 +185,9 @@ SELECT modulo, accion, descripcion FROM (
 ('categorias', 'ajustar', 'Ajustar categorías'),
 ('categorias', 'exportar', 'Exportar categorías'),
 ('categorias', 'gestionar', 'Gestionar categorías'),
+('categorias', 'movimientos', 'Ver movimientos de categorías'),
+('categorias', 'backup', 'Realizar backup de categorías'),
+('categorias', 'restaurar', 'Restaurar backup de categorías'),
 
 -- Promociones
 ('promociones', 'crear', 'Crear promociones'),
@@ -158,7 +196,10 @@ SELECT modulo, accion, descripcion FROM (
 ('promociones', 'eliminar', 'Eliminar promociones'),
 ('promociones', 'ajustar', 'Ajustar promociones'),
 ('promociones', 'exportar', 'Exportar promociones'),
-('promociones', 'gestionar', 'Gestionar promociones')
+('promociones', 'gestionar', 'Gestionar promociones'),
+('promociones', 'movimientos', 'Ver movimientos de promociones'),
+('promociones', 'backup', 'Realizar backup de promociones'),
+('promociones', 'restaurar', 'Restaurar backup de promociones')
 ) AS nuevos_permisos(modulo, accion, descripcion)
 WHERE NOT EXISTS (
   SELECT 1 FROM permisos 

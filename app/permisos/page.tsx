@@ -37,6 +37,29 @@ export default function PermisosPage() {
     loadPermisos()
   }, [])
 
+  // Recargar permisos cuando la página gana foco (cuando el usuario regresa de otra vista)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('Página visible, recargando permisos...')
+        loadPermisos()
+      }
+    }
+
+    const handleFocus = () => {
+      console.log('Página ganó foco, recargando permisos...')
+      loadPermisos()
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    window.addEventListener('focus', handleFocus)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('focus', handleFocus)
+    }
+  }, [])
+
   const loadPermisos = async () => {
     try {
       console.log('Cargando permisos - 100% ONLINE')
