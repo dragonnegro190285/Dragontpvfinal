@@ -14,7 +14,8 @@ export default function DashboardPage() {
     productos: false,
     proveedores: false,
     clientes: false,
-    usuarios: false
+    usuarios: false,
+    configuracion: false
   })
 
   const toggleSection = (section: string) => {
@@ -189,6 +190,31 @@ export default function DashboardPage() {
                 )}
               </div>
             )}
+            <div>
+              <button
+                onClick={() => toggleSection('configuracion')}
+                className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors flex items-center justify-between"
+              >
+                <h3 className="text-sm font-semibold text-gray-400">Configuración</h3>
+                <span>{expandedSections.configuracion ? '▼' : '▶'}</span>
+              </button>
+              {expandedSections.configuracion && (
+                <div className="ml-2 space-y-1">
+                  <button
+                    className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+                    onClick={() => router.push('/empresa')}
+                  >
+                    🏢 Empresa
+                  </button>
+                  <button
+                    className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+                    onClick={() => router.push('/permisos')}
+                  >
+                    🔐 Permisos
+                  </button>
+                </div>
+              )}
+            </div>
           </nav>
         </div>
       </div>
