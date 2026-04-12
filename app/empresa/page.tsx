@@ -68,6 +68,7 @@ export default function EmpresaPage() {
   const [selectedRol, setSelectedRol] = useState<string>('')
   const [loadingPermisos, setLoadingPermisos] = useState(false)
   const pathname = usePathname()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   // Recargar al abrir la página o cuando cambia la ruta
   useEffect(() => {
@@ -313,24 +314,89 @@ export default function EmpresaPage() {
   if (loading) return <div className="min-h-screen bg-gray-100 flex items-center justify-center"><div className="text-xl">Cargando...</div></div>
 
   return (
-    <div className="container mx-auto px-4 py-4 md:py-8">
-      <div className="bg-white rounded-lg shadow p-4 md:p-6">
-        <h1 className="text-2xl md:text-3xl font-bold mb-6">Configuración de Empresa</h1>
-        {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
-        {success && <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">{success}</div>}
-
-        <div className="border-b border-gray-200 mb-6">
-          <nav className="-mb-px flex space-x-8 overflow-x-auto">
-            {tabs.map((tab) => (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                className={`${activeTab === tab.id ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}>
-                {tab.label}
-              </button>
-            ))}
+    <div className="flex min-h-screen bg-gray-100">
+      {/* Sidebar colapsable */}
+      <div className={`${sidebarOpen ? 'w-64' : 'w-0'} bg-gray-800 text-white transition-all duration-300 overflow-hidden`}>
+        <div className="p-4">
+          <h2 className="text-xl font-bold mb-4">Configuración</h2>
+          <nav className="space-y-2">
+            <button
+              onClick={() => setActiveTab('generales')}
+              className={`w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors ${activeTab === 'generales' ? 'bg-gray-700' : ''}`}
+            >
+              📋 Datos Generales
+            </button>
+            <button
+              onClick={() => setActiveTab('direccion')}
+              className={`w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors ${activeTab === 'direccion' ? 'bg-gray-700' : ''}`}
+            >
+              📍 Dirección
+            </button>
+            <button
+              onClick={() => setActiveTab('contacto')}
+              className={`w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors ${activeTab === 'contacto' ? 'bg-gray-700' : ''}`}
+            >
+              📞 Contacto
+            </button>
+            <button
+              onClick={() => setActiveTab('fiscal')}
+              className={`w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors ${activeTab === 'fiscal' ? 'bg-gray-700' : ''}`}
+            >
+              💰 Fiscal
+            </button>
+            <button
+              onClick={() => setActiveTab('bancaria')}
+              className={`w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors ${activeTab === 'bancaria' ? 'bg-gray-700' : ''}`}
+            >
+              🏦 Bancaria
+            </button>
+            <button
+              onClick={() => setActiveTab('mensajes')}
+              className={`w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors ${activeTab === 'mensajes' ? 'bg-gray-700' : ''}`}
+            >
+              📝 Mensajes
+            </button>
+            <button
+              onClick={() => setActiveTab('permisos')}
+              className={`w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors ${activeTab === 'permisos' ? 'bg-gray-700' : ''}`}
+            >
+              🔐 Permisos
+            </button>
           </nav>
+          <div className="mt-8 pt-4 border-t border-gray-700">
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              🏠 Volver al Dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Contenido principal */}
+      <div className="flex-1 flex flex-col">
+        {/* Header con botón de toggle */}
+        <div className="bg-white shadow p-4">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="text-gray-600 hover:text-gray-800 focus:outline-none"
+            >
+              {sidebarOpen ? '◀' : '▶'} Menú
+            </button>
+            <h1 className="text-2xl font-bold">Configuración de Empresa</h1>
+            <div className="w-16"></div> {/* Espaciador para centrar */}
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Contenido del formulario */}
+        <div className="flex-1 p-4 md:p-8">
+          <div className="bg-white rounded-lg shadow p-4 md:p-6">
+            {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
+            {success && <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">{success}</div>}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
           {activeTab === 'generales' && (
             <div className="space-y-4">
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
@@ -582,7 +648,7 @@ export default function EmpresaPage() {
           )}
 
           <div className="flex justify-between items-center border-t pt-6">
-            <button type="button" onClick={() => router.push('/')} className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">Cancelar</button>
+            <button type="button" onClick={() => router.push('/dashboard')} className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">Cancelar</button>
             <div className="flex gap-2">
               {tabs.map((tab) => (
                 <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)} className={`px-3 py-1 text-sm rounded ${activeTab === tab.id ? 'bg-gray-200' : 'bg-gray-100 hover:bg-gray-200'}`}>{tab.label.split(' ')[1]}</button>
@@ -591,6 +657,8 @@ export default function EmpresaPage() {
             </div>
           </div>
         </form>
+          </div>
+        </div>
       </div>
     </div>
   )
