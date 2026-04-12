@@ -152,6 +152,7 @@ export default function EmpresaPage() {
   const handlePermisoChange = async (rolId: string, modulo: string, accion: string, checked: boolean) => {
     if (!permisosData) return
     
+    // ACTUALIZACIÓN INMEDIATA DE UI
     const updatedRoles = permisosData.roles.map((rol: any) => {
       if (rol.id === rolId) {
         const updatedPermisos = { ...rol.permisos }
@@ -163,70 +164,42 @@ export default function EmpresaPage() {
       return rol
     })
     
+    // Actualizar estado inmediatamente (sin await)
     setPermisosData({ ...permisosData, roles: updatedRoles })
 
-    // Guardar en localStorage como backup (igual que en /permisos)
-    try {
-      localStorage.setItem('permisos-guardados', JSON.stringify(updatedRoles))
-      console.log('Permisos guardados en localStorage:', updatedRoles)
-    } catch (error) {
-      console.error('Error al guardar en localStorage:', error)
-    }
+    // Guardar en localStorage inmediatamente (sin await)
+    localStorage.setItem('permisos-guardados', JSON.stringify(updatedRoles))
+    console.log('Permisos guardados en localStorage (inmediato):', { rolId, modulo, accion, checked })
 
-    try {
-      // PRIORIDAD: APIs que conectan a Supabase real
-      let response = await fetch('/api/permisos-test', {
+    // LLAMADAS API EN PARALELO (sin bloquear UI)
+    Promise.all([
+      // Intentar API test
+      fetch('/api/permisos-test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          rol_id: rolId,
-          modulo,
-          accion,
-          checked
-        })
+        body: JSON.stringify({ rol_id: rolId, modulo, accion, checked })
+      }),
+      // Intentar API pública en paralelo
+      fetch('/api/permisos-public', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rol_id: rolId, modulo, accion, checked })
       })
-
-      if (!response.ok) {
-        console.log('API test no disponible, intentando API pública...')
-        response = await fetch('/api/permisos-public', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            rol_id: rolId,
-            modulo,
-            accion,
-            checked
-          })
-        })
+    ]).then(([testResponse, publicResponse]) => {
+      // Usar la primera respuesta exitosa
+      if (testResponse.ok) {
+        console.log('Permiso guardado en API test:', { rolId, modulo, accion, checked })
+        setSuccess('Permiso actualizado en base de datos')
+      } else if (publicResponse.ok) {
+        console.log('Permiso guardado en API pública:', { rolId, modulo, accion, checked })
+        setSuccess('Permiso actualizado en base de datos')
+      } else {
+        console.log('APIs no disponibles, usando localStorage como backup')
       }
-
-      if (!response.ok) {
-        console.log('APIs reales no disponibles, usando API simple...')
-        response = await fetch('/api/permisos-simple', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            rol_id: rolId,
-            modulo,
-            accion,
-            checked
-          })
-        })
-      }
-
-      const result = await response.json()
-      
-      if (!response.ok) {
-        throw new Error(result.error || 'Error al actualizar permiso')
-      }
-      
-      console.log('Permiso actualizado:', result)
-      setSuccess('Permiso actualizado correctamente')
-      setTimeout(() => setSuccess(''), 3000)
-    } catch (err: any) {
-      console.error('Error al actualizar permiso:', err)
-      setError(err.message)
-    }
+      setTimeout(() => setSuccess(''), 2000)
+    }).catch(err => {
+      console.log('Error en APIs, persistiendo en localStorage:', err)
+    })
   }
 
   const toggleAllPermisos = (rolId: string, modulo: string, checked: boolean) => {

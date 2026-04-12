@@ -235,91 +235,69 @@ export default function PermisosPage() {
   const handlePermisoChange = async (rolId: string, modulo: string, accion: string, checked: boolean) => {
     console.log('Cambiando permiso:', { rolId, modulo, accion, checked })
     
-    setSaving(true)
-    setError('')
-    setSuccess('')
+    // ACTUALIZACIÓN INMEDIATA DE UI - Sin bloquear
+    const checkboxKey = `${modulo}-${accion}`
+    setCheckboxStates(prev => ({
+      ...prev,
+      [checkboxKey]: checked
+    }))
+    console.log('Estado directo actualizado:', checkboxKey, checked)
 
-    try {
-      // PRIMERO: Actualizar estado directo de checkboxes inmediatamente
-      const checkboxKey = `${modulo}-${accion}`
-      setCheckboxStates(prev => ({
-        ...prev,
-        [checkboxKey]: checked
-      }))
-      console.log('Estado directo actualizado:', checkboxKey, checked)
-
-      // SEGUNDO: Actualizar datos del rol en el estado
-      if (data) {
-        const updatedRoles = data.roles.map(rol => {
-          if (rol.id === rolId) {
-            const updatedPermisos = {
-              ...rol.permisos,
-              [modulo]: {
-                ...rol.permisos[modulo],
-                [accion]: checked
-              }
+    // Actualizar datos del rol en el estado inmediatamente
+    if (data) {
+      const updatedRoles = data.roles.map(rol => {
+        if (rol.id === rolId) {
+          const updatedPermisos = {
+            ...rol.permisos,
+            [modulo]: {
+              ...rol.permisos[modulo],
+              [accion]: checked
             }
-            console.log('Permisos del rol actualizados:', updatedPermisos)
-            return { ...rol, permisos: updatedPermisos }
           }
-          return rol
-        })
-
-        setData({ ...data, roles: updatedRoles })
-        saveToLocalStorage(updatedRoles)
-      }
-
-      // TERCERO: Intentar guardar en APIs reales que conectan a Supabase
-      try {
-        let response = await fetch('/api/permisos-test', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ rol_id: rolId, modulo, accion, checked })
-        })
-
-        if (!response.ok) {
-          console.log('API test no disponible, intentando API pública...')
-          response = await fetch('/api/permisos-public', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ rol_id: rolId, modulo, accion, checked })
-          })
+          console.log('Permisos del rol actualizados:', updatedPermisos)
+          return { ...rol, permisos: updatedPermisos }
         }
+        return rol
+      })
 
-        if (response.ok) {
-          const result = await response.json()
-          console.log('Permiso guardado en API real:', result)
-          setSuccess(`Permiso ${checked ? 'activado' : 'desactivado'} correctamente`)
-        } else {
-          console.log('APIs reales no disponibles, usando localStorage')
-          setSuccess(`Permiso ${checked ? 'activado' : 'desactivado'} (offline)`)
-        }
-      } catch (apiError) {
-        console.log('Error en APIs reales, usando localStorage:', apiError)
-        setSuccess(`Permiso ${checked ? 'activado' : 'desactivado'} (offline)`)
-      }
-
-      // CUARTO: Forzar re-render para asegurar consistencia
-      setTimeout(() => {
-        setForceRender(prev => prev + 1)
-      }, 50)
-
-      setTimeout(() => setSuccess(''), 3000)
-    } catch (err: any) {
-      console.error('Error al cambiar permiso:', err)
-      setError('Error al cambiar permiso')
-      
-      // Revertir estado directo si hay error
-      const checkboxKey = `${modulo}-${accion}`
-      setCheckboxStates(prev => ({
-        ...prev,
-        [checkboxKey]: !checked
-      }))
-      
-      setTimeout(() => setError(''), 3000)
-    } finally {
-      setSaving(false)
+      setData({ ...data, roles: updatedRoles })
+      saveToLocalStorage(updatedRoles)
     }
+
+    // LLAMADAS API EN PARALELO (sin bloquear UI)
+    Promise.all([
+      // Intentar API test
+      fetch('/api/permisos-test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rol_id: rolId, modulo, accion, checked })
+      }),
+      // Intentar API pública en paralelo
+      fetch('/api/permisos-public', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rol_id: rolId, modulo, accion, checked })
+      })
+    ]).then(([testResponse, publicResponse]) => {
+      // Usar la primera respuesta exitosa
+      if (testResponse.ok) {
+        console.log('Permiso guardado en API test:', { rolId, modulo, accion, checked })
+        setSuccess(`Permiso ${checked ? 'activado' : 'desactivado'} en base de datos`)
+      } else if (publicResponse.ok) {
+        console.log('Permiso guardado en API pública:', { rolId, modulo, accion, checked })
+        setSuccess(`Permiso ${checked ? 'activado' : 'desactivado'} en base de datos`)
+      } else {
+        console.log('APIs no disponibles, usando localStorage como backup')
+      }
+      setTimeout(() => setSuccess(''), 2000)
+    }).catch(err => {
+      console.log('Error en APIs, persistiendo en localStorage:', err)
+    })
+
+    // Forzar re-render rápido
+    setTimeout(() => {
+      setForceRender(prev => prev + 1)
+    }, 10)
   }
 
   const handleSaveAll = async () => {
