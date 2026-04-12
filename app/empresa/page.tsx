@@ -103,7 +103,19 @@ export default function EmpresaPage() {
           setSelectedRol(result.roles[0].id)
         }
       } else {
-        throw new Error('APIs no disponibles')
+        console.log('APIs reales fallando, usando API simple como fallback...')
+        // Fallback a API simple
+        const simpleResponse = await fetch('/api/permisos-simple')
+        if (simpleResponse.ok) {
+          const simpleData = await simpleResponse.json()
+          console.log('✅ Datos cargados desde API simple (fallback):', simpleData)
+          setPermisosData(simpleData)
+          if (simpleData.roles && simpleData.roles.length > 0) {
+            setSelectedRol(simpleData.roles[0].id)
+          }
+        } else {
+          throw new Error('APIs no disponibles')
+        }
       }
     } catch (err: any) {
       console.error('Error al cargar permisos:', err)

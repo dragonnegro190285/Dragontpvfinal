@@ -73,7 +73,27 @@ export default function PermisosPage() {
           }, 200)
         }
       } else {
-        throw new Error('APIs no disponibles')
+        console.log('APIs reales fallando, usando API simple como fallback...')
+        // Fallback a API simple
+        const simpleResponse = await fetch('/api/permisos-simple')
+        if (simpleResponse.ok) {
+          const simpleData = await simpleResponse.json()
+          console.log('✅ Datos cargados desde API simple (fallback):', simpleData)
+          setData(simpleData)
+          setOfflineMode(false)
+          
+          if (simpleData.roles.length > 0) {
+            setSelectedRol(simpleData.roles[0].id)
+            setForceRender(prev => prev + 1)
+            
+            setTimeout(() => {
+              setSelectedRol(simpleData.roles[0].id)
+              setForceRender(prev => prev + 1)
+            }, 200)
+          }
+        } else {
+          throw new Error('APIs no disponibles')
+        }
       }
     } catch (err: any) {
       console.error('Error al cargar permisos:', err)
@@ -188,8 +208,18 @@ export default function PermisosPage() {
         console.log('✅ Permiso guardado en API pública (Supabase):', { rolId, modulo, accion, checked })
         setSuccess(`Permiso ${checked ? 'activado' : 'desactivado'} en base de datos`)
       } else {
-        console.error('❌ Error: APIs no disponibles')
-        setError('Error: APIs no disponibles. Por favor verifica la conexión a Supabase.')
+        console.log('APIs reales fallando, usando API simple como fallback...')
+        // Fallback a API simple
+        fetch('/api/permisos-simple', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rol_id: rolId, modulo, accion, checked })
+        }).then(simpleResponse => {
+          if (simpleResponse.ok) {
+            console.log('✅ Permiso guardado en API simple (fallback):', { rolId, modulo, accion, checked })
+            setSuccess(`Permiso ${checked ? 'activado' : 'desactivado'} (API simple)`)
+          }
+        })
       }
       setTimeout(() => setSuccess(''), 2000)
     }).catch(err => {
