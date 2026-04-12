@@ -70,8 +70,8 @@ export default function PermisosPage() {
             })
           }
           
-          setOfflineMode(true)
-          console.log('Modo offline activado - usando localStorage')
+          // NO activar modo offline automáticamente - localStorage es un backup válido
+          console.log('Datos cargados desde localStorage (backup)')
         } catch (parseError) {
           console.error('Error al parsear localStorage:', parseError)
           // Limpiar localStorage corrupto
@@ -106,6 +106,8 @@ export default function PermisosPage() {
             apiData = await response.json()
             console.log('Datos cargados desde API real:', apiData)
             finalData = apiData
+            // NO activar modo offline si la API real funciona
+            setOfflineMode(false)
           } else {
             console.log('APIs reales no disponibles, usando fallback simple...')
             // Fallback solo si las reales fallan
@@ -370,8 +372,11 @@ export default function PermisosPage() {
       saveToLocalStorage(data.roles)
       
       if (!apiSuccess) {
-        setSuccess('Permisos guardados localmente (modo offline)')
+        setSuccess('Permisos guardados localmente')
         setOfflineMode(true)
+      } else {
+        setSuccess('Permisos guardados exitosamente en base de datos')
+        setOfflineMode(false)
       }
       
       setTimeout(() => setSuccess(''), 5000)
