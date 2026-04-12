@@ -70,6 +70,11 @@ export default function EmpresaPage() {
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
+  // Monitorear cambios en sidebarOpen
+  useEffect(() => {
+    console.log('Sidebar state changed to:', sidebarOpen)
+  }, [sidebarOpen])
+
   // Recargar al abrir la página o cuando cambia la ruta
   useEffect(() => {
     loadEmpresa()
@@ -380,7 +385,10 @@ export default function EmpresaPage() {
         <div className="bg-white shadow p-4">
           <div className="flex items-center justify-between">
             <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
+              onClick={() => {
+                console.log('Toggle sidebar clicked, current state:', sidebarOpen)
+                setSidebarOpen(!sidebarOpen)
+              }}
               className="text-gray-600 hover:text-gray-800 focus:outline-none"
             >
               {sidebarOpen ? '◀' : '▶'} Menú
