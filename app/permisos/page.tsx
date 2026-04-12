@@ -82,35 +82,42 @@ export default function PermisosPage() {
       
       // SEGUNDO: Solo intentar APIs si NO hay nada en localStorage
       if (!finalData) {
-        console.log('No hay datos en localStorage, intentando APIs...')
+        console.log('No hay datos en localStorage, intentando APIs reales...')
         let apiData = null
         
         try {
-          // Intentar con la API simple primero
-          let response = await fetch('/api/permisos-simple')
+          // PRIORIDAD: APIs que conectan a Supabase real
+          let response = await fetch('/api/permisos-test', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'get_all' })
+          })
           
           if (!response.ok) {
-            // Fallback a API de prueba
-            response = await fetch('/api/permisos-test')
-          }
-          
-          if (!response.ok) {
-            // Fallback a API pública
-            response = await fetch('/api/permisos-public')
-          }
-          
-          if (!response.ok) {
-            // Fallback a API original
-            response = await fetch('/api/permisos')
+            console.log('API test no disponible, intentando API pública...')
+            response = await fetch('/api/permisos-public', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'get_all' })
+            })
           }
           
           if (response.ok) {
             apiData = await response.json()
-            console.log('Datos cargados desde API:', apiData)
+            console.log('Datos cargados desde API real:', apiData)
             finalData = apiData
+          } else {
+            console.log('APIs reales no disponibles, usando fallback simple...')
+            // Fallback solo si las reales fallan
+            response = await fetch('/api/permisos-simple')
+            if (response.ok) {
+              apiData = await response.json()
+              console.log('Datos cargados desde API simple (fallback):', apiData)
+              finalData = apiData
+            }
           }
         } catch (apiError) {
-          console.error('Error al cargar desde API:', apiError)
+          console.error('Error al cargar desde APIs:', apiError)
         }
       }
       
@@ -260,23 +267,33 @@ export default function PermisosPage() {
         saveToLocalStorage(updatedRoles)
       }
 
-      // TERCERO: Intentar guardar en API (si funciona)
+      // TERCERO: Intentar guardar en APIs reales que conectan a Supabase
       try {
-        const response = await fetch('/api/permisos-simple', {
+        let response = await fetch('/api/permisos-test', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ rol_id: rolId, modulo, accion, checked })
         })
 
+        if (!response.ok) {
+          console.log('API test no disponible, intentando API pública...')
+          response = await fetch('/api/permisos-public', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ rol_id: rolId, modulo, accion, checked })
+          })
+        }
+
         if (response.ok) {
-          console.log('Permiso guardado en API:', { rolId, modulo, accion, checked })
+          const result = await response.json()
+          console.log('Permiso guardado en API real:', result)
           setSuccess(`Permiso ${checked ? 'activado' : 'desactivado'} correctamente`)
         } else {
-          console.log('API no disponible, usando localStorage')
+          console.log('APIs reales no disponibles, usando localStorage')
           setSuccess(`Permiso ${checked ? 'activado' : 'desactivado'} (offline)`)
         }
       } catch (apiError) {
-        console.log('Error en API, persistiendo en localStorage:', apiError)
+        console.log('Error en APIs reales, usando localStorage:', apiError)
         setSuccess(`Permiso ${checked ? 'activado' : 'desactivado'} (offline)`)
       }
 
@@ -316,8 +333,9 @@ export default function PermisosPage() {
       // Intentar guardar en API si está disponible
       let apiSuccess = false
       
+      // PRIORIDAD: APIs que conectan a Supabase real
       try {
-        let response = await fetch('/api/permisos-simple', {
+        let response = await fetch('/api/permisos-test', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -327,17 +345,7 @@ export default function PermisosPage() {
         })
 
         if (!response.ok) {
-          response = await fetch('/api/permisos-test', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              rol_id: selectedRol,
-              permisos: selectedRolData.permisos
-            })
-          })
-        }
-
-        if (!response.ok) {
+          console.log('API test no disponible, intentando API pública...')
           response = await fetch('/api/permisos-public', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -350,12 +358,12 @@ export default function PermisosPage() {
 
         if (response.ok) {
           const result = await response.json()
-          console.log('Guardado exitoso en API:', result)
+          console.log('Guardado exitoso en API real:', result)
           setSuccess(result.message)
           apiSuccess = true
         }
       } catch (apiError) {
-        console.log('Error al guardar en API, usando localStorage:', apiError)
+        console.log('Error en APIs reales, usando localStorage:', apiError)
       }
       
       // Siempre guardar en localStorage como backup
