@@ -9,6 +9,7 @@ export default function ProductosPage() {
   const [productos, setProductos] = useState<Producto[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   useEffect(() => {
     loadProductos()
@@ -57,26 +58,93 @@ export default function ProductosPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => router.push('/dashboard')}
-                className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
-              >
-                ← Volver
-              </button>
-              <h1 className="text-2xl font-bold">Gestión de Productos</h1>
-            </div>
+    <div className="flex min-h-screen bg-gray-100">
+      {/* Sidebar colapsable */}
+      <div className={`${sidebarOpen ? 'w-64' : 'w-0'} bg-gray-800 text-white transition-all duration-300 overflow-hidden`}>
+        <div className="p-4">
+          <h2 className="text-xl font-bold mb-4">Menú Principal</h2>
+          <nav className="space-y-2">
             <button
-              onClick={() => router.push('/productos/nuevo')}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              onClick={() => router.push('/dashboard')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
             >
-              + Nuevo Producto
+              🏠 Dashboard
+            </button>
+            <button
+              onClick={() => router.push('/productos')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors bg-gray-700"
+            >
+              📦 Productos
+            </button>
+            <button
+              onClick={() => router.push('/proveedores')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              📦 Proveedores
+            </button>
+            <button
+              onClick={() => router.push('/clientes')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              👤 Clientes
+            </button>
+            <button
+              onClick={() => router.push('/usuarios')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              👥 Usuarios
+            </button>
+            <button
+              onClick={() => router.push('/empresa')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              🏢 Empresa
+            </button>
+            <button
+              onClick={() => router.push('/permisos')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              🔐 Permisos
+            </button>
+          </nav>
+          <div className="mt-8 pt-4 border-t border-gray-700">
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              🏠 Volver al Dashboard
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* Contenido principal */}
+      <div className="flex-1 flex flex-col">
+        {/* Header con botón de toggle */}
+        <div className="bg-white shadow p-4">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="text-gray-600 hover:text-gray-800 focus:outline-none"
+            >
+              {sidebarOpen ? '◀' : '▶'} Menú
+            </button>
+            <h1 className="text-2xl font-bold">Gestión de Productos</h1>
+            <div className="w-16"></div> {/* Espaciador para centrar */}
+          </div>
+        </div>
+
+        {/* Contenido */}
+        <div className="flex-1 p-4 md:p-8">
+          <div className="bg-white rounded-lg shadow p-4 md:p-6">
+            <div className="flex justify-between items-center mb-6">
+              <button
+                onClick={() => router.push('/productos/nuevo')}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              >
+                + Nuevo Producto
+              </button>
+            </div>
 
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -183,6 +251,7 @@ export default function ProductosPage() {
               No hay productos registrados
             </div>
           )}
+          </div>
         </div>
       </div>
     </div>
