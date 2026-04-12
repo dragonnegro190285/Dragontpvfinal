@@ -348,17 +348,6 @@ export default function PermisosPage() {
           })
         }
 
-        if (!response.ok) {
-          response = await fetch('/api/permisos', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              rol_id: selectedRol,
-              permisos: selectedRolData.permisos
-            })
-          })
-        }
-
         if (response.ok) {
           const result = await response.json()
           console.log('Guardado exitoso en API:', result)
