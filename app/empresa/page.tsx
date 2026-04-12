@@ -104,7 +104,14 @@ export default function EmpresaPage() {
         console.log('✅ Datos cargados desde API online:', result)
         finalData = result
       } else {
-        console.log('APIs no disponibles, intentando localStorage como fallback...')
+        console.log('APIs reales no disponibles, intentando API simple...')
+        // Fallback inmediato a API simple (siempre funciona)
+        response = await fetch('/api/permisos-simple')
+        if (response.ok) {
+          const result = await response.json()
+          console.log('✅ Datos cargados desde API simple (fallback):', result)
+          finalData = result
+        }
       }
 
       // SEGUNDO: Solo usar localStorage si APIs fallan (fallback)
