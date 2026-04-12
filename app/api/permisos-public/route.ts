@@ -115,6 +115,73 @@ export async function POST(request: Request) {
     })
 
     const body = await request.json()
+    console.log('POST API pública - Datos recibidos:', body)
+    
+    // Manejar action: 'get_all'
+    if (body.action === 'get_all') {
+      console.log('API pública POST - action: get_all')
+      
+      // Obtener todos los permisos
+      const { data: permisos, error: permisosError } = await supabase
+        .from('permisos')
+        .select('*')
+        .order('modulo', { ascending: true })
+
+      if (permisosError) throw permisosError
+
+      // Obtener roles con sus permisos
+      const { data: roles, error: rolesError } = await supabase
+        .from('roles')
+        .select(`
+          id,
+          nombre,
+          roles_permisos (
+            permiso_id,
+            permisos (
+              id,
+              modulo,
+              accion,
+              descripcion
+            )
+          )
+        `)
+        .order('nombre')
+
+      if (rolesError) throw rolesError
+
+      // Organizar datos para el frontend
+      const modulos = Array.from(new Set(permisos.map(p => p.modulo)))
+      const acciones = Array.from(new Set(permisos.map(p => p.accion))).sort()
+      
+      const permisosPorRol = roles.map(rol => {
+        const rolPermisos = rol.roles_permisos.map((rp: any) => rp.permisos).filter(Boolean)
+        
+        const permisosMap = new Map()
+        
+        modulos.forEach(modulo => {
+          const moduloPermisos: Record<string, boolean> = {}
+          acciones.forEach(accion => {
+            moduloPermisos[accion] = rolPermisos.some((p: any) => p.modulo === modulo && p.accion === accion)
+          })
+          permisosMap.set(modulo, moduloPermisos)
+        })
+        
+        return {
+          id: rol.id,
+          nombre: rol.nombre,
+          permisos: Object.fromEntries(permisosMap)
+        }
+      })
+
+      return NextResponse.json({ 
+        modulos,
+        acciones,
+        roles: permisosPorRol,
+        permisos: permisos
+      })
+    }
+    
+    // Manejar actualización individual de permiso
     const { rol_id, modulo, accion, checked } = body
 
     console.log('POST API - Datos recibidos:', { rol_id, modulo, accion, checked })

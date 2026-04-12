@@ -163,6 +163,100 @@ export async function POST(request: Request) {
     const body = await request.json()
     console.log('API de prueba POST - Datos recibidos:', body)
     
+    // Manejar action: 'get_all'
+    if (body.action === 'get_all') {
+      console.log('API test POST - action: get_all')
+      
+      // Verificar variables de entorno
+      if (!supabaseUrl || !supabaseServiceKey) {
+        console.log('Variables de entorno faltantes, usando datos de prueba')
+        return getTestData()
+      }
+
+      const supabase = createClient(supabaseUrl!, supabaseServiceKey!, {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      })
+
+      console.log('Conectando a Supabase...')
+
+      // Obtener todos los permisos
+      const { data: permisos, error: permisosError } = await supabase
+        .from('permisos')
+        .select('*')
+        .order('modulo', { ascending: true })
+
+      if (permisosError) {
+        console.error('Error al obtener permisos de Supabase:', permisosError)
+        console.log('Usando datos de prueba como fallback')
+        return getTestData()
+      }
+
+      // Obtener roles con sus permisos
+      const { data: roles, error: rolesError } = await supabase
+        .from('roles')
+        .select(`
+          id,
+          nombre,
+          roles_permisos (
+            permiso_id,
+            permisos (
+              id,
+              modulo,
+              accion,
+              descripcion
+            )
+          )
+        `)
+        .order('nombre')
+
+      if (rolesError) {
+        console.error('Error al obtener roles de Supabase:', rolesError)
+        console.log('Usando datos de prueba como fallback')
+        return getTestData()
+      }
+
+      console.log('Datos obtenidos de Supabase:', {
+        permisos: permisos.length,
+        roles: roles.length
+      })
+
+      // Organizar datos para el frontend
+      const modulos = Array.from(new Set(permisos.map(p => p.modulo)))
+      const acciones = Array.from(new Set(permisos.map(p => p.accion))).sort()
+      
+      const permisosPorRol = roles.map(rol => {
+        const rolPermisos = rol.roles_permisos.map((rp: any) => rp.permisos).filter(Boolean)
+        
+        const permisosMap = new Map()
+        
+        modulos.forEach(modulo => {
+          const moduloPermisos: Record<string, boolean> = {}
+          acciones.forEach(accion => {
+            moduloPermisos[accion] = rolPermisos.some((p: any) => p.modulo === modulo && p.accion === accion)
+          })
+          permisosMap.set(modulo, moduloPermisos)
+        })
+        
+        return {
+          id: rol.id,
+          nombre: rol.nombre,
+          permisos: Object.fromEntries(permisosMap)
+        }
+      })
+
+      return NextResponse.json({ 
+        modulos,
+        acciones,
+        roles: permisosPorRol,
+        permisos: permisos
+      })
+    }
+    
+    // Manejar actualización individual de permiso
+    
     // Intentar usar Supabase si está disponible
     if (supabaseUrl && supabaseServiceKey) {
       try {
