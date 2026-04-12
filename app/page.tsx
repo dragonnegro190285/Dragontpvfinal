@@ -7,8 +7,8 @@ export default function Home() {
   const router = useRouter()
 
   useEffect(() => {
-    // Redirigir directamente a la página de login
-    router.push('/login')
+    // Redirigir directamente a la página de empresa (sin login)
+    router.push('/empresa')
   }, [router])
 
   return (
@@ -18,7 +18,7 @@ export default function Home() {
         <p className="text-gray-600 mb-8">
           Sistema de Punto de Venta - Configuración inicial completada
         </p>
-        <p className="text-gray-600">Redirigiendo al login...</p>
+        <p className="text-gray-600">Cargando...</p>
       </div>
     </main>
   )
