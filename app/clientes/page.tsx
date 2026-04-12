@@ -10,6 +10,7 @@ export default function ClientesPage() {
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   useEffect(() => {
     loadClientes()
@@ -58,33 +59,38 @@ export default function ClientesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/dashboard"
-              className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
-            >
-              ← Dashboard
-            </Link>
-            <h1 className="text-3xl font-bold">Gestión de Clientes</h1>
+    <div className="flex min-h-screen bg-gray-100">
+      <div className={`${sidebarOpen ? 'w-64' : 'w-0'} bg-gray-800 text-white transition-all duration-300 overflow-hidden`}>
+        <div className="p-4">
+          <h2 className="text-xl font-bold mb-4">Menú Principal</h2>
+          <nav className="space-y-2">
+            <button onClick={() => router.push('/dashboard')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🏠 Dashboard</button>
+            <button onClick={() => router.push('/productos')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">📦 Productos</button>
+            <button onClick={() => router.push('/proveedores')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">📦 Proveedores</button>
+            <button onClick={() => router.push('/clientes')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors bg-gray-700">👤 Clientes</button>
+            <button onClick={() => router.push('/usuarios')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">👥 Usuarios</button>
+            <button onClick={() => router.push('/empresa')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🏢 Empresa</button>
+            <button onClick={() => router.push('/permisos')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🔐 Permisos</button>
+          </nav>
+          <div className="mt-8 pt-4 border-t border-gray-700">
+            <button onClick={() => router.push('/dashboard')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🏠 Volver al Dashboard</button>
           </div>
-          <Link
-            href="/clientes/nuevo"
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            + Nuevo Cliente
-          </Link>
         </div>
-
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
+      </div>
+      <div className="flex-1 flex flex-col">
+        <div className="bg-white shadow p-4">
+          <div className="flex items-center justify-between">
+            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-600 hover:text-gray-800 focus:outline-none">{sidebarOpen ? '◀' : '▶'} Menú</button>
+            <h1 className="text-2xl font-bold">Gestión de Clientes</h1>
+            <div className="w-16"></div>
           </div>
-        )}
-
-        <div className="bg-white shadow rounded-lg overflow-hidden">
+        </div>
+        <div className="flex-1 p-4 md:p-8">
+          <div className="bg-white rounded-lg shadow p-4 md:p-6">
+            <div className="flex justify-between items-center mb-6">
+              <button onClick={() => router.push('/clientes/nuevo')} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">+ Nuevo Cliente</button>
+            </div>
+            {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
           <table className="min-w-full">
             <thead className="bg-gray-50">
               <tr>
@@ -159,6 +165,7 @@ export default function ClientesPage() {
               No hay clientes registrados
             </div>
           )}
+          </div>
         </div>
       </div>
     </div>
