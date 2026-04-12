@@ -1,6 +1,31 @@
-import Link from 'next/link'
+'use client'
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { supabase } from '@/lib/supabase'
 
 export default function Home() {
+  const router = useRouter()
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
+          // Si está logueado, ir a dashboard
+          router.push('/dashboard')
+        } else {
+          // Si no está logueado, ir a login
+          router.push('/login')
+        }
+      } catch (err) {
+        // Si hay error, ir a login
+        router.push('/login')
+      }
+    }
+    checkAuth()
+  }, [router])
+
   return (
     <main className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="container mx-auto p-8 text-center">
@@ -8,28 +33,7 @@ export default function Home() {
         <p className="text-gray-600 mb-8">
           Sistema de Punto de Venta
         </p>
-        <div className="space-y-4">
-          <Link 
-            href="/dashboard"
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors inline-block"
-          >
-            Ir al Dashboard
-          </Link>
-          <br />
-          <Link 
-            href="/empresa"
-            className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors inline-block"
-          >
-            Configuración de Empresa
-          </Link>
-          <br />
-          <Link 
-            href="/permisos"
-            className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors inline-block"
-          >
-            Gestión de Permisos
-          </Link>
-        </div>
+        <p className="text-gray-600">Verificando autenticación...</p>
       </div>
     </main>
   )
