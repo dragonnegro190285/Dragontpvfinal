@@ -370,10 +370,12 @@ export async function PUT(request: Request) {
           } else {
             // Insertar nuevos permisos
             const permisosToInsert = []
+            let totalMarcados = 0
 
             for (const [modulo, acciones] of Object.entries(permisos)) {
               for (const [accion, checked] of Object.entries(acciones as any)) {
                 if (checked) {
+                  totalMarcados++
                   const permiso = todosLosPermisos?.find(p => p.modulo === modulo && p.accion === accion)
                   
                   if (permiso) {
@@ -385,6 +387,13 @@ export async function PUT(request: Request) {
                 }
               }
             }
+
+            console.log('=== ESTADÍSTICAS DE GUARDADO ===')
+            console.log('Total checkboxes marcados en frontend:', totalMarcados)
+            console.log('Total permisos en tabla Supabase:', todosLosPermisos?.length)
+            console.log('Permisos encontrados para insertar:', permisosToInsert.length)
+            console.log('Permisos NO encontrados:', totalMarcados - permisosToInsert.length)
+            console.log('================================')
 
             if (permisosToInsert.length > 0) {
               const { error: insertError } = await supabase
