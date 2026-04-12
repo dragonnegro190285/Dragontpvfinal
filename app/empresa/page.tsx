@@ -77,61 +77,56 @@ export default function EmpresaPage() {
   const loadPermisos = async () => {
     setLoadingPermisos(true)
     try {
-      console.log('Cargando permisos...')
+      console.log('Cargando permisos - PRIORIDAD ONLINE')
       
-      // PRIMERO: Intentar cargar desde localStorage (prioridad absoluta)
-      const savedPermisos = localStorage.getItem('permisos-guardados')
       let finalData = null
       
-      if (savedPermisos) {
-        try {
-          const permisosGuardados = JSON.parse(savedPermisos)
-          console.log('Permisos cargados desde localStorage:', permisosGuardados)
-          
-          // Construir estructura completa con permisos guardados
-          finalData = {
-            modulos: ['usuarios', 'proveedores', 'productos', 'compras', 'ventas', 
-                     'clientes', 'marcas', 'empresa', 'reportes', 'permisos',
-                     'inventario', 'configuracion', 'sistema', 'auditoria'],
-            acciones: ['crear', 'modificar', 'ver', 'eliminar', 'ajustar', 'exportar', 'gestionar'],
-            roles: permisosGuardados,
-            permisos: []
-          }
-        } catch (parseError) {
-          console.error('Error al parsear localStorage:', parseError)
-        }
-      }
+      // PRIMERO: Intentar APIs reales (prioridad online)
+      console.log('Intentando APIs reales primero (modo online)...')
       
-      // SEGUNDO: Si no hay datos en localStorage, intentar APIs
-      if (!finalData) {
-        console.log('No hay datos en localStorage, intentando APIs reales...')
-        
-        // PRIORIDAD: APIs que conectan a Supabase real
-        let response = await fetch('/api/permisos-test', {
+      let response = await fetch('/api/permisos-test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'get_all' })
+      })
+
+      if (!response.ok) {
+        console.log('API test no disponible, intentando API pública...')
+        response = await fetch('/api/permisos-public', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'get_all' })
         })
+      }
 
-        if (!response.ok) {
-          console.log('API test no disponible, intentando API pública...')
-          response = await fetch('/api/permisos-public', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'get_all' })
-          })
-        }
-
-        if (!response.ok) {
-          console.log('APIs reales no disponibles, intentando API simple...')
-          response = await fetch('/api/permisos-simple')
-        }
-
+      if (response.ok) {
         const result = await response.json()
+        console.log('✅ Datos cargados desde API online:', result)
+        finalData = result
+      } else {
+        console.log('APIs no disponibles, intentando localStorage como fallback...')
+      }
+
+      // SEGUNDO: Solo usar localStorage si APIs fallan (fallback)
+      if (!finalData) {
+        const savedPermisos = localStorage.getItem('permisos-guardados')
         
-        if (response.ok) {
-          console.log('Permisos cargados desde API:', result)
-          finalData = result
+        if (savedPermisos) {
+          try {
+            const permisosGuardados = JSON.parse(savedPermisos)
+            console.log('⚠️ Usando datos de localStorage (modo offline - APIs no disponibles)')
+            
+            finalData = {
+              modulos: ['usuarios', 'proveedores', 'productos', 'compras', 'ventas', 
+                       'clientes', 'marcas', 'empresa', 'reportes', 'permisos',
+                       'inventario', 'configuracion', 'sistema', 'auditoria'],
+              acciones: ['crear', 'modificar', 'ver', 'eliminar', 'ajustar', 'exportar', 'gestionar'],
+              roles: permisosGuardados,
+              permisos: []
+            }
+          } catch (parseError) {
+            console.error('Error al parsear localStorage:', parseError)
+          }
         }
       }
       
