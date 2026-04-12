@@ -39,101 +39,45 @@ export default function PermisosPage() {
 
   const loadPermisos = async () => {
     try {
-      console.log('Cargando permisos - SINCRONIZACIÓN ENTRE VISTAS')
+      console.log('Cargando permisos - 100% ONLINE')
       
-      let finalData = null
-      
-      // PRIMERO: Siempre cargar desde localStorage (fuente de verdad para sincronización)
-      const savedData = localStorage.getItem('permisos-data')
-      const savedPermisos = localStorage.getItem('permisos-guardados')
-      
-      if (savedData) {
-        try {
-          finalData = JSON.parse(savedData)
-          console.log('✅ Datos cargados desde localStorage (sincronización entre vistas):', finalData)
-          
-          // Aplicar permisos guardados si existen
-          if (savedPermisos) {
-            const permisosGuardados = JSON.parse(savedPermisos)
-            console.log('Permisos guardados encontrados:', permisosGuardados)
-            
-            finalData.roles = finalData.roles.map((rol: Rol) => {
-              const rolGuardado = permisosGuardados.find((r: any) => r.id === rol.id)
-              if (rolGuardado) {
-                console.log(`Aplicando permisos guardados para ${rol.nombre}:`, {
-                  totalPermisos: Object.values(rolGuardado.permisos).reduce((sum: number, mod: any) => 
-                    sum + Object.values(mod).filter(Boolean).length, 0)
-                })
-                return { ...rol, permisos: rolGuardado.permisos }
-              }
-              return rol
-            })
-          }
-          
-          setOfflineMode(false)
-        } catch (parseError) {
-          console.error('Error al parsear localStorage:', parseError)
-          localStorage.removeItem('permisos-data')
-          localStorage.removeItem('permisos-guardados')
-        }
-      }
-      
-      // SEGUNDO: Solo intentar APIs si no hay datos en localStorage (primera carga)
-      if (!finalData) {
-        console.log('No hay datos en localStorage, intentando APIs...')
-        
-        let response = await fetch('/api/permisos-test', {
+      // SIEMPRE usar APIs reales (sin localStorage)
+      let response = await fetch('/api/permisos-test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'get_all' })
+      })
+
+      if (!response.ok) {
+        console.log('API test no disponible, intentando API pública...')
+        response = await fetch('/api/permisos-public', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'get_all' })
         })
-
-        if (!response.ok) {
-          response = await fetch('/api/permisos-public', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'get_all' })
-          })
-        }
-
-        if (response.ok) {
-          const apiData = await response.json()
-          console.log('✅ Datos cargados desde API online:', apiData)
-          finalData = apiData
-          // Guardar en localStorage para sincronización
-          localStorage.setItem('permisos-data', JSON.stringify(finalData))
-        } else {
-          response = await fetch('/api/permisos-simple')
-          if (response.ok) {
-            const apiData = await response.json()
-            console.log('✅ Datos cargados desde API simple:', apiData)
-            finalData = apiData
-            localStorage.setItem('permisos-data', JSON.stringify(finalData))
-          }
-        }
       }
-      
-      // TERCERO: Si no hay datos de ningún lugar, usar datos por defecto
-      if (!finalData) {
-        console.log('Usando datos por defecto...')
-        finalData = getDefaultData()
-        localStorage.setItem('permisos-data', JSON.stringify(finalData))
-      }
-      
-      setData(finalData)
-      
-      if (finalData.roles.length > 0) {
-        setSelectedRol(finalData.roles[0].id)
-        setForceRender(prev => prev + 1)
+
+      if (response.ok) {
+        const apiData = await response.json()
+        console.log('✅ Datos cargados desde API online:', apiData)
+        setData(apiData)
+        setOfflineMode(false)
         
-        setTimeout(() => {
-          setSelectedRol(finalData.roles[0].id)
+        if (apiData.roles.length > 0) {
+          setSelectedRol(apiData.roles[0].id)
           setForceRender(prev => prev + 1)
-        }, 200)
+          
+          setTimeout(() => {
+            setSelectedRol(apiData.roles[0].id)
+            setForceRender(prev => prev + 1)
+          }, 200)
+        }
+      } else {
+        throw new Error('APIs no disponibles')
       }
     } catch (err: any) {
       console.error('Error al cargar permisos:', err)
-      setError(err.message)
+      setError('Error: APIs no disponibles. Por favor verifica la conexión a Supabase.')
     } finally {
       setLoading(false)
     }
@@ -190,27 +134,6 @@ export default function PermisosPage() {
     }
   }
 
-  const saveToLocalStorage = (roles: Rol[]) => {
-    try {
-      // Guardar permisos actualizados
-      localStorage.setItem('permisos-guardados', JSON.stringify(roles))
-      
-      // También guardar la estructura completa de datos
-      if (data) {
-        const updatedData = { ...data, roles }
-        localStorage.setItem('permisos-data', JSON.stringify(updatedData))
-      }
-      
-      console.log('Permisos guardados en localStorage:', roles.map(r => ({ 
-        rol: r.nombre, 
-        totalPermisos: Object.values(r.permisos).reduce((sum, mod) => 
-          sum + Object.values(mod).filter(Boolean).length, 0)
-      })))
-    } catch (error) {
-      console.error('Error al guardar en localStorage:', error)
-    }
-  }
-
   const handlePermisoChange = async (rolId: string, modulo: string, accion: string, checked: boolean) => {
     console.log('Cambiando permiso:', { rolId, modulo, accion, checked })
     
@@ -240,10 +163,9 @@ export default function PermisosPage() {
       })
 
       setData({ ...data, roles: updatedRoles })
-      saveToLocalStorage(updatedRoles)
     }
 
-    // LLAMADAS API EN PARALELO (sin bloquear UI)
+    // GUARDAR EN API (online)
     Promise.all([
       // Intentar API test
       fetch('/api/permisos-test', {
@@ -260,17 +182,19 @@ export default function PermisosPage() {
     ]).then(([testResponse, publicResponse]) => {
       // Usar la primera respuesta exitosa
       if (testResponse.ok) {
-        console.log('Permiso guardado en API test:', { rolId, modulo, accion, checked })
+        console.log('✅ Permiso guardado en API test (Supabase):', { rolId, modulo, accion, checked })
         setSuccess(`Permiso ${checked ? 'activado' : 'desactivado'} en base de datos`)
       } else if (publicResponse.ok) {
-        console.log('Permiso guardado en API pública:', { rolId, modulo, accion, checked })
+        console.log('✅ Permiso guardado en API pública (Supabase):', { rolId, modulo, accion, checked })
         setSuccess(`Permiso ${checked ? 'activado' : 'desactivado'} en base de datos`)
       } else {
-        console.log('APIs no disponibles, usando localStorage como backup')
+        console.error('❌ Error: APIs no disponibles')
+        setError('Error: APIs no disponibles. Por favor verifica la conexión a Supabase.')
       }
       setTimeout(() => setSuccess(''), 2000)
     }).catch(err => {
-      console.log('Error en APIs, persistiendo en localStorage:', err)
+      console.error('❌ Error en APIs:', err)
+      setError('Error: APIs no disponibles. Por favor verifica la conexión a Supabase.')
     })
 
     // Forzar re-render rápido
@@ -322,18 +246,12 @@ export default function PermisosPage() {
           apiSuccess = true
         }
       } catch (apiError) {
-        console.log('Error en APIs reales, usando localStorage:', apiError)
+        console.error('❌ Error en APIs reales:', apiError)
+        setError('Error: APIs no disponibles. Por favor verifica la conexión a Supabase.')
       }
       
-      // Siempre guardar en localStorage como backup
-      saveToLocalStorage(data.roles)
-      
-      if (!apiSuccess) {
-        setSuccess('Permisos guardados localmente')
-        setOfflineMode(true)
-      } else {
+      if (apiSuccess) {
         setSuccess('Permisos guardados exitosamente en base de datos')
-        setOfflineMode(false)
       }
       
       setTimeout(() => setSuccess(''), 5000)
@@ -374,7 +292,6 @@ export default function PermisosPage() {
     })
 
     setData({ ...data, roles: updatedRoles })
-    saveToLocalStorage(updatedRoles)
     setSuccess('Todos los permisos seleccionados')
     setTimeout(() => setSuccess(''), 3000)
   }
@@ -408,7 +325,6 @@ export default function PermisosPage() {
     })
 
     setData({ ...data, roles: updatedRoles })
-    saveToLocalStorage(updatedRoles)
     setSuccess('Todos los permisos deseleccionados')
     setTimeout(() => setSuccess(''), 3000)
   }
