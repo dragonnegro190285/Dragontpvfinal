@@ -551,6 +551,7 @@ export default function PermisosPage() {
               value={selectedRol}
               onChange={(e) => setSelectedRol(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label="Seleccionar rol"
             >
               {data.roles.map(rol => (
                 <option key={rol.id} value={rol.id}>
@@ -609,9 +610,15 @@ export default function PermisosPage() {
                         {data.acciones.map(accion => {
                           const checkboxKey = `${modulo}-${accion}`
                           const isChecked = checkboxStates[checkboxKey] || false
+                          const inputId = `permiso-${selectedRol}-${modulo}-${accion}`
                           return (
                             <td key={accion} className="px-6 py-4 whitespace-nowrap text-center">
+                              <label htmlFor={inputId} className="sr-only">
+                                Permiso {accion} para {modulo}
+                              </label>
                               <input
+                                id={inputId}
+                                name={`permiso_${modulo}_${accion}`}
                                 key={`${modulo}-${accion}-${forceRender}`} // Forzar re-render
                                 type="checkbox"
                                 checked={isChecked}
