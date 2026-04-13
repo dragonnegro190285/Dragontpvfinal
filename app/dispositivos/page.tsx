@@ -133,14 +133,14 @@ function DispositivosContent() {
   }
 
   const tiposDispositivo = [
-    { value: 'lector_codigos', label: 'Lector de Códigos' },
-    { value: 'impresora_tickets', label: 'Impresora de Tickets' },
-    { value: 'impresora_facturas', label: 'Impresora de Facturas' },
-    { value: 'bascula', label: 'Báscula' },
-    { value: 'torreta', label: 'Torreta' },
-    { value: 'cajon_dinero', label: 'Cajón de Dinero' },
-    { value: 'display_cliente', label: 'Display Cliente' },
-    { value: 'pantalla_touch', label: 'Pantalla Touch' }
+    { value: 'lector_codigos', label: 'Lector de Códigos', icon: '📷' },
+    { value: 'impresora_tickets', label: 'Impresora de Tickets', icon: '🎫' },
+    { value: 'impresora_facturas', label: 'Impresora de Facturas', icon: '📄' },
+    { value: 'bascula', label: 'Báscula', icon: '⚖️' },
+    { value: 'torreta', label: 'Torreta', icon: '🔊' },
+    { value: 'cajon_dinero', label: 'Cajón de Dinero', icon: '💵' },
+    { value: 'display_cliente', label: 'Display Cliente', icon: '📺' },
+    { value: 'pantalla_touch', label: 'Pantalla Touch', icon: '🖥️' }
   ]
 
   const dispositivosFiltrados = filtroTipo
@@ -226,75 +226,89 @@ function DispositivosContent() {
               </button>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-white border border-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Código</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Modelo</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Marca</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Estación</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Global</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {dispositivosFiltrados.map((dispositivo) => (
-                    <tr key={dispositivo.id} className="border-b hover:bg-gray-50">
-                      <td className="px-4 py-2">{dispositivo.codigo}</td>
-                      <td className="px-4 py-2 font-medium">{dispositivo.nombre}</td>
-                      <td className="px-4 py-2">{tiposDispositivo.find(t => t.value === dispositivo.tipo)?.label || dispositivo.tipo}</td>
-                      <td className="px-4 py-2">{dispositivo.modelo || '-'}</td>
-                      <td className="px-4 py-2">{dispositivo.marca || '-'}</td>
-                      <td className="px-4 py-2">{dispositivo.estacion_trabajo || '-'}</td>
-                      <td className="px-4 py-2">
-                        {dispositivo.configuracion_global ? (
-                          <span className="text-green-600">✓ Sí</span>
-                        ) : (
-                          <span className="text-gray-400">✗ No</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-2">
-                        <span className={`px-2 py-1 rounded text-xs ${dispositivo.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                          {dispositivo.activo ? 'Activo' : 'Inactivo'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-2">
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleToggleActivo(dispositivo)}
-                            className="text-blue-600 hover:text-blue-800 text-sm"
-                          >
-                            {dispositivo.activo ? 'Desactivar' : 'Activar'}
-                          </button>
-                          <button
-                            onClick={() => handleEditar(dispositivo)}
-                            className="text-green-600 hover:text-green-800 text-sm"
-                          >
-                            Editar
-                          </button>
-                          <button
-                            onClick={() => handleEliminar(dispositivo.id)}
-                            className="text-red-600 hover:text-red-800 text-sm"
-                          >
-                            Eliminar
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                  {dispositivosFiltrados.length === 0 && (
-                    <tr>
-                      <td colSpan={9} className="px-4 py-8 text-center text-gray-500">
-                        No hay dispositivos registrados
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+            <div className="space-y-6">
+              {tiposDispositivo.map((tipo) => {
+                const dispositivosTipo = dispositivosFiltrados.filter(d => d.tipo === tipo.value)
+                return (
+                  <div key={tipo.value} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                    <div className="bg-gray-50 px-4 py-3 border-b flex items-center gap-3">
+                      <span className="text-2xl">{tipo.icon}</span>
+                      <h3 className="text-lg font-semibold">{tipo.label}</h3>
+                      <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                        {dispositivosTipo.length} dispositivo{dispositivosTipo.length !== 1 ? 's' : ''}
+                      </span>
+                    </div>
+                    {dispositivosTipo.length > 0 ? (
+                      <div className="p-4">
+                        {dispositivosTipo.map((dispositivo) => (
+                          <div key={dispositivo.id} className="border-b last:border-b-0 py-3 last:pb-0">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h4 className="font-semibold text-gray-900">{dispositivo.nombre}</h4>
+                                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">{dispositivo.codigo}</span>
+                                  {dispositivo.configuracion_global && (
+                                    <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Global</span>
+                                  )}
+                                  <span className={`text-xs px-2 py-0.5 rounded ${dispositivo.activo ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                    {dispositivo.activo ? 'Activo' : 'Inactivo'}
+                                  </span>
+                                </div>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-gray-600">
+                                  <div>
+                                    <span className="font-medium">Modelo:</span> {dispositivo.modelo || '-'}
+                                  </div>
+                                  <div>
+                                    <span className="font-medium">Marca:</span> {dispositivo.marca || '-'}
+                                  </div>
+                                  <div>
+                                    <span className="font-medium">Puerto:</span> {dispositivo.puerto || '-'}
+                                  </div>
+                                  <div>
+                                    <span className="font-medium">Estación:</span> {dispositivo.estacion_trabajo || '-'}
+                                  </div>
+                                </div>
+                                {dispositivo.observaciones && (
+                                  <p className="text-sm text-gray-500 mt-1">{dispositivo.observaciones}</p>
+                                )}
+                              </div>
+                              <div className="flex gap-2 ml-4">
+                                <button
+                                  onClick={() => handleToggleActivo(dispositivo)}
+                                  className="text-blue-600 hover:text-blue-800 text-sm px-2 py-1"
+                                >
+                                  {dispositivo.activo ? 'Desactivar' : 'Activar'}
+                                </button>
+                                <button
+                                  onClick={() => handleEditar(dispositivo)}
+                                  className="text-green-600 hover:text-green-800 text-sm px-2 py-1"
+                                >
+                                  Editar
+                                </button>
+                                <button
+                                  onClick={() => handleEliminar(dispositivo.id)}
+                                  className="text-red-600 hover:text-red-800 text-sm px-2 py-1"
+                                >
+                                  Eliminar
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-8 text-center text-gray-500">
+                        No hay dispositivos de este tipo
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+              {dispositivosFiltrados.length === 0 && (
+                <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-gray-500">
+                  No hay dispositivos registrados
+                </div>
+              )}
             </div>
           </div>
         </div>
