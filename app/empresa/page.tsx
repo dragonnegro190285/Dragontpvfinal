@@ -369,6 +369,18 @@ export default function EmpresaPage() {
             </button>
           </nav>
           <div className="mt-8 pt-4 border-t border-gray-700">
+            <h3 className="text-sm font-semibold mb-2 text-gray-400">Navegación</h3>
+            <nav className="space-y-2">
+              <button onClick={() => router.push('/dashboard')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🏠 Dashboard</button>
+              <button onClick={() => router.push('/productos')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">📦 Productos</button>
+              <button onClick={() => router.push('/proveedores')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">📦 Proveedores</button>
+              <button onClick={() => router.push('/clientes')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">👤 Clientes</button>
+              <button onClick={() => router.push('/usuarios')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">👥 Usuarios</button>
+              <button onClick={() => router.push('/compras')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🛒 Compras</button>
+              <button onClick={() => router.push('/cajas')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">💰 Caja</button>
+            </nav>
+          </div>
+          <div className="mt-8 pt-4 border-t border-gray-700">
             <button
               onClick={() => router.push('/dashboard')}
               className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
