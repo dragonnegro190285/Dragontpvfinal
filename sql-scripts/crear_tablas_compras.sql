@@ -4,6 +4,65 @@
 -- Fecha: 2026-04-12
 -- ============================================
 
+-- Tabla de Formas de Pago
+CREATE TABLE IF NOT EXISTS formas_pago (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    codigo VARCHAR(20) UNIQUE NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    activo BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Datos iniciales de formas de pago
+INSERT INTO formas_pago (codigo, nombre, descripcion) VALUES
+    ('EFECTIVO', 'Efectivo', 'Pago en efectivo'),
+    ('TRANSFERENCIA', 'Transferencia', 'Transferencia bancaria'),
+    ('CHEQUE', 'Cheque', 'Pago con cheque'),
+    ('TARJETA', 'Tarjeta', 'Pago con tarjeta de crédito/débito'),
+    ('CREDITO', 'Crédito', 'Pago a crédito')
+ON CONFLICT (codigo) DO NOTHING;
+
+-- Tabla de Impuestos
+CREATE TABLE IF NOT EXISTS impuestos (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    codigo VARCHAR(20) UNIQUE NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    porcentaje DECIMAL(5, 2) NOT NULL,
+    descripcion TEXT,
+    activo BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Datos iniciales de impuestos
+INSERT INTO impuestos (codigo, nombre, porcentaje, descripcion) VALUES
+    ('IVA_0', 'Exento', 0, 'Productos exentos de IVA'),
+    ('IVA_16', 'IVA General', 16, 'Tasa general de IVA'),
+    ('IVA_8', 'IVA Reducido', 8, 'Tasa reducida de IVA'),
+    ('IVA_4', 'IVA Super Reducido', 4, 'Tasa super reducida de IVA')
+ON CONFLICT (codigo) DO NOTHING;
+
+-- Tabla de Recordatorios de Pago
+CREATE TABLE IF NOT EXISTS recordatorios_pago (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    compra_id UUID NOT NULL REFERENCES compras(id) ON DELETE CASCADE,
+    usuario_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    fecha_recordatorio TIMESTAMP WITH TIME ZONE NOT NULL,
+    fecha_enviado TIMESTAMP WITH TIME ZONE,
+    enviado BOOLEAN DEFAULT FALSE,
+    metodo_envio VARCHAR(50) CHECK (metodo_envio IN ('email', 'sms', 'notificacion')),
+    mensaje TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Índices para recordatorios_pago
+DROP INDEX IF EXISTS idx_recordatorios_compra;
+CREATE INDEX idx_recordatorios_compra ON recordatorios_pago(compra_id);
+DROP INDEX IF EXISTS idx_recordatorios_fecha;
+CREATE INDEX idx_recordatorios_fecha ON recordatorios_pago(fecha_recordatorio);
+DROP INDEX IF EXISTS idx_recordatorios_enviado;
+CREATE INDEX idx_recordatorios_enviado ON recordatorios_pago(enviado);
+
 -- Tabla de Compras (Encabezado)
 CREATE TABLE IF NOT EXISTS compras (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -21,9 +80,10 @@ CREATE TABLE IF NOT EXISTS compras (
     total DECIMAL(15, 2) NOT NULL DEFAULT 0,
     estado VARCHAR(20) NOT NULL DEFAULT 'pendiente' CHECK (estado IN ('pendiente', 'recibida', 'cancelada', 'parcial')),
     observaciones TEXT,
-    metodo_pago VARCHAR(50),
+    forma_pago_id UUID REFERENCES formas_pago(id) ON DELETE RESTRICT,
+    impuesto_id UUID REFERENCES impuestos(id) ON DELETE RESTRICT,
     numero_factura VARCHAR(100),
-    condicion_pago VARCHAR(50),
+    condicion_pago VARCHAR(50) CHECK (condicion_pago IN ('contado', '30_dias', '60_dias', '90_dias')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     
@@ -218,6 +278,48 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Función para generar recordatorios de pago automáticos
+CREATE OR REPLACE FUNCTION generar_recordatorios_pago()
+RETURNS TRIGGER AS $$
+DECLARE
+    dias INTEGER;
+    fecha_recordatorio TIMESTAMP WITH TIME ZONE;
+BEGIN
+    -- Solo generar recordatorios si la condición de pago es a crédito
+    IF NEW.condicion_pago IN ('30_dias', '60_dias', '90_dias') THEN
+        -- Calcular días según la condición
+        CASE NEW.condicion_pago
+            WHEN '30_dias' THEN dias := 30;
+            WHEN '60_dias' THEN dias := 60;
+            WHEN '90_dias' THEN dias := 90;
+        END CASE;
+        
+        -- Calcular fecha del recordatorio (3 días antes del vencimiento)
+        fecha_recordatorio := NEW.fecha_compra + (dias - 3) * INTERVAL '1 day';
+        
+        -- Insertar recordatorio
+        INSERT INTO recordatorios_pago (
+            compra_id,
+            usuario_id,
+            fecha_recordatorio,
+            mensaje
+        ) VALUES (
+            NEW.id,
+            NEW.usuario_id,
+            fecha_recordatorio,
+            'Recordatorio: La compra ' || NEW.numero_compra || ' vence en 3 días'
+        );
+    END IF;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger para generar recordatorios al crear compra
+DROP TRIGGER IF EXISTS trigger_generar_recordatorios ON compras;
+CREATE TRIGGER trigger_generar_recordatorios AFTER INSERT ON compras
+    FOR EACH ROW EXECUTE FUNCTION generar_recordatorios_pago();
+
 -- ============================================
 -- VISTAS ÚTILES
 -- ============================================
@@ -242,14 +344,21 @@ SELECT
     c.total,
     c.estado,
     c.observaciones,
-    c.metodo_pago,
+    c.forma_pago_id,
+    fp.nombre AS forma_pago_nombre,
+    fp.codigo AS forma_pago_codigo,
+    c.impuesto_id,
+    imp.nombre AS impuesto_nombre,
+    imp.porcentaje AS impuesto_porcentaje,
     c.numero_factura,
     c.condicion_pago,
     c.created_at,
     c.updated_at
 FROM compras c
 LEFT JOIN proveedores p ON c.proveedor_id = p.id
-LEFT JOIN usuarios u ON c.usuario_id = u.id;
+LEFT JOIN usuarios u ON c.usuario_id = u.id
+LEFT JOIN formas_pago fp ON c.forma_pago_id = fp.id
+LEFT JOIN impuestos imp ON c.impuesto_id = imp.id;
 
 -- Vista de detalles de compra con información del producto
 CREATE OR REPLACE VIEW vista_compra_detalles_completa AS

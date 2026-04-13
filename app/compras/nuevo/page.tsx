@@ -2,12 +2,14 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Proveedor, Producto } from '@/lib/types'
+import { Proveedor, Producto, FormaPago, Impuesto } from '@/lib/types'
 
 function NuevaCompraContent() {
   const router = useRouter()
   const [proveedores, setProveedores] = useState<Proveedor[]>([])
   const [productos, setProductos] = useState<Producto[]>([])
+  const [formasPago, setFormasPago] = useState<FormaPago[]>([])
+  const [impuestos, setImpuestos] = useState<Impuesto[]>([])
   const [loading, setLoading] = useState(true)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [error, setError] = useState('')
@@ -20,9 +22,9 @@ function NuevaCompraContent() {
     fecha_vencimiento: '',
     numero_factura: '',
     condicion_pago: 'contado',
-    metodo_pago: 'efectivo',
+    forma_pago_id: '',
+    impuesto_id: '',
     observaciones: '',
-    iva_porcentaje: 16,
     descuento_porcentaje: 0
   })
   
@@ -56,11 +58,44 @@ function NuevaCompraContent() {
     }
   }, [])
 
+  const loadFormasPago = useCallback(async () => {
+    try {
+      const response = await fetch('/api/formas-pago')
+      const data = await response.json()
+      setFormasPago(data.formas_pago?.filter((f: FormaPago) => f.activo) || [])
+      // Seleccionar la primera forma de pago por defecto
+      if (data.formas_pago?.length > 0) {
+        setFormData(prev => ({ ...prev, forma_pago_id: data.formas_pago[0].id }))
+      }
+    } catch (err) {
+      console.error('Error al cargar formas de pago:', err)
+      setError('Error al cargar formas de pago')
+    }
+  }, [])
+
+  const loadImpuestos = useCallback(async () => {
+    try {
+      const response = await fetch('/api/impuestos')
+      const data = await response.json()
+      setImpuestos(data.impuestos?.filter((i: Impuesto) => i.activo) || [])
+      // Seleccionar IVA 16% por defecto
+      const iva16 = data.impuestos?.find((i: Impuesto) => i.codigo === 'IVA_16')
+      if (iva16) {
+        setFormData(prev => ({ ...prev, impuesto_id: iva16.id }))
+      }
+    } catch (err) {
+      console.error('Error al cargar impuestos:', err)
+      setError('Error al cargar impuestos')
+    }
+  }, [])
+
   useEffect(() => {
     loadProveedores()
     loadProductos()
+    loadFormasPago()
+    loadImpuestos()
     setLoading(false)
-  }, [loadProveedores, loadProductos])
+  }, [loadProveedores, loadProductos, loadFormasPago, loadImpuestos])
 
   const handleAgregarDetalle = () => {
     if (!productoSeleccionado || cantidad <= 0 || precioUnitario <= 0) {
@@ -71,8 +106,11 @@ function NuevaCompraContent() {
     const producto = productos.find(p => p.id === productoSeleccionado)
     if (!producto) return
 
+    const impuestoSeleccionado = impuestos.find(i => i.id === formData.impuesto_id)
+    const ivaPorcentaje = impuestoSeleccionado?.porcentaje || 16
+
     const subtotal = cantidad * precioUnitario
-    const iva_monto = subtotal * (formData.iva_porcentaje / 100)
+    const iva_monto = subtotal * (ivaPorcentaje / 100)
     const descuento_monto = subtotal * (formData.descuento_porcentaje / 100)
     const total = subtotal + iva_monto - descuento_monto
 
@@ -83,7 +121,7 @@ function NuevaCompraContent() {
       descuento_porcentaje: formData.descuento_porcentaje,
       descuento_monto,
       subtotal,
-      iva_porcentaje: formData.iva_porcentaje,
+      iva_porcentaje: ivaPorcentaje,
       iva_monto,
       total,
       lote,
@@ -122,6 +160,9 @@ function NuevaCompraContent() {
       const descuento_monto = detalles.reduce((sum, d) => sum + d.descuento_monto, 0)
       const total = subtotal + iva_monto - descuento_monto
 
+      const impuestoSeleccionado = impuestos.find(i => i.id === formData.impuesto_id)
+      const ivaPorcentaje = impuestoSeleccionado?.porcentaje || 16
+
       const response = await fetch('/api/compras', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -132,13 +173,14 @@ function NuevaCompraContent() {
           fecha_recepcion: formData.fecha_recepcion || null,
           fecha_vencimiento: formData.fecha_vencimiento || null,
           subtotal,
-          iva_porcentaje: formData.iva_porcentaje,
+          iva_porcentaje: ivaPorcentaje,
           iva_monto,
           descuento_porcentaje: formData.descuento_porcentaje,
           descuento_monto,
           total,
           observaciones: formData.observaciones,
-          metodo_pago: formData.metodo_pago,
+          forma_pago_id: formData.forma_pago_id,
+          impuesto_id: formData.impuesto_id,
           numero_factura: formData.numero_factura,
           condicion_pago: formData.condicion_pago,
           detalles
@@ -283,18 +325,31 @@ function NuevaCompraContent() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">Método Pago</label>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Forma Pago</label>
                     <select
-                      value={formData.metodo_pago}
-                      onChange={(e) => setFormData({ ...formData, metodo_pago: e.target.value })}
+                      value={formData.forma_pago_id}
+                      onChange={(e) => setFormData({ ...formData, forma_pago_id: e.target.value })}
                       className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                      aria-label="Método de pago"
+                      aria-label="Forma de pago"
                     >
-                      <option value="efectivo">Efectivo</option>
-                      <option value="transferencia">Transferencia</option>
-                      <option value="cheque">Cheque</option>
-                      <option value="tarjeta">Tarjeta</option>
-                      <option value="credito">Crédito</option>
+                      <option value="">Seleccionar...</option>
+                      {formasPago.map((fp) => (
+                        <option key={fp.id} value={fp.id}>{fp.nombre}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Impuesto</label>
+                    <select
+                      value={formData.impuesto_id}
+                      onChange={(e) => setFormData({ ...formData, impuesto_id: e.target.value })}
+                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                      aria-label="Impuesto"
+                    >
+                      <option value="">Seleccionar...</option>
+                      {impuestos.map((imp) => (
+                        <option key={imp.id} value={imp.id}>{imp.nombre} ({imp.porcentaje}%)</option>
+                      ))}
                     </select>
                   </div>
                   <div className="md:col-span-2 lg:col-span-4">
@@ -435,7 +490,7 @@ function NuevaCompraContent() {
                       <span>${subtotal.toFixed(2)}</span>
                     </div>
                     <div className="flex gap-8">
-                      <span>IVA ({formData.iva_porcentaje}%):</span>
+                      <span>IVA ({impuestos.find(i => i.id === formData.impuesto_id)?.porcentaje || 16}%):</span>
                       <span>${iva_monto.toFixed(2)}</span>
                     </div>
                     <div className="flex gap-8">

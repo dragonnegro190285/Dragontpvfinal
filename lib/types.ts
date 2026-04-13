@@ -104,6 +104,37 @@ export interface PrecioVentaCliente {
 }
 
 // Tipos para Módulo de Compras
+export interface FormaPago {
+  id: string
+  codigo: string
+  nombre: string
+  descripcion?: string
+  activo: boolean
+  created_at: string
+}
+
+export interface Impuesto {
+  id: string
+  codigo: string
+  nombre: string
+  porcentaje: number
+  descripcion?: string
+  activo: boolean
+  created_at: string
+}
+
+export interface RecordatorioPago {
+  id: string
+  compra_id: string
+  usuario_id: string
+  fecha_recordatorio: string
+  fecha_enviado?: string
+  enviado: boolean
+  metodo_envio?: 'email' | 'sms' | 'notificacion'
+  mensaje?: string
+  created_at: string
+}
+
 export interface Compra {
   id: string
   numero_compra: string
@@ -120,13 +151,17 @@ export interface Compra {
   total: number
   estado: 'pendiente' | 'recibida' | 'cancelada' | 'parcial'
   observaciones?: string
-  metodo_pago?: string
+  forma_pago_id?: string
+  impuesto_id?: string
   numero_factura?: string
-  condicion_pago?: string
+  condicion_pago?: 'contado' | '30_dias' | '60_dias' | '90_dias'
   created_at: string
   updated_at: string
   proveedor?: Proveedor
   usuario?: Usuario
+  forma_pago?: FormaPago
+  impuesto?: Impuesto
+  recordatorios?: RecordatorioPago[]
 }
 
 export interface CompraDetalle {
