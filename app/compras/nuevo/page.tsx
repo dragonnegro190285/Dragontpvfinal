@@ -204,215 +204,211 @@ function NuevaCompraContent() {
             <div className="w-16"></div>
           </div>
         </div>
-        <div className="flex-1 p-4 md:p-8">
-          <div className="bg-white rounded-lg shadow p-4 md:p-6">
-            {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
+        <div className="flex-1 p-4 md:p-8 overflow-hidden">
+          <div className="h-full flex flex-col bg-white rounded-lg shadow">
+            {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded m-4">{error}</div>}
 
-            <form onSubmit={(e) => { e.preventDefault(); handleGuardar() }} className="space-y-6">
-              {/* Datos Generales */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Proveedor *</label>
-                  <select
-                    value={formData.proveedor_id}
-                    onChange={(e) => setFormData({ ...formData, proveedor_id: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                    required
-                    aria-label="Seleccionar proveedor"
-                  >
-                    <option value="">Seleccionar proveedor...</option>
-                    {proveedores.map((p) => (
-                      <option key={p.id} value={p.id}>{p.razon_social}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Fecha Compra</label>
-                  <input
-                    type="datetime-local"
-                    value={formData.fecha_compra}
-                    onChange={(e) => setFormData({ ...formData, fecha_compra: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                    required
-                    aria-label="Fecha de compra"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Fecha Recepción</label>
-                  <input
-                    type="datetime-local"
-                    value={formData.fecha_recepcion}
-                    onChange={(e) => setFormData({ ...formData, fecha_recepcion: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                    aria-label="Fecha de recepción"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Fecha Vencimiento</label>
-                  <input
-                    type="datetime-local"
-                    value={formData.fecha_vencimiento}
-                    onChange={(e) => setFormData({ ...formData, fecha_vencimiento: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                    aria-label="Fecha de vencimiento"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Número de Factura</label>
-                  <input
-                    type="text"
-                    value={formData.numero_factura}
-                    onChange={(e) => setFormData({ ...formData, numero_factura: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                    aria-label="Número de factura"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Condición de Pago</label>
-                  <select
-                    value={formData.condicion_pago}
-                    onChange={(e) => setFormData({ ...formData, condicion_pago: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                    aria-label="Condición de pago"
-                  >
-                    <option value="contado">Contado</option>
-                    <option value="30_dias">30 días</option>
-                    <option value="60_dias">60 días</option>
-                    <option value="90_dias">90 días</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Método de Pago</label>
-                  <select
-                    value={formData.metodo_pago}
-                    onChange={(e) => setFormData({ ...formData, metodo_pago: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                    aria-label="Método de pago"
-                  >
-                    <option value="efectivo">Efectivo</option>
-                    <option value="transferencia">Transferencia</option>
-                    <option value="cheque">Cheque</option>
-                    <option value="tarjeta">Tarjeta</option>
-                    <option value="credito">Crédito</option>
-                  </select>
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
-                  <textarea
-                    value={formData.observaciones}
-                    onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                    rows={2}
-                    aria-label="Observaciones"
-                  />
-                </div>
-              </div>
-
-              {/* Detalles de Compra */}
-              <div className="border-t pt-6">
-                <h3 className="text-lg font-semibold mb-4">Detalles de Compra</h3>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <form onSubmit={(e) => { e.preventDefault(); handleGuardar() }} className="flex-1 flex flex-col">
+              {/* Header Fijo - Datos Generales Compactos */}
+              <div className="border-b bg-gray-50 p-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Producto *</label>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Proveedor *</label>
                     <select
-                      value={productoSeleccionado}
-                      onChange={(e) => {
-                        setProductoSeleccionado(e.target.value)
-                        const producto = productos.find(p => p.id === e.target.value)
-                        if (producto) setPrecioUnitario(producto.precio_venta_base)
-                      }}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      aria-label="Seleccionar producto"
+                      value={formData.proveedor_id}
+                      onChange={(e) => setFormData({ ...formData, proveedor_id: e.target.value })}
+                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                      required
+                      aria-label="Seleccionar proveedor"
                     >
-                      <option value="">Seleccionar producto...</option>
-                      {productos.map((p) => (
-                        <option key={p.id} value={p.id}>{p.nombre} - ${p.precio_venta_base.toFixed(2)}</option>
+                      <option value="">Seleccionar...</option>
+                      {proveedores.map((p) => (
+                        <option key={p.id} value={p.id}>{p.razon_social}</option>
                       ))}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Cantidad *</label>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Fecha Compra</label>
                     <input
-                      type="number"
-                      value={cantidad}
-                      onChange={(e) => setCantidad(parseFloat(e.target.value) || 0)}
-                      min="1"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      type="datetime-local"
+                      value={formData.fecha_compra}
+                      onChange={(e) => setFormData({ ...formData, fecha_compra: e.target.value })}
+                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
                       required
-                      aria-label="Cantidad"
+                      aria-label="Fecha de compra"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Precio Unitario *</label>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Fecha Recepción</label>
                     <input
-                      type="number"
-                      step="0.01"
-                      value={precioUnitario}
-                      onChange={(e) => setPrecioUnitario(parseFloat(e.target.value) || 0)}
-                      min="0"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      required
-                      aria-label="Precio unitario"
+                      type="datetime-local"
+                      value={formData.fecha_recepcion}
+                      onChange={(e) => setFormData({ ...formData, fecha_recepcion: e.target.value })}
+                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                      aria-label="Fecha de recepción"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Lote</label>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Fecha Vencimiento</label>
+                    <input
+                      type="datetime-local"
+                      value={formData.fecha_vencimiento}
+                      onChange={(e) => setFormData({ ...formData, fecha_vencimiento: e.target.value })}
+                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                      aria-label="Fecha de vencimiento"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">N° Factura</label>
                     <input
                       type="text"
-                      value={lote}
-                      onChange={(e) => setLote(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      aria-label="Número de lote"
+                      value={formData.numero_factura}
+                      onChange={(e) => setFormData({ ...formData, numero_factura: e.target.value })}
+                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                      aria-label="Número de factura"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Vencimiento Lote</label>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Condición Pago</label>
+                    <select
+                      value={formData.condicion_pago}
+                      onChange={(e) => setFormData({ ...formData, condicion_pago: e.target.value })}
+                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                      aria-label="Condición de pago"
+                    >
+                      <option value="contado">Contado</option>
+                      <option value="30_dias">30 días</option>
+                      <option value="60_dias">60 días</option>
+                      <option value="90_dias">90 días</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Método Pago</label>
+                    <select
+                      value={formData.metodo_pago}
+                      onChange={(e) => setFormData({ ...formData, metodo_pago: e.target.value })}
+                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                      aria-label="Método de pago"
+                    >
+                      <option value="efectivo">Efectivo</option>
+                      <option value="transferencia">Transferencia</option>
+                      <option value="cheque">Cheque</option>
+                      <option value="tarjeta">Tarjeta</option>
+                      <option value="credito">Crédito</option>
+                    </select>
+                  </div>
+                  <div className="md:col-span-2 lg:col-span-4">
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Observaciones</label>
                     <input
-                      type="date"
-                      value={fechaVencimientoLote}
-                      onChange={(e) => setFechaVencimientoLote(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      aria-label="Fecha de vencimiento del lote"
+                      type="text"
+                      value={formData.observaciones}
+                      onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
+                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                      placeholder="Observaciones..."
+                      aria-label="Observaciones"
                     />
                   </div>
-                  <div className="md:col-span-3">
-                    <button
-                      type="button"
-                      onClick={handleAgregarDetalle}
-                      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                    >
-                      + Agregar Detalle
-                    </button>
+                </div>
+              </div>
+
+              {/* Middle - Detalles con Scroll */}
+              <div className="flex-1 flex flex-col overflow-hidden">
+                {/* Formulario de agregar detalle */}
+                <div className="border-b bg-gray-50 p-3">
+                  <h3 className="text-sm font-semibold mb-2">Agregar Producto</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">Producto</label>
+                      <select
+                        value={productoSeleccionado}
+                        onChange={(e) => {
+                          setProductoSeleccionado(e.target.value)
+                          const producto = productos.find(p => p.id === e.target.value)
+                          if (producto) setPrecioUnitario(producto.precio_venta_base)
+                        }}
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                        aria-label="Seleccionar producto"
+                      >
+                        <option value="">Seleccionar...</option>
+                        {productos.map((p) => (
+                          <option key={p.id} value={p.id}>{p.nombre}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">Cantidad</label>
+                      <input
+                        type="number"
+                        value={cantidad}
+                        onChange={(e) => setCantidad(parseFloat(e.target.value) || 0)}
+                        min="1"
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                        required
+                        aria-label="Cantidad"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">Precio</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={precioUnitario}
+                        onChange={(e) => setPrecioUnitario(parseFloat(e.target.value) || 0)}
+                        min="0"
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                        required
+                        aria-label="Precio unitario"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">Lote</label>
+                      <input
+                        type="text"
+                        value={lote}
+                        onChange={(e) => setLote(e.target.value)}
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                        aria-label="Número de lote"
+                      />
+                    </div>
+                    <div className="flex items-end">
+                      <button
+                        type="button"
+                        onClick={handleAgregarDetalle}
+                        className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm w-full"
+                      >
+                        + Agregar
+                      </button>
+                    </div>
                   </div>
                 </div>
 
-                {/* Tabla de Detalles */}
-                {detalles.length > 0 && (
-                  <div className="overflow-x-auto mb-4">
-                    <table className="min-w-full bg-white border border-gray-200">
-                      <thead>
-                        <tr className="bg-gray-50">
-                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Producto</th>
-                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Cantidad</th>
-                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Precio</th>
-                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Subtotal</th>
-                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                {/* Tabla de Detalles con Scroll */}
+                <div className="flex-1 overflow-auto">
+                  {detalles.length > 0 ? (
+                    <table className="min-w-full">
+                      <thead className="bg-gray-100 sticky top-0">
+                        <tr>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-600 border-b">Producto</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-600 border-b">Cantidad</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-600 border-b">Precio</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-600 border-b">Subtotal</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-600 border-b">Acciones</th>
                         </tr>
                       </thead>
                       <tbody>
                         {detalles.map((detalle, index) => {
                           const producto = productos.find(p => p.id === detalle.producto_id)
                           return (
-                            <tr key={index}>
-                              <td className="px-4 py-2">{producto?.nombre || '-'}</td>
-                              <td className="px-4 py-2">{detalle.cantidad}</td>
-                              <td className="px-4 py-2">${detalle.precio_unitario.toFixed(2)}</td>
-                              <td className="px-4 py-2">${detalle.subtotal.toFixed(2)}</td>
-                              <td className="px-4 py-2">
+                            <tr key={index} className="border-b hover:bg-gray-50">
+                              <td className="px-3 py-2 text-sm">{producto?.nombre || '-'}</td>
+                              <td className="px-3 py-2 text-sm">{detalle.cantidad}</td>
+                              <td className="px-3 py-2 text-sm">${detalle.precio_unitario.toFixed(2)}</td>
+                              <td className="px-3 py-2 text-sm font-medium">${detalle.subtotal.toFixed(2)}</td>
+                              <td className="px-3 py-2">
                                 <button
                                   type="button"
                                   onClick={() => handleEliminarDetalle(index)}
-                                  className="text-red-600 hover:text-red-800"
+                                  className="text-red-600 hover:text-red-800 text-sm"
                                 >
                                   Eliminar
                                 </button>
@@ -422,52 +418,52 @@ function NuevaCompraContent() {
                         })}
                       </tbody>
                     </table>
-                  </div>
-                )}
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      No hay detalles agregados
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* Totales */}
-              {detalles.length > 0 && (
-                <div className="border-t pt-6">
-                  <div className="flex justify-end">
-                    <div className="w-64 space-y-2">
-                      <div className="flex justify-between">
-                        <span>Subtotal:</span>
-                        <span>${subtotal.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>IVA ({formData.iva_porcentaje}%):</span>
-                        <span>${iva_monto.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Descuento:</span>
-                        <span>-${descuento_monto.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between font-bold text-lg border-t pt-2">
-                        <span>Total:</span>
-                        <span>${total.toFixed(2)}</span>
-                      </div>
+              {/* Footer Fijo - Totales */}
+              <div className="border-t bg-gray-50 p-4">
+                <div className="flex justify-between items-end">
+                  <div className="space-y-1 text-sm">
+                    <div className="flex gap-8">
+                      <span>Subtotal:</span>
+                      <span>${subtotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex gap-8">
+                      <span>IVA ({formData.iva_porcentaje}%):</span>
+                      <span>${iva_monto.toFixed(2)}</span>
+                    </div>
+                    <div className="flex gap-8">
+                      <span>Descuento:</span>
+                      <span className="text-red-600">-${descuento_monto.toFixed(2)}</span>
+                    </div>
+                    <div className="flex gap-8 font-bold text-lg border-t pt-1">
+                      <span>Total:</span>
+                      <span>${total.toFixed(2)}</span>
                     </div>
                   </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => router.push('/compras')}
+                      className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={detalles.length === 0}
+                      className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
+                    >
+                      Guardar
+                    </button>
+                  </div>
                 </div>
-              )}
-
-              {/* Botones */}
-              <div className="flex justify-end gap-2 pt-4 border-t">
-                <button
-                  type="button"
-                  onClick={() => router.push('/compras')}
-                  className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={detalles.length === 0}
-                  className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
-                >
-                  Guardar Compra
-                </button>
               </div>
             </form>
           </div>
