@@ -231,12 +231,35 @@ function DispositivosContent() {
                 const dispositivosTipo = dispositivosFiltrados.filter(d => d.tipo === tipo.value)
                 return (
                   <div key={tipo.value} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                    <div className="bg-gray-50 px-4 py-3 border-b flex items-center gap-3">
-                      <span className="text-2xl">{tipo.icon}</span>
-                      <h3 className="text-lg font-semibold">{tipo.label}</h3>
-                      <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                        {dispositivosTipo.length} dispositivo{dispositivosTipo.length !== 1 ? 's' : ''}
-                      </span>
+                    <div className="bg-gray-50 px-4 py-3 border-b flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{tipo.icon}</span>
+                        <h3 className="text-lg font-semibold">{tipo.label}</h3>
+                        <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                          {dispositivosTipo.length} dispositivo{dispositivosTipo.length !== 1 ? 's' : ''}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setDispositivoEditando(null)
+                          setFormData({
+                            codigo: '',
+                            nombre: '',
+                            tipo: tipo.value,
+                            modelo: '',
+                            marca: '',
+                            puerto: '',
+                            configuracion_global: true,
+                            configuracion: '{}',
+                            estacion_trabajo: '',
+                            observaciones: ''
+                          })
+                          setMostrarModal(true)
+                        }}
+                        className="bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 text-sm"
+                      >
+                        + Agregar {tipo.label}
+                      </button>
                     </div>
                     {dispositivosTipo.length > 0 ? (
                       <div className="p-4">
@@ -383,9 +406,408 @@ function DispositivosContent() {
                   value={formData.puerto}
                   onChange={(e) => setFormData({ ...formData, puerto: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  placeholder="COM1, /dev/ttyUSB0, IP:puerto"
                   aria-label="Puerto del dispositivo"
                 />
               </div>
+
+              {/* Configuraciones específicas por tipo */}
+              {formData.tipo === 'lector_codigos' && (
+                <>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Baudrate</label>
+                      <select
+                        value={JSON.parse(formData.configuracion || '{}').baudrate || 9600}
+                        onChange={(e) => {
+                          const config = JSON.parse(formData.configuracion || '{}')
+                          config.baudrate = parseInt(e.target.value)
+                          setFormData({ ...formData, configuracion: JSON.stringify(config) })
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        aria-label="Baudrate"
+                      >
+                        <option value="9600">9600</option>
+                        <option value="19200">19200</option>
+                        <option value="38400">38400</option>
+                        <option value="57600">57600</option>
+                        <option value="115200">115200</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Parity</label>
+                      <select
+                        value={JSON.parse(formData.configuracion || '{}').parity || 'none'}
+                        onChange={(e) => {
+                          const config = JSON.parse(formData.configuracion || '{}')
+                          config.parity = e.target.value
+                          setFormData({ ...formData, configuracion: JSON.stringify(config) })
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        aria-label="Parity"
+                      >
+                        <option value="none">None</option>
+                        <option value="odd">Odd</option>
+                        <option value="even">Even</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Stop Bits</label>
+                      <select
+                        value={JSON.parse(formData.configuracion || '{}').stopbits || 1}
+                        onChange={(e) => {
+                          const config = JSON.parse(formData.configuracion || '{}')
+                          config.stopbits = parseInt(e.target.value)
+                          setFormData({ ...formData, configuracion: JSON.stringify(config) })
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        aria-label="Stop Bits"
+                      >
+                        <option value="1">1</option>
+                        <option value="1.5">1.5</option>
+                        <option value="2">2</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Data Bits</label>
+                      <select
+                        value={JSON.parse(formData.configuracion || '{}').databits || 8}
+                        onChange={(e) => {
+                          const config = JSON.parse(formData.configuracion || '{}')
+                          config.databits = parseInt(e.target.value)
+                          setFormData({ ...formData, configuracion: JSON.stringify(config) })
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        aria-label="Data Bits"
+                      >
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                      </select>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {formData.tipo === 'impresora_tickets' && (
+                <>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Ancho (caracteres)</label>
+                      <select
+                        value={JSON.parse(formData.configuracion || '{}').width || 80}
+                        onChange={(e) => {
+                          const config = JSON.parse(formData.configuracion || '{}')
+                          config.width = parseInt(e.target.value)
+                          setFormData({ ...formData, configuracion: JSON.stringify(config) })
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        aria-label="Ancho del ticket"
+                      >
+                        <option value="58">58</option>
+                        <option value="80">80</option>
+                        <option value="112">112</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Copias</label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={JSON.parse(formData.configuracion || '{}').copies || 1}
+                        onChange={(e) => {
+                          const config = JSON.parse(formData.configuracion || '{}')
+                          config.copies = parseInt(e.target.value)
+                          setFormData({ ...formData, configuracion: JSON.stringify(config) })
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        aria-label="Copias"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={JSON.parse(formData.configuracion || '{}').cut_paper || false}
+                        onChange={(e) => {
+                          const config = JSON.parse(formData.configuracion || '{}')
+                          config.cut_paper = e.target.checked
+                          setFormData({ ...formData, configuracion: JSON.stringify(config) })
+                        }}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        aria-label="Cortar papel"
+                      />
+                      <span className="text-sm text-gray-700">Cortar papel automáticamente</span>
+                    </label>
+                  </div>
+                </>
+              )}
+
+              {formData.tipo === 'impresora_facturas' && (
+                <>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Formato</label>
+                      <select
+                        value={JSON.parse(formData.configuracion || '{}').format || 'A4'}
+                        onChange={(e) => {
+                          const config = JSON.parse(formData.configuracion || '{}')
+                          config.format = e.target.value
+                          setFormData({ ...formData, configuracion: JSON.stringify(config) })
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        aria-label="Formato de factura"
+                      >
+                        <option value="A4">A4</option>
+                        <option value="Letter">Letter</option>
+                        <option value="A5">A5</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Copias</label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={JSON.parse(formData.configuracion || '{}').copies || 1}
+                        onChange={(e) => {
+                          const config = JSON.parse(formData.configuracion || '{}')
+                          config.copies = parseInt(e.target.value)
+                          setFormData({ ...formData, configuracion: JSON.stringify(config) })
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        aria-label="Copias"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {formData.tipo === 'bascula' && (
+                <>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Unidad</label>
+                      <select
+                        value={JSON.parse(formData.configuracion || '{}').unit || 'kg'}
+                        onChange={(e) => {
+                          const config = JSON.parse(formData.configuracion || '{}')
+                          config.unit = e.target.value
+                          setFormData({ ...formData, configuracion: JSON.stringify(config) })
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        aria-label="Unidad de peso"
+                      >
+                        <option value="kg">Kilogramos (kg)</option>
+                        <option value="g">Gramos (g)</option>
+                        <option value="lb">Libras (lb)</option>
+                        <option value="oz">Onzas (oz)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Precisión (decimales)</label>
+                      <select
+                        value={JSON.parse(formData.configuracion || '{}').precision || 2}
+                        onChange={(e) => {
+                          const config = JSON.parse(formData.configuracion || '{}')
+                          config.precision = parseInt(e.target.value)
+                          setFormData({ ...formData, configuracion: JSON.stringify(config) })
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        aria-label="Precisión"
+                      >
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={JSON.parse(formData.configuracion || '{}').auto_zero || false}
+                        onChange={(e) => {
+                          const config = JSON.parse(formData.configuracion || '{}')
+                          config.auto_zero = e.target.checked
+                          setFormData({ ...formData, configuracion: JSON.stringify(config) })
+                        }}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        aria-label="Auto cero"
+                      />
+                      <span className="text-sm text-gray-700">Auto cero al pesar</span>
+                    </label>
+                  </div>
+                </>
+              )}
+
+              {formData.tipo === 'torreta' && (
+                <>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Volumen</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={JSON.parse(formData.configuracion || '{}').volume || 80}
+                        onChange={(e) => {
+                          const config = JSON.parse(formData.configuracion || '{}')
+                          config.volume = parseInt(e.target.value)
+                          setFormData({ ...formData, configuracion: JSON.stringify(config) })
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        aria-label="Volumen"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Sonido</label>
+                      <select
+                        value={JSON.parse(formData.configuracion || '{}').sound_type || 'beep'}
+                        onChange={(e) => {
+                          const config = JSON.parse(formData.configuracion || '{}')
+                          config.sound_type = e.target.value
+                          setFormData({ ...formData, configuracion: JSON.stringify(config) })
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        aria-label="Tipo de sonido"
+                      >
+                        <option value="beep">Beep</option>
+                        <option value="melody">Melodía</option>
+                        <option value="voice">Voz</option>
+                      </select>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {formData.tipo === 'cajon_dinero' && (
+                <>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Pulse Width (ms)</label>
+                      <input
+                        type="number"
+                        min="50"
+                        max="500"
+                        value={JSON.parse(formData.configuracion || '{}').pulse_width || 200}
+                        onChange={(e) => {
+                          const config = JSON.parse(formData.configuracion || '{}')
+                          config.pulse_width = parseInt(e.target.value)
+                          setFormData({ ...formData, configuracion: JSON.stringify(config) })
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        aria-label="Pulse Width"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Número de Compartimientos</label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="10"
+                        value={JSON.parse(formData.configuracion || '{}').compartments || 5}
+                        onChange={(e) => {
+                          const config = JSON.parse(formData.configuracion || '{}')
+                          config.compartments = parseInt(e.target.value)
+                          setFormData({ ...formData, configuracion: JSON.stringify(config) })
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        aria-label="Compartimientos"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {formData.tipo === 'display_cliente' && (
+                <>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Filas</label>
+                      <select
+                        value={JSON.parse(formData.configuracion || '{}').rows || 2}
+                        onChange={(e) => {
+                          const config = JSON.parse(formData.configuracion || '{}')
+                          config.rows = parseInt(e.target.value)
+                          setFormData({ ...formData, configuracion: JSON.stringify(config) })
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        aria-label="Filas"
+                      >
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="4">4</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Columnas</label>
+                      <select
+                        value={JSON.parse(formData.configuracion || '{}').columns || 20}
+                        onChange={(e) => {
+                          const config = JSON.parse(formData.configuracion || '{}')
+                          config.columns = parseInt(e.target.value)
+                          setFormData({ ...formData, configuracion: JSON.stringify(config) })
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        aria-label="Columnas"
+                      >
+                        <option value="16">16</option>
+                        <option value="20">20</option>
+                        <option value="40">40</option>
+                      </select>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {formData.tipo === 'pantalla_touch' && (
+                <>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Resolución</label>
+                      <select
+                        value={JSON.parse(formData.configuracion || '{}').resolution || '1920x1080'}
+                        onChange={(e) => {
+                          const config = JSON.parse(formData.configuracion || '{}')
+                          config.resolution = e.target.value
+                          setFormData({ ...formData, configuracion: JSON.stringify(config) })
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        aria-label="Resolución"
+                      >
+                        <option value="1024x768">1024x768</option>
+                        <option value="1280x720">1280x720</option>
+                        <option value="1920x1080">1920x1080</option>
+                        <option value="2560x1440">2560x1440</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Tamaño (pulgadas)</label>
+                      <select
+                        value={JSON.parse(formData.configuracion || '{}').size || 15}
+                        onChange={(e) => {
+                          const config = JSON.parse(formData.configuracion || '{}')
+                          config.size = parseInt(e.target.value)
+                          setFormData({ ...formData, configuracion: JSON.stringify(config) })
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        aria-label="Tamaño"
+                      >
+                        <option value="10">10&quot;</option>
+                        <option value="12">12&quot;</option>
+                        <option value="15">15&quot;</option>
+                        <option value="17">17&quot;</option>
+                        <option value="19">19&quot;</option>
+                        <option value="22">22&quot;</option>
+                      </select>
+                    </div>
+                  </div>
+                </>
+              )}
+
               <div>
                 <label className="flex items-center space-x-2">
                   <input
@@ -400,16 +822,16 @@ function DispositivosContent() {
                 <p className="text-xs text-gray-500 mt-1">Si está marcado, este dispositivo se usará en todo el sistema. Si no, solo en la estación especificada.</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Configuración (JSON)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Configuración Adicional (JSON)</label>
                 <textarea
                   value={formData.configuracion}
                   onChange={(e) => setFormData({ ...formData, configuracion: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md font-mono text-sm"
                   rows={3}
-                  placeholder='{"baudrate": 9600, "parity": "none"}'
+                  placeholder='Configuración adicional en formato JSON'
                   aria-label="Configuración JSON del dispositivo"
                 />
-                <p className="text-xs text-gray-500 mt-1">Configuración específica del dispositivo en formato JSON</p>
+                <p className="text-xs text-gray-500 mt-1">Configuración adicional del dispositivo en formato JSON (opcional)</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Estación de Trabajo</label>
