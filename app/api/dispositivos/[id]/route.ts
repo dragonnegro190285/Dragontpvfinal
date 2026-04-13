@@ -42,11 +42,15 @@ export async function PUT(
       marca,
       puerto,
       configuracion,
+      configuracion_global,
       activo,
       estacion_trabajo,
       usuario_id,
       observaciones
     } = body
+
+    // Parsear configuracion si es string
+    const configuracionParsed = typeof configuracion === 'string' ? JSON.parse(configuracion) : configuracion
 
     const { data, error } = await supabase
       .from('dispositivos')
@@ -57,7 +61,8 @@ export async function PUT(
         modelo,
         marca,
         puerto,
-        configuracion,
+        configuracion: configuracionParsed,
+        configuracion_global,
         activo,
         estacion_trabajo,
         usuario_id,

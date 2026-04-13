@@ -12,6 +12,7 @@ function DispositivosContent() {
   const [error, setError] = useState('')
   const [mostrarModal, setMostrarModal] = useState(false)
   const [filtroTipo, setFiltroTipo] = useState('')
+  const [tabActiva, setTabActiva] = useState('lector_codigos')
   const [dispositivoEditando, setDispositivoEditando] = useState<Dispositivo | null>(null)
 
   const [formData, setFormData] = useState({
@@ -189,149 +190,143 @@ function DispositivosContent() {
           <div className="bg-white rounded-lg shadow p-4 md:p-6">
             {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
 
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex gap-4">
-                <select
-                  value={filtroTipo}
-                  onChange={(e) => setFiltroTipo(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded"
-                  aria-label="Filtrar por tipo"
-                >
-                  <option value="">Todos los tipos</option>
-                  {tiposDispositivo.map(tipo => (
-                    <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
-                  ))}
-                </select>
-              </div>
-              <button
-                onClick={() => {
-                  setDispositivoEditando(null)
-                  setFormData({
-                    codigo: '',
-                    nombre: '',
-                    tipo: 'lector_codigos',
-                    modelo: '',
-                    marca: '',
-                    puerto: '',
-                    configuracion_global: true,
-                    configuracion: '{}',
-                    estacion_trabajo: '',
-                    observaciones: ''
-                  })
-                  setMostrarModal(true)
-                }}
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-              >
-                + Nuevo Dispositivo
-              </button>
-            </div>
-
-            <div className="space-y-6">
-              {tiposDispositivo.map((tipo) => {
-                const dispositivosTipo = dispositivosFiltrados.filter(d => d.tipo === tipo.value)
-                return (
-                  <div key={tipo.value} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                    <div className="bg-gray-50 px-4 py-3 border-b flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">{tipo.icon}</span>
-                        <h3 className="text-lg font-semibold">{tipo.label}</h3>
-                        <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                          {dispositivosTipo.length} dispositivo{dispositivosTipo.length !== 1 ? 's' : ''}
-                        </span>
-                      </div>
+            <div className="mb-6">
+              {/* Tabs de navegación */}
+              <div className="border-b border-gray-200">
+                <nav className="-mb-px flex space-x-8 overflow-x-auto">
+                  {tiposDispositivo.map((tipo) => {
+                    const dispositivosTipo = dispositivos.filter(d => d.tipo === tipo.value)
+                    return (
                       <button
-                        onClick={() => {
-                          setDispositivoEditando(null)
-                          setFormData({
-                            codigo: '',
-                            nombre: '',
-                            tipo: tipo.value,
-                            modelo: '',
-                            marca: '',
-                            puerto: '',
-                            configuracion_global: true,
-                            configuracion: '{}',
-                            estacion_trabajo: '',
-                            observaciones: ''
-                          })
-                          setMostrarModal(true)
-                        }}
-                        className="bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 text-sm"
+                        key={tipo.value}
+                        onClick={() => setTabActiva(tipo.value)}
+                        className={`flex items-center gap-2 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                          tabActiva === tipo.value
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        }`}
                       >
-                        + Agregar {tipo.label}
+                        <span>{tipo.icon}</span>
+                        {tipo.label}
+                        <span className={`ml-1 px-2 py-0.5 rounded-full text-xs ${
+                          tabActiva === tipo.value
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          {dispositivosTipo.length}
+                        </span>
                       </button>
+                    )
+                  })}
+                </nav>
+              </div>
+
+              {/* Contenido de la tab activa */}
+              <div className="mt-6">
+                {tiposDispositivo.map((tipo) => {
+                  if (tabActiva !== tipo.value) return null
+                  const dispositivosTipo = dispositivos.filter(d => d.tipo === tipo.value)
+                  return (
+                    <div key={tipo.value}>
+                      <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-2xl font-bold flex items-center gap-3">
+                          <span className="text-3xl">{tipo.icon}</span>
+                          {tipo.label}
+                        </h2>
+                        <button
+                          onClick={() => {
+                            setDispositivoEditando(null)
+                            setFormData({
+                              codigo: '',
+                              nombre: '',
+                              tipo: tipo.value,
+                              modelo: '',
+                              marca: '',
+                              puerto: '',
+                              configuracion_global: true,
+                              configuracion: '{}',
+                              estacion_trabajo: '',
+                              observaciones: ''
+                            })
+                            setMostrarModal(true)
+                          }}
+                          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                        >
+                          + Agregar {tipo.label}
+                        </button>
+                      </div>
+
+                      {dispositivosTipo.length > 0 ? (
+                        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                          <table className="min-w-full">
+                            <thead className="bg-gray-50">
+                              <tr>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Código</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Modelo</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Marca</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Puerto</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Global</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {dispositivosTipo.map((dispositivo) => (
+                                <tr key={dispositivo.id} className="border-b hover:bg-gray-50">
+                                  <td className="px-4 py-3">{dispositivo.codigo}</td>
+                                  <td className="px-4 py-3 font-medium">{dispositivo.nombre}</td>
+                                  <td className="px-4 py-3">{dispositivo.modelo || '-'}</td>
+                                  <td className="px-4 py-3">{dispositivo.marca || '-'}</td>
+                                  <td className="px-4 py-3">{dispositivo.puerto || '-'}</td>
+                                  <td className="px-4 py-3">
+                                    {dispositivo.configuracion_global ? (
+                                      <span className="text-green-600">✓ Sí</span>
+                                    ) : (
+                                      <span className="text-gray-400">✗ No</span>
+                                    )}
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    <span className={`px-2 py-1 rounded text-xs ${dispositivo.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                      {dispositivo.activo ? 'Activo' : 'Inactivo'}
+                                    </span>
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    <div className="flex gap-2">
+                                      <button
+                                        onClick={() => handleToggleActivo(dispositivo)}
+                                        className="text-blue-600 hover:text-blue-800 text-sm"
+                                      >
+                                        {dispositivo.activo ? 'Desactivar' : 'Activar'}
+                                      </button>
+                                      <button
+                                        onClick={() => handleEditar(dispositivo)}
+                                        className="text-green-600 hover:text-green-800 text-sm"
+                                      >
+                                        Editar
+                                      </button>
+                                      <button
+                                        onClick={() => handleEliminar(dispositivo.id)}
+                                        className="text-red-600 hover:text-red-800 text-sm"
+                                      >
+                                        Eliminar
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      ) : (
+                        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-gray-500">
+                          No hay dispositivos de {tipo.label} registrados
+                        </div>
+                      )}
                     </div>
-                    {dispositivosTipo.length > 0 ? (
-                      <div className="p-4">
-                        {dispositivosTipo.map((dispositivo) => (
-                          <div key={dispositivo.id} className="border-b last:border-b-0 py-3 last:pb-0">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h4 className="font-semibold text-gray-900">{dispositivo.nombre}</h4>
-                                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">{dispositivo.codigo}</span>
-                                  {dispositivo.configuracion_global && (
-                                    <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Global</span>
-                                  )}
-                                  <span className={`text-xs px-2 py-0.5 rounded ${dispositivo.activo ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                                    {dispositivo.activo ? 'Activo' : 'Inactivo'}
-                                  </span>
-                                </div>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-gray-600">
-                                  <div>
-                                    <span className="font-medium">Modelo:</span> {dispositivo.modelo || '-'}
-                                  </div>
-                                  <div>
-                                    <span className="font-medium">Marca:</span> {dispositivo.marca || '-'}
-                                  </div>
-                                  <div>
-                                    <span className="font-medium">Puerto:</span> {dispositivo.puerto || '-'}
-                                  </div>
-                                  <div>
-                                    <span className="font-medium">Estación:</span> {dispositivo.estacion_trabajo || '-'}
-                                  </div>
-                                </div>
-                                {dispositivo.observaciones && (
-                                  <p className="text-sm text-gray-500 mt-1">{dispositivo.observaciones}</p>
-                                )}
-                              </div>
-                              <div className="flex gap-2 ml-4">
-                                <button
-                                  onClick={() => handleToggleActivo(dispositivo)}
-                                  className="text-blue-600 hover:text-blue-800 text-sm px-2 py-1"
-                                >
-                                  {dispositivo.activo ? 'Desactivar' : 'Activar'}
-                                </button>
-                                <button
-                                  onClick={() => handleEditar(dispositivo)}
-                                  className="text-green-600 hover:text-green-800 text-sm px-2 py-1"
-                                >
-                                  Editar
-                                </button>
-                                <button
-                                  onClick={() => handleEliminar(dispositivo.id)}
-                                  className="text-red-600 hover:text-red-800 text-sm px-2 py-1"
-                                >
-                                  Eliminar
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="p-8 text-center text-gray-500">
-                        No hay dispositivos de este tipo
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-              {dispositivosFiltrados.length === 0 && (
-                <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-gray-500">
-                  No hay dispositivos registrados
-                </div>
-              )}
+                  )
+                })}
+              </div>
             </div>
           </div>
         </div>
