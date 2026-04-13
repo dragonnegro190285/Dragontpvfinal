@@ -13,6 +13,17 @@ function NuevaCompraContent() {
   const [loading, setLoading] = useState(true)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [error, setError] = useState('')
+  const [mostrarModalProducto, setMostrarModalProducto] = useState(false)
+  const [nuevoProducto, setNuevoProducto] = useState({
+    nombre: '',
+    codigo_producto: '',
+    descripcion: '',
+    precio_venta_base: 0,
+    costo: 0,
+    stock_actual: 0,
+    stock_minimo: 0,
+    marca_id: ''
+  })
   
   // Estado del formulario
   const [formData, setFormData] = useState({
@@ -137,6 +148,61 @@ function NuevaCompraContent() {
     setLote('')
     setFechaVencimientoLote('')
     setError('')
+  }
+
+  const handleCrearProducto = async () => {
+    try {
+      const response = await fetch('/api/productos/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nuevoProducto)
+      })
+
+      if (!response.ok) throw new Error('Error al crear producto')
+
+      const data = await response.json()
+      
+      // Recargar productos
+      await loadProductos()
+      
+      // Seleccionar el producto creado
+      setProductoSeleccionado(data.producto.id)
+      setPrecioUnitario(data.producto.precio_venta_base)
+      
+      // Cerrar modal y limpiar
+      setMostrarModalProducto(false)
+      setNuevoProducto({
+        nombre: '',
+        codigo_producto: '',
+        descripcion: '',
+        precio_venta_base: 0,
+        costo: 0,
+        stock_actual: 0,
+        stock_minimo: 0,
+        marca_id: ''
+      })
+      setError('')
+    } catch (err: any) {
+      setError(err.message)
+    }
+  }
+
+  const handleAbrirModalProducto = () => {
+    setMostrarModalProducto(true)
+  }
+
+  const handleCerrarModalProducto = () => {
+    setMostrarModalProducto(false)
+    setNuevoProducto({
+      nombre: '',
+      codigo_producto: '',
+      descripcion: '',
+      precio_venta_base: 0,
+      costo: 0,
+      stock_actual: 0,
+      stock_minimo: 0,
+      marca_id: ''
+    })
   }
 
   const handleEliminarDetalle = (index: number) => {
@@ -371,7 +437,7 @@ function NuevaCompraContent() {
                 {/* Formulario de agregar detalle */}
                 <div className="border-b bg-gray-50 p-3">
                   <h3 className="text-sm font-semibold mb-2">Agregar Producto</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                  <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
                     <div>
                       <label className="block text-xs text-gray-600 mb-1">Producto</label>
                       <select
@@ -389,6 +455,16 @@ function NuevaCompraContent() {
                           <option key={p.id} value={p.id}>{p.nombre}</option>
                         ))}
                       </select>
+                    </div>
+                    <div className="flex items-end">
+                      <button
+                        type="button"
+                        onClick={handleAbrirModalProducto}
+                        className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm w-full"
+                        aria-label="Crear nuevo producto"
+                      >
+                        + Nuevo
+                      </button>
                     </div>
                     <div>
                       <label className="block text-xs text-gray-600 mb-1">Cantidad</label>
@@ -524,6 +600,99 @@ function NuevaCompraContent() {
           </div>
         </div>
       </div>
+
+      {/* Modal para crear producto */}
+      {mostrarModalProducto && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-4">
+            <h2 className="text-xl font-bold mb-4">Crear Nuevo Producto</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+                <input
+                  type="text"
+                  value={nuevoProducto.nombre}
+                  onChange={(e) => setNuevoProducto({ ...nuevoProducto, nombre: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  required
+                  aria-label="Nombre del producto"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Código</label>
+                <input
+                  type="text"
+                  value={nuevoProducto.codigo_producto}
+                  onChange={(e) => setNuevoProducto({ ...nuevoProducto, codigo_producto: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  aria-label="Código del producto"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                <textarea
+                  value={nuevoProducto.descripcion}
+                  onChange={(e) => setNuevoProducto({ ...nuevoProducto, descripcion: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  rows={2}
+                  aria-label="Descripción del producto"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Precio Venta *</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={nuevoProducto.precio_venta_base}
+                    onChange={(e) => setNuevoProducto({ ...nuevoProducto, precio_venta_base: parseFloat(e.target.value) || 0 })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    required
+                    aria-label="Precio de venta"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Costo</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={nuevoProducto.costo}
+                    onChange={(e) => setNuevoProducto({ ...nuevoProducto, costo: parseFloat(e.target.value) || 0 })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    aria-label="Costo del producto"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Stock Mínimo</label>
+                  <input
+                    type="number"
+                    value={nuevoProducto.stock_minimo}
+                    onChange={(e) => setNuevoProducto({ ...nuevoProducto, stock_minimo: parseFloat(e.target.value) || 0 })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    aria-label="Stock mínimo"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-6">
+              <button
+                onClick={handleCerrarModalProducto}
+                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleCrearProducto}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              >
+                Crear Producto
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

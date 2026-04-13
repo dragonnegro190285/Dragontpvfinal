@@ -320,6 +320,53 @@ DROP TRIGGER IF EXISTS trigger_generar_recordatorios ON compras;
 CREATE TRIGGER trigger_generar_recordatorios AFTER INSERT ON compras
     FOR EACH ROW EXECUTE FUNCTION generar_recordatorios_pago();
 
+-- Función para registrar movimiento de compra en kardex
+CREATE OR REPLACE FUNCTION registrar_compra_kardex()
+RETURNS TRIGGER AS $$
+DECLARE
+    saldo_actual DECIMAL(15,3);
+BEGIN
+    -- Obtener el saldo actual del producto
+    SELECT COALESCE(MAX(saldo_nuevo), 0) INTO saldo_actual
+    FROM kardex
+    WHERE producto_id = NEW.producto_id;
+    
+    -- Registrar movimiento de entrada en kardex
+    INSERT INTO kardex (
+        producto_id,
+        tipo_movimiento,
+        subtipo_movimiento,
+        cantidad,
+        costo_unitario,
+        saldo_anterior,
+        saldo_nuevo,
+        referencia_id,
+        referencia_tipo,
+        notas,
+        usuario_id
+    ) VALUES (
+        NEW.producto_id,
+        'ENTRADA',
+        'COMPRA',
+        NEW.cantidad,
+        NEW.precio_unitario,
+        saldo_actual,
+        saldo_actual + NEW.cantidad,
+        NEW.compra_id,
+        'COMPRA',
+        'Compra: ' || (SELECT numero_compra FROM compras WHERE id = NEW.compra_id),
+        (SELECT usuario_id FROM compras WHERE id = NEW.compra_id)
+    );
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger para registrar kardex al crear detalle de compra
+DROP TRIGGER IF EXISTS trigger_registrar_kardex_compra ON compra_detalles;
+CREATE TRIGGER trigger_registrar_kardex_compra AFTER INSERT ON compra_detalles
+    FOR EACH ROW EXECUTE FUNCTION registrar_compra_kardex();
+
 -- ============================================
 -- VISTAS ÚTILES
 -- ============================================
