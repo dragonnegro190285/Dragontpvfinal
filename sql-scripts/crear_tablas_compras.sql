@@ -104,6 +104,36 @@ CREATE INDEX idx_compras_estado ON compras(estado);
 DROP INDEX IF EXISTS idx_compras_numero;
 CREATE INDEX idx_compras_numero ON compras(numero_compra);
 
+-- Migración: Agregar columnas faltantes si la tabla ya existe
+DO $$
+BEGIN
+    -- Agregar columna forma_pago_id si no existe
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'compras' AND column_name = 'forma_pago_id'
+    ) THEN
+        ALTER TABLE compras ADD COLUMN forma_pago_id UUID REFERENCES formas_pago(id) ON DELETE RESTRICT;
+    END IF;
+    
+    -- Agregar columna impuesto_id si no existe
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'compras' AND column_name = 'impuesto_id'
+    ) THEN
+        ALTER TABLE compras ADD COLUMN impuesto_id UUID REFERENCES impuestos(id) ON DELETE RESTRICT;
+    END IF;
+    
+    -- Actualizar constraint de condicion_pago si existe
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'compras' AND column_name = 'condicion_pago'
+    ) THEN
+        ALTER TABLE compras DROP CONSTRAINT IF EXISTS compras_condicion_pago_check;
+        ALTER TABLE compras ADD CONSTRAINT compras_condicion_pago_check 
+            CHECK (condicion_pago IN ('contado', '30_dias', '60_dias', '90_dias'));
+    END IF;
+END $$;
+
 -- Tabla de Detalles de Compra
 CREATE TABLE IF NOT EXISTS compra_detalles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
