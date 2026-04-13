@@ -280,8 +280,8 @@ function CompraDetalleContent() {
                     <p className="font-medium">{compra.condicion_pago || '-'}</p>
                   </div>
                   <div>
-                    <label className="text-sm text-gray-500">Método Pago</label>
-                    <p className="font-medium">{compra.metodo_pago || '-'}</p>
+                    <label className="text-sm text-gray-500">Forma Pago</label>
+                    <p className="font-medium">{compra.forma_pago?.nombre || '-'}</p>
                   </div>
                 </div>
                 {compra.observaciones && (
