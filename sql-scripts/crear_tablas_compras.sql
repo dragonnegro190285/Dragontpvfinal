@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS dispositivos (
     marca VARCHAR(100),
     puerto VARCHAR(50),
     configuracion JSONB,
+    configuracion_global BOOLEAN DEFAULT TRUE,
     activo BOOLEAN DEFAULT TRUE,
     estacion_trabajo VARCHAR(50),
     usuario_id UUID REFERENCES usuarios(id) ON DELETE SET NULL,

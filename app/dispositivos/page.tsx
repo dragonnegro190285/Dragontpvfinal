@@ -21,6 +21,8 @@ function DispositivosContent() {
     modelo: '',
     marca: '',
     puerto: '',
+    configuracion_global: true,
+    configuracion: '{}',
     estacion_trabajo: '',
     observaciones: ''
   })
@@ -69,6 +71,8 @@ function DispositivosContent() {
         modelo: '',
         marca: '',
         puerto: '',
+        configuracion_global: true,
+        configuracion: '{}',
         estacion_trabajo: '',
         observaciones: ''
       })
@@ -88,6 +92,8 @@ function DispositivosContent() {
       modelo: dispositivo.modelo || '',
       marca: dispositivo.marca || '',
       puerto: dispositivo.puerto || '',
+      configuracion_global: dispositivo.configuracion_global,
+      configuracion: typeof dispositivo.configuracion === 'string' ? dispositivo.configuracion : JSON.stringify(dispositivo.configuracion),
       estacion_trabajo: dispositivo.estacion_trabajo || '',
       observaciones: dispositivo.observaciones || ''
     })
@@ -207,6 +213,8 @@ function DispositivosContent() {
                     modelo: '',
                     marca: '',
                     puerto: '',
+                    configuracion_global: true,
+                    configuracion: '{}',
                     estacion_trabajo: '',
                     observaciones: ''
                   })
@@ -228,6 +236,7 @@ function DispositivosContent() {
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Modelo</th>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Marca</th>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Estación</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Global</th>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
                   </tr>
@@ -241,6 +250,13 @@ function DispositivosContent() {
                       <td className="px-4 py-2">{dispositivo.modelo || '-'}</td>
                       <td className="px-4 py-2">{dispositivo.marca || '-'}</td>
                       <td className="px-4 py-2">{dispositivo.estacion_trabajo || '-'}</td>
+                      <td className="px-4 py-2">
+                        {dispositivo.configuracion_global ? (
+                          <span className="text-green-600">✓ Sí</span>
+                        ) : (
+                          <span className="text-gray-400">✗ No</span>
+                        )}
+                      </td>
                       <td className="px-4 py-2">
                         <span className={`px-2 py-1 rounded text-xs ${dispositivo.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                           {dispositivo.activo ? 'Activo' : 'Inactivo'}
@@ -272,7 +288,7 @@ function DispositivosContent() {
                   ))}
                   {dispositivosFiltrados.length === 0 && (
                     <tr>
-                      <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
+                      <td colSpan={9} className="px-4 py-8 text-center text-gray-500">
                         No hay dispositivos registrados
                       </td>
                     </tr>
@@ -355,6 +371,31 @@ function DispositivosContent() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   aria-label="Puerto del dispositivo"
                 />
+              </div>
+              <div>
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.configuracion_global}
+                    onChange={(e) => setFormData({ ...formData, configuracion_global: e.target.checked })}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    aria-label="Configuración global"
+                  />
+                  <span className="text-sm font-medium text-gray-700">Configuración Global del Sistema</span>
+                </label>
+                <p className="text-xs text-gray-500 mt-1">Si está marcado, este dispositivo se usará en todo el sistema. Si no, solo en la estación especificada.</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Configuración (JSON)</label>
+                <textarea
+                  value={formData.configuracion}
+                  onChange={(e) => setFormData({ ...formData, configuracion: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md font-mono text-sm"
+                  rows={3}
+                  placeholder='{"baudrate": 9600, "parity": "none"}'
+                  aria-label="Configuración JSON del dispositivo"
+                />
+                <p className="text-xs text-gray-500 mt-1">Configuración específica del dispositivo en formato JSON</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Estación de Trabajo</label>

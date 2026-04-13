@@ -144,6 +144,7 @@ export interface Dispositivo {
   marca?: string
   puerto?: string
   configuracion?: any
+  configuracion_global: boolean
   activo: boolean
   estacion_trabajo?: string
   usuario_id?: string
