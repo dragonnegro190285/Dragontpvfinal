@@ -14,6 +14,9 @@ function NuevaCompraContent() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [error, setError] = useState('')
   const [mostrarModalProducto, setMostrarModalProducto] = useState(false)
+  const [mostrarBusquedaProducto, setMostrarBusquedaProducto] = useState(false)
+  const [textoBusqueda, setTextoBusqueda] = useState('')
+  const [productosFiltrados, setProductosFiltrados] = useState<Producto[]>([])
   const [nuevoProducto, setNuevoProducto] = useState({
     nombre: '',
     codigo_producto: '',
@@ -107,6 +110,45 @@ function NuevaCompraContent() {
     loadImpuestos()
     setLoading(false)
   }, [loadProveedores, loadProductos, loadFormasPago, loadImpuestos])
+
+  // Efecto para manejar tecla de acceso rápido (Ctrl+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault()
+        setMostrarBusquedaProducto(true)
+        setTextoBusqueda('')
+        setProductosFiltrados(productos)
+      }
+      if (e.key === 'Escape') {
+        setMostrarBusquedaProducto(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [productos])
+
+  const handleBuscarProducto = (texto: string) => {
+    setTextoBusqueda(texto)
+    if (texto.trim() === '') {
+      setProductosFiltrados(productos)
+    } else {
+      const filtrados = productos.filter(p =>
+        p.nombre.toLowerCase().includes(texto.toLowerCase()) ||
+        p.codigo_producto?.toLowerCase().includes(texto.toLowerCase())
+      )
+      setProductosFiltrados(filtrados)
+    }
+  }
+
+  const handleSeleccionarProductoBusqueda = (producto: Producto) => {
+    setProductoSeleccionado(producto.id)
+    setPrecioUnitario(producto.precio_venta_base)
+    setMostrarBusquedaProducto(false)
+    setTextoBusqueda('')
+    setProductosFiltrados([])
+  }
 
   const handleAgregarDetalle = () => {
     if (!productoSeleccionado || cantidad <= 0 || precioUnitario <= 0) {
@@ -437,7 +479,7 @@ function NuevaCompraContent() {
                 {/* Formulario de agregar detalle */}
                 <div className="border-b bg-gray-50 p-3">
                   <h3 className="text-sm font-semibold mb-2">Agregar Producto</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
+                  <div className="grid grid-cols-2 md:grid-cols-7 gap-2">
                     <div>
                       <label className="block text-xs text-gray-600 mb-1">Producto</label>
                       <select
@@ -455,6 +497,17 @@ function NuevaCompraContent() {
                           <option key={p.id} value={p.id}>{p.nombre}</option>
                         ))}
                       </select>
+                    </div>
+                    <div className="flex items-end">
+                      <button
+                        type="button"
+                        onClick={() => setMostrarBusquedaProducto(true)}
+                        className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm w-full"
+                        aria-label="Buscar producto (Ctrl+K)"
+                        title="Buscar producto (Ctrl+K)"
+                      >
+                        🔍
+                      </button>
                     </div>
                     <div className="flex items-end">
                       <button
@@ -600,6 +653,72 @@ function NuevaCompraContent() {
           </div>
         </div>
       </div>
+
+      {/* Modal de búsqueda de productos */}
+      {mostrarBusquedaProducto && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Buscar Producto</h2>
+              <button
+                onClick={() => setMostrarBusquedaProducto(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="mb-4">
+              <input
+                type="text"
+                value={textoBusqueda}
+                onChange={(e) => handleBuscarProducto(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                placeholder="Buscar por nombre o código..."
+                autoFocus
+                aria-label="Buscar producto"
+              />
+              <p className="text-xs text-gray-500 mt-1">Presiona Ctrl+K para abrir búsqueda • ESC para cerrar</p>
+            </div>
+            <div className="max-h-96 overflow-auto">
+              {productosFiltrados.length > 0 ? (
+                <table className="min-w-full">
+                  <thead className="bg-gray-50 sticky top-0">
+                    <tr>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-600 border-b">Código</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-600 border-b">Nombre</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-600 border-b">Precio</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-600 border-b">Stock</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-600 border-b">Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {productosFiltrados.map((producto) => (
+                      <tr key={producto.id} className="border-b hover:bg-gray-50 cursor-pointer">
+                        <td className="px-3 py-2 text-sm">{producto.codigo_producto || '-'}</td>
+                        <td className="px-3 py-2 text-sm font-medium">{producto.nombre}</td>
+                        <td className="px-3 py-2 text-sm">${producto.precio_venta_base.toFixed(2)}</td>
+                        <td className="px-3 py-2 text-sm">{producto.existencias || 0}</td>
+                        <td className="px-3 py-2">
+                          <button
+                            onClick={() => handleSeleccionarProductoBusqueda(producto)}
+                            className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm"
+                          >
+                            Seleccionar
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  No se encontraron productos
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal para crear producto */}
       {mostrarModalProducto && (
