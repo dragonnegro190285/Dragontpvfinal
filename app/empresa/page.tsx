@@ -408,25 +408,25 @@ export default function EmpresaPage() {
           {activeTab === 'generales' && (
             <div className="space-y-4">
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
-                <input type="text" required value={empresa.nombre} onChange={(e) => setEmpresa({ ...empresa, nombre: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" /></div>
+                <input type="text" required value={empresa.nombre} onChange={(e) => setEmpresa({ ...empresa, nombre: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" aria-label="Nombre de la empresa" /></div>
               <div><label className="block text-sm font-medium text-gray-700 mb-1">RFC</label>
-                <input type="text" value={empresa.rfc || ''} onChange={(e) => setEmpresa({ ...empresa, rfc: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" /></div>
+                <input type="text" value={empresa.rfc || ''} onChange={(e) => setEmpresa({ ...empresa, rfc: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" aria-label="RFC de la empresa" /></div>
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Sitio Web</label>
-                <input type="url" value={empresa.sitio_web || ''} onChange={(e) => setEmpresa({ ...empresa, sitio_web: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" /></div>
+                <input type="url" value={empresa.sitio_web || ''} onChange={(e) => setEmpresa({ ...empresa, sitio_web: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" aria-label="Sitio web de la empresa" /></div>
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Logo URL</label>
-                <input type="url" value={empresa.logo_url || ''} onChange={(e) => setEmpresa({ ...empresa, logo_url: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" /></div>
+                <input type="url" value={empresa.logo_url || ''} onChange={(e) => setEmpresa({ ...empresa, logo_url: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" aria-label="URL del logo" /></div>
             </div>
           )}
 
           {activeTab === 'direccion' && (
             <div className="space-y-4">
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Dirección Fiscal</label>
-                <textarea value={empresa.direccion_fiscal || ''} onChange={(e) => setEmpresa({ ...empresa, direccion_fiscal: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" rows={2} /></div>
+                <textarea value={empresa.direccion_fiscal || ''} onChange={(e) => setEmpresa({ ...empresa, direccion_fiscal: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" rows={2} aria-label="Dirección fiscal" /></div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div><label className="block text-sm font-medium text-gray-700 mb-1">Ciudad</label><input type="text" value={empresa.ciudad || ''} onChange={(e) => setEmpresa({ ...empresa, ciudad: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" /></div>
-                <div><label className="block text-sm font-medium text-gray-700 mb-1">Estado</label><input type="text" value={empresa.estado || ''} onChange={(e) => setEmpresa({ ...empresa, estado: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" /></div>
-                <div><label className="block text-sm font-medium text-gray-700 mb-1">CP</label><input type="text" value={empresa.codigo_postal || ''} onChange={(e) => setEmpresa({ ...empresa, codigo_postal: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" /></div>
-                <div><label className="block text-sm font-medium text-gray-700 mb-1">País</label><input type="text" value={empresa.pais || 'México'} onChange={(e) => setEmpresa({ ...empresa, pais: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" /></div>
+                <div><label className="block text-sm font-medium text-gray-700 mb-1">Ciudad</label><input type="text" value={empresa.ciudad || ''} onChange={(e) => setEmpresa({ ...empresa, ciudad: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" aria-label="Ciudad" /></div>
+                <div><label className="block text-sm font-medium text-gray-700 mb-1">Estado</label><input type="text" value={empresa.estado || ''} onChange={(e) => setEmpresa({ ...empresa, estado: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" aria-label="Estado" /></div>
+                <div><label className="block text-sm font-medium text-gray-700 mb-1">CP</label><input type="text" value={empresa.codigo_postal || ''} onChange={(e) => setEmpresa({ ...empresa, codigo_postal: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" aria-label="Código postal" /></div>
+                <div><label className="block text-sm font-medium text-gray-700 mb-1">País</label><input type="text" value={empresa.pais || 'México'} onChange={(e) => setEmpresa({ ...empresa, pais: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" aria-label="País" /></div>
               </div>
             </div>
           )}
@@ -434,9 +434,9 @@ export default function EmpresaPage() {
           {activeTab === 'contacto' && (
             <div className="space-y-4">
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-                <input type="tel" value={empresa.telefono || ''} onChange={(e) => setEmpresa({ ...empresa, telefono: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" /></div>
+                <input type="tel" value={empresa.telefono || ''} onChange={(e) => setEmpresa({ ...empresa, telefono: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" aria-label="Teléfono" /></div>
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input type="email" value={empresa.correo_electronico || ''} onChange={(e) => setEmpresa({ ...empresa, correo_electronico: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" /></div>
+                <input type="email" value={empresa.correo_electronico || ''} onChange={(e) => setEmpresa({ ...empresa, correo_electronico: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" aria-label="Correo electrónico" /></div>
             </div>
           )}
 
@@ -444,25 +444,25 @@ export default function EmpresaPage() {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div><label className="block text-sm font-medium text-gray-700 mb-1">Moneda</label>
-                  <select value={empresa.moneda_predeterminada || 'MXN'} onChange={(e) => setEmpresa({ ...empresa, moneda_predeterminada: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2">
+                  <select value={empresa.moneda_predeterminada || 'MXN'} onChange={(e) => setEmpresa({ ...empresa, moneda_predeterminada: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" aria-label="Moneda predeterminada">
                     <option value="MXN">MXN</option><option value="USD">USD</option><option value="EUR">EUR</option>
                   </select></div>
                 <div><label className="block text-sm font-medium text-gray-700 mb-1">IVA (%)</label>
-                  <input type="number" step="0.01" value={empresa.iva_porcentaje || 16} onChange={(e) => setEmpresa({ ...empresa, iva_porcentaje: parseFloat(e.target.value) })} className="w-full border border-gray-300 rounded px-3 py-2" /></div>
+                  <input type="number" step="0.01" value={empresa.iva_porcentaje || 16} onChange={(e) => setEmpresa({ ...empresa, iva_porcentaje: parseFloat(e.target.value) })} className="w-full border border-gray-300 rounded px-3 py-2" aria-label="Porcentaje de IVA" /></div>
               </div>
-              <div><label className="flex items-center"><input type="checkbox" checked={empresa.iva_incluido || false} onChange={(e) => setEmpresa({ ...empresa, iva_incluido: e.target.checked })} className="mr-2" /><span>IVA incluido</span></label></div>
+              <div><label className="flex items-center"><input type="checkbox" checked={empresa.iva_incluido || false} onChange={(e) => setEmpresa({ ...empresa, iva_incluido: e.target.checked })} className="mr-2" aria-label="IVA incluido" /><span>IVA incluido</span></label></div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div><label className="block text-sm font-medium text-gray-700 mb-1">Régimen Fiscal</label>
-                  <select value={empresa.regimen_fiscal || ''} onChange={(e) => setEmpresa({ ...empresa, regimen_fiscal: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2">
+                  <select value={empresa.regimen_fiscal || ''} onChange={(e) => setEmpresa({ ...empresa, regimen_fiscal: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" aria-label="Régimen fiscal">
                     <option value="">Seleccionar...</option><option value="601">601 - General de Ley Personas Morales</option><option value="612">612 - Personas Físicas con Actividades Empresariales</option><option value="626">626 - RÉSIM</option>
                   </select></div>
-                <div><label className="block text-sm font-medium text-gray-700 mb-1">CP Expedición</label><input type="text" value={empresa.codigo_postal_exp || ''} onChange={(e) => setEmpresa({ ...empresa, codigo_postal_exp: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" /></div>
+                <div><label className="block text-sm font-medium text-gray-700 mb-1">CP Expedición</label><input type="text" value={empresa.codigo_postal_exp || ''} onChange={(e) => setEmpresa({ ...empresa, codigo_postal_exp: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" aria-label="Código postal de expedición" /></div>
                 <div><label className="block text-sm font-medium text-gray-700 mb-1">Uso CFDI</label>
-                  <select value={empresa.uso_cfdi || 'P01'} onChange={(e) => setEmpresa({ ...empresa, uso_cfdi: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2">
+                  <select value={empresa.uso_cfdi || 'P01'} onChange={(e) => setEmpresa({ ...empresa, uso_cfdi: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" aria-label="Uso de CFDI">
                     <option value="P01">P01 - Por definir</option><option value="G03">G03 - Gastos en general</option><option value="G01">G01 - Adquisición de mercancías</option>
                   </select></div>
                 <div><label className="block text-sm font-medium text-gray-700 mb-1">Método Pago</label>
-                  <select value={empresa.metodo_pago || 'PUE'} onChange={(e) => setEmpresa({ ...empresa, metodo_pago: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2">
+                  <select value={empresa.metodo_pago || 'PUE'} onChange={(e) => setEmpresa({ ...empresa, metodo_pago: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" aria-label="Método de pago">
                     <option value="PUE">PUE - Una sola exhibición</option><option value="PPD">PPD - Parcialidades o diferido</option>
                   </select></div>
               </div>
@@ -470,7 +470,7 @@ export default function EmpresaPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-60 overflow-y-auto p-2 border border-gray-200 rounded">
                   {formasPago.map((fp) => (
                     <label key={fp.value} className="flex items-center">
-                      <input type="checkbox" checked={selectedFormasPago.includes(fp.value)} onChange={(e) => handleFormaPagoChange(fp.value, e.target.checked)} className="mr-2" />
+                      <input type="checkbox" checked={selectedFormasPago.includes(fp.value)} onChange={(e) => handleFormaPagoChange(fp.value, e.target.checked)} className="mr-2" aria-label={`Forma de pago ${fp.label}`} />
                       <span className="text-sm">{fp.label}</span>
                     </label>
                   ))}
@@ -482,12 +482,12 @@ export default function EmpresaPage() {
           {activeTab === 'bancaria' && (
             <div className="space-y-4">
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Banco</label>
-                <input type="text" value={empresa.banco_nombre || ''} onChange={(e) => setEmpresa({ ...empresa, banco_nombre: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" /></div>
+                <input type="text" value={empresa.banco_nombre || ''} onChange={(e) => setEmpresa({ ...empresa, banco_nombre: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" aria-label="Nombre del banco" /></div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div><label className="block text-sm font-medium text-gray-700 mb-1">Cuenta</label><input type="text" value={empresa.banco_cuenta || ''} onChange={(e) => setEmpresa({ ...empresa, banco_cuenta: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" /></div>
-                <div><label className="block text-sm font-medium text-gray-700 mb-1">CLABE</label><input type="text" maxLength={18} value={empresa.banco_clabe || ''} onChange={(e) => setEmpresa({ ...empresa, banco_clabe: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" /></div>
-                <div><label className="block text-sm font-medium text-gray-700 mb-1">Sucursal</label><input type="text" value={empresa.banco_sucursal || ''} onChange={(e) => setEmpresa({ ...empresa, banco_sucursal: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" /></div>
-                <div><label className="block text-sm font-medium text-gray-700 mb-1">Titular</label><input type="text" value={empresa.banco_titular || ''} onChange={(e) => setEmpresa({ ...empresa, banco_titular: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" /></div>
+                <div><label className="block text-sm font-medium text-gray-700 mb-1">Cuenta</label><input type="text" value={empresa.banco_cuenta || ''} onChange={(e) => setEmpresa({ ...empresa, banco_cuenta: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" aria-label="Número de cuenta" /></div>
+                <div><label className="block text-sm font-medium text-gray-700 mb-1">CLABE</label><input type="text" maxLength={18} value={empresa.banco_clabe || ''} onChange={(e) => setEmpresa({ ...empresa, banco_clabe: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" aria-label="CLABE interbancaria" /></div>
+                <div><label className="block text-sm font-medium text-gray-700 mb-1">Sucursal</label><input type="text" value={empresa.banco_sucursal || ''} onChange={(e) => setEmpresa({ ...empresa, banco_sucursal: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" aria-label="Sucursal bancaria" /></div>
+                <div><label className="block text-sm font-medium text-gray-700 mb-1">Titular</label><input type="text" value={empresa.banco_titular || ''} onChange={(e) => setEmpresa({ ...empresa, banco_titular: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" aria-label="Titular de la cuenta" /></div>
               </div>
             </div>
           )}
@@ -495,9 +495,9 @@ export default function EmpresaPage() {
           {activeTab === 'mensajes' && (
             <div className="space-y-4">
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Mensaje en Factura</label>
-                <textarea value={empresa.mensaje_factura || ''} onChange={(e) => setEmpresa({ ...empresa, mensaje_factura: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" rows={3} /></div>
+                <textarea value={empresa.mensaje_factura || ''} onChange={(e) => setEmpresa({ ...empresa, mensaje_factura: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" rows={3} aria-label="Mensaje en factura" /></div>
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Condiciones de Pago</label>
-                <textarea value={empresa.condiciones_pago || ''} onChange={(e) => setEmpresa({ ...empresa, condiciones_pago: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" rows={3} /></div>
+                <textarea value={empresa.condiciones_pago || ''} onChange={(e) => setEmpresa({ ...empresa, condiciones_pago: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2" rows={3} aria-label="Condiciones de pago" /></div>
             </div>
           )}
 
@@ -517,6 +517,7 @@ export default function EmpresaPage() {
                       value={selectedRol}
                       onChange={(e) => setSelectedRol(e.target.value)}
                       className="w-full md:w-64 border border-gray-300 rounded px-3 py-2"
+                      aria-label="Seleccionar rol"
                     >
                       {permisosData.roles.map((rol: any) => (
                         <option key={rol.id} value={rol.id}>
@@ -563,6 +564,7 @@ export default function EmpresaPage() {
                                   checked={permisosData.roles.find((r: any) => r.id === selectedRol)?.permisos[modulo]?.[accion] || false}
                                   onChange={(e) => handlePermisoChange(selectedRol, modulo, accion, e.target.checked)}
                                   className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+                                  aria-label={`Permiso ${accion} para módulo ${modulo}`}
                                 />
                               </td>
                             ))}
@@ -574,6 +576,7 @@ export default function EmpresaPage() {
                                 )}
                                 onChange={(e) => toggleAllPermisos(selectedRol, modulo, e.target.checked)}
                                 className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+                                aria-label={`Seleccionar todos los permisos para módulo ${modulo}`}
                               />
                             </td>
                           </tr>

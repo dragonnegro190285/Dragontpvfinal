@@ -102,3 +102,95 @@ export interface PrecioVentaCliente {
   creado_at: string
   actualizado_at: string
 }
+
+// Tipos para Módulo de Compras
+export interface Compra {
+  id: string
+  numero_compra: string
+  proveedor_id: string
+  usuario_id: string
+  fecha_compra: string
+  fecha_recepcion?: string
+  fecha_vencimiento?: string
+  subtotal: number
+  iva_porcentaje: number
+  iva_monto: number
+  descuento_porcentaje: number
+  descuento_monto: number
+  total: number
+  estado: 'pendiente' | 'recibida' | 'cancelada' | 'parcial'
+  observaciones?: string
+  metodo_pago?: string
+  numero_factura?: string
+  condicion_pago?: string
+  created_at: string
+  updated_at: string
+  proveedor?: Proveedor
+  usuario?: Usuario
+}
+
+export interface CompraDetalle {
+  id: string
+  compra_id: string
+  producto_id: string
+  cantidad: number
+  precio_unitario: number
+  descuento_porcentaje: number
+  descuento_monto: number
+  subtotal: number
+  iva_porcentaje: number
+  iva_monto: number
+  total: number
+  lote?: string
+  fecha_vencimiento_lote?: string
+  observaciones?: string
+  created_at: string
+  producto?: Producto
+}
+
+export interface CompraPago {
+  id: string
+  compra_id: string
+  usuario_id: string
+  monto: number
+  metodo_pago: 'efectivo' | 'transferencia' | 'cheque' | 'tarjeta' | 'credito'
+  referencia?: string
+  fecha_pago: string
+  observaciones?: string
+  created_at: string
+  usuario?: Usuario
+}
+
+// Tipos para Módulo de Caja
+export interface Caja {
+  id: string
+  usuario_id: string
+  numero_caja: string
+  fecha_apertura: string
+  fecha_cierre?: string
+  monto_apertura: number
+  monto_cierre?: number
+  monto_esperado?: number
+  diferencia?: number
+  estado: 'abierta' | 'cerrada'
+  observaciones?: string
+  created_at: string
+  updated_at: string
+  usuario?: Usuario
+}
+
+export interface CajaMovimiento {
+  id: string
+  caja_id: string
+  usuario_id: string
+  tipo_movimiento: 'entrada' | 'salida'
+  categoria: 'venta' | 'compra' | 'pago_compra' | 'pago_venta' | 'retiro' | 'deposito' | 'ajuste'
+  monto: number
+  referencia_id?: string
+  referencia_tipo?: string
+  descripcion?: string
+  metodo_pago?: string
+  fecha_movimiento: string
+  created_at: string
+  usuario?: Usuario
+}
