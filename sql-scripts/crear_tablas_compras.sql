@@ -402,7 +402,8 @@ CREATE TRIGGER trigger_registrar_kardex_compra AFTER INSERT ON compra_detalles
 -- ============================================
 
 -- Vista de compras con detalles de proveedor
-CREATE OR REPLACE VIEW vista_compras_completa AS
+DROP VIEW IF EXISTS vista_compras_completa;
+CREATE VIEW vista_compras_completa AS
 SELECT 
     c.id,
     c.numero_compra,
@@ -438,7 +439,8 @@ LEFT JOIN formas_pago fp ON c.forma_pago_id = fp.id
 LEFT JOIN impuestos imp ON c.impuesto_id = imp.id;
 
 -- Vista de detalles de compra con información del producto
-CREATE OR REPLACE VIEW vista_compra_detalles_completa AS
+DROP VIEW IF EXISTS vista_compra_detalles_completa;
+CREATE VIEW vista_compra_detalles_completa AS
 SELECT 
     cd.id,
     cd.compra_id,
@@ -462,7 +464,8 @@ LEFT JOIN compras c ON cd.compra_id = c.id
 LEFT JOIN productos prod ON cd.producto_id = prod.id;
 
 -- Vista de resumen de caja
-CREATE OR REPLACE VIEW vista_caja_resumen AS
+DROP VIEW IF EXISTS vista_caja_resumen;
+CREATE VIEW vista_caja_resumen AS
 SELECT 
     c.id,
     c.numero_caja,
