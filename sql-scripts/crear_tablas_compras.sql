@@ -169,10 +169,12 @@ END;
 $$ language 'plpgsql';
 
 -- Trigger para actualizar updated_at en compras
+DROP TRIGGER IF EXISTS update_compras_updated_at ON compras;
 CREATE TRIGGER update_compras_updated_at BEFORE UPDATE ON compras
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Trigger para actualizar updated_at en cajas
+DROP TRIGGER IF EXISTS update_cajas_updated_at ON cajas;
 CREATE TRIGGER update_cajas_updated_at BEFORE UPDATE ON cajas
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
