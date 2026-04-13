@@ -399,5 +399,5 @@ function DispositivosContent() {
 }
 
 export default function DispositivosPage() {
-  return <DispositivosContent()
+  return <DispositivosContent />
 }
