@@ -33,10 +33,15 @@ CREATE TABLE IF NOT EXISTS compras (
 );
 
 -- Índices para compras
+DROP INDEX IF EXISTS idx_compras_proveedor;
 CREATE INDEX idx_compras_proveedor ON compras(proveedor_id);
+DROP INDEX IF EXISTS idx_compras_usuario;
 CREATE INDEX idx_compras_usuario ON compras(usuario_id);
+DROP INDEX IF EXISTS idx_compras_fecha;
 CREATE INDEX idx_compras_fecha ON compras(fecha_compra);
+DROP INDEX IF EXISTS idx_compras_estado;
 CREATE INDEX idx_compras_estado ON compras(estado);
+DROP INDEX IF EXISTS idx_compras_numero;
 CREATE INDEX idx_compras_numero ON compras(numero_compra);
 
 -- Tabla de Detalles de Compra
@@ -63,7 +68,9 @@ CREATE TABLE IF NOT EXISTS compra_detalles (
 );
 
 -- Índices para compra_detalles
+DROP INDEX IF EXISTS idx_compra_detalles_compra;
 CREATE INDEX idx_compra_detalles_compra ON compra_detalles(compra_id);
+DROP INDEX IF EXISTS idx_compra_detalles_producto;
 CREATE INDEX idx_compra_detalles_producto ON compra_detalles(producto_id);
 
 -- Tabla de Pagos de Compras
@@ -80,8 +87,11 @@ CREATE TABLE IF NOT EXISTS compra_pagos (
 );
 
 -- Índices para compra_pagos
+DROP INDEX IF EXISTS idx_compra_pagos_compra;
 CREATE INDEX idx_compra_pagos_compra ON compra_pagos(compra_id);
+DROP INDEX IF EXISTS idx_compra_pagos_usuario;
 CREATE INDEX idx_compra_pagos_usuario ON compra_pagos(usuario_id);
+DROP INDEX IF EXISTS idx_compra_pagos_fecha;
 CREATE INDEX idx_compra_pagos_fecha ON compra_pagos(fecha_pago);
 
 -- ============================================
@@ -106,9 +116,13 @@ CREATE TABLE IF NOT EXISTS cajas (
 );
 
 -- Índices para cajas
+DROP INDEX IF EXISTS idx_cajas_usuario;
 CREATE INDEX idx_cajas_usuario ON cajas(usuario_id);
+DROP INDEX IF EXISTS idx_cajas_fecha;
 CREATE INDEX idx_cajas_fecha ON cajas(fecha_apertura);
+DROP INDEX IF EXISTS idx_cajas_estado;
 CREATE INDEX idx_cajas_estado ON cajas(estado);
+DROP INDEX IF EXISTS idx_cajas_numero;
 CREATE INDEX idx_cajas_numero ON cajas(numero_caja);
 
 -- Tabla de Movimientos de Caja
@@ -128,11 +142,17 @@ CREATE TABLE IF NOT EXISTS caja_movimientos (
 );
 
 -- Índices para caja_movimientos
+DROP INDEX IF EXISTS idx_caja_movimientos_caja;
 CREATE INDEX idx_caja_movimientos_caja ON caja_movimientos(caja_id);
+DROP INDEX IF EXISTS idx_caja_movimientos_usuario;
 CREATE INDEX idx_caja_movimientos_usuario ON caja_movimientos(usuario_id);
+DROP INDEX IF EXISTS idx_caja_movimientos_tipo;
 CREATE INDEX idx_caja_movimientos_tipo ON caja_movimientos(tipo_movimiento);
+DROP INDEX IF EXISTS idx_caja_movimientos_categoria;
 CREATE INDEX idx_caja_movimientos_categoria ON caja_movimientos(categoria);
+DROP INDEX IF EXISTS idx_caja_movimientos_fecha;
 CREATE INDEX idx_caja_movimientos_fecha ON caja_movimientos(fecha_movimiento);
+DROP INDEX IF EXISTS idx_caja_movimientos_referencia;
 CREATE INDEX idx_caja_movimientos_referencia ON caja_movimientos(referencia_id, referencia_tipo);
 
 -- ============================================

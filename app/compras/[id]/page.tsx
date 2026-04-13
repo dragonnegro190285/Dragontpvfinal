@@ -553,8 +553,10 @@ function CompraDetalleContent() {
                 <div className="mt-4">
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-green-600 h-2 rounded-full"
-                      style={{ width: `${(pagado / compra.total) * 100}%` }}
+                      className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${Math.min((pagado / compra.total) * 100, 100)}%` }}
+                      role="progressbar"
+                      aria-label={`Progreso de pago: ${((pagado / compra.total) * 100).toFixed(1)}%`}
                     ></div>
                   </div>
                   <p className="text-sm text-gray-500 mt-1 text-center">
