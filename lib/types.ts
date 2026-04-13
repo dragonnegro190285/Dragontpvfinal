@@ -135,6 +135,23 @@ export interface RecordatorioPago {
   created_at: string
 }
 
+export interface Dispositivo {
+  id: string
+  codigo: string
+  nombre: string
+  tipo: 'lector_codigos' | 'impresora_tickets' | 'impresora_facturas' | 'bascula' | 'torreta' | 'cajon_dinero' | 'display_cliente' | 'pantalla_touch'
+  modelo?: string
+  marca?: string
+  puerto?: string
+  configuracion?: any
+  activo: boolean
+  estacion_trabajo?: string
+  usuario_id?: string
+  observaciones?: string
+  created_at: string
+  updated_at: string
+}
+
 export interface Compra {
   id: string
   numero_compra: string

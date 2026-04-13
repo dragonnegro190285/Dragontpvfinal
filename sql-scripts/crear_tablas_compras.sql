@@ -4,6 +4,32 @@
 -- Fecha: 2026-04-12
 -- ============================================
 
+-- Tabla de Dispositivos
+CREATE TABLE IF NOT EXISTS dispositivos (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    codigo VARCHAR(50) UNIQUE NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    tipo VARCHAR(50) NOT NULL CHECK (tipo IN ('lector_codigos', 'impresora_tickets', 'impresora_facturas', 'bascula', 'torreta', 'cajon_dinero', 'display_cliente', 'pantalla_touch')),
+    modelo VARCHAR(100),
+    marca VARCHAR(100),
+    puerto VARCHAR(50),
+    configuracion JSONB,
+    activo BOOLEAN DEFAULT TRUE,
+    estacion_trabajo VARCHAR(50),
+    usuario_id UUID REFERENCES usuarios(id) ON DELETE SET NULL,
+    observaciones TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Índices para dispositivos
+DROP INDEX IF EXISTS idx_dispositivos_tipo;
+CREATE INDEX idx_dispositivos_tipo ON dispositivos(tipo);
+DROP INDEX IF EXISTS idx_dispositivos_activo;
+CREATE INDEX idx_dispositivos_activo ON dispositivos(activo);
+DROP INDEX IF EXISTS idx_dispositivos_estacion;
+CREATE INDEX idx_dispositivos_estacion ON dispositivos(estacion_trabajo);
+
 -- Tabla de Formas de Pago
 CREATE TABLE IF NOT EXISTS formas_pago (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -396,6 +422,11 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS trigger_registrar_kardex_compra ON compra_detalles;
 CREATE TRIGGER trigger_registrar_kardex_compra AFTER INSERT ON compra_detalles
     FOR EACH ROW EXECUTE FUNCTION registrar_compra_kardex();
+
+-- Trigger para actualizar updated_at en dispositivos
+DROP TRIGGER IF EXISTS update_dispositivos_updated_at ON dispositivos;
+CREATE TRIGGER update_dispositivos_updated_at BEFORE UPDATE ON dispositivos
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- ============================================
 -- VISTAS ÚTILES
