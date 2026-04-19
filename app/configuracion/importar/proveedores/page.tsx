@@ -191,9 +191,12 @@ export default function ImportarProveedoresPage() {
               <h1 className="text-2xl font-bold">Importar Proveedores</h1>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-full">
-                <span className="text-sm font-medium text-blue-800">
+              <div className="flex flex-col items-end bg-blue-50 px-4 py-2 rounded-lg">
+                <span className="text-sm font-semibold text-blue-800">
                   Usuario Logueado
+                </span>
+                <span className="text-xs text-blue-600">
+                  Activo
                 </span>
               </div>
             </div>

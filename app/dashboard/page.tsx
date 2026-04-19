@@ -173,13 +173,13 @@ export default function DashboardPage() {
             <h1 className="text-2xl font-bold">Dashboard</h1>
             <div className="flex items-center gap-2">
               {usuario && (
-                <div className="flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-full">
-                  <span className="text-sm font-medium text-blue-800">
+                <div className="flex flex-col items-end bg-blue-50 px-4 py-2 rounded-lg">
+                  <span className="text-sm font-semibold text-blue-800">
                     {usuario.nombre || 'Usuario'}
                   </span>
                   {usuario.roles?.nombre && (
                     <span className="text-xs text-blue-600">
-                      ({usuario.roles.nombre})
+                      {usuario.roles.nombre}
                     </span>
                   )}
                 </div>
