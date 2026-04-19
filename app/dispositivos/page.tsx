@@ -186,7 +186,7 @@ function DispositivosContent() {
             <div className="w-16"></div>
           </div>
         </div>
-        <div className="flex-1 p-4 md:p-8">
+        <div className="flex-1 p-4 md:p-8 overflow-x-auto">
           <div className="bg-white rounded-lg shadow p-4 md:p-6">
             {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
 
