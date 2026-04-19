@@ -200,18 +200,18 @@ function DispositivosContent() {
                       <button
                         key={tipo.value}
                         onClick={() => setTabActiva(tipo.value)}
-                        className={`flex items-center gap-2 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                        className={`flex items-center gap-2 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
                           tabActiva === tipo.value
-                            ? 'border-blue-500 text-blue-600'
-                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            ? 'border-blue-500 text-blue-600 py-4 px-3 text-base'
+                            : 'border-transparent text-gray-400 hover:text-gray-600 hover:border-gray-300 py-2 px-2 text-xs'
                         }`}
                       >
                         <span>{tipo.icon}</span>
                         {tipo.label}
-                        <span className={`ml-1 px-2 py-0.5 rounded-full text-xs ${
+                        <span className={`ml-1 px-2 py-0.5 rounded-full transition-all duration-200 ${
                           tabActiva === tipo.value
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-gray-100 text-gray-600'
+                            ? 'bg-blue-100 text-blue-800 text-xs'
+                            : 'bg-gray-100 text-gray-500 text-xs'
                         }`}>
                           {dispositivosTipo.length}
                         </span>
