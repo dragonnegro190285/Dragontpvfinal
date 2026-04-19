@@ -113,12 +113,6 @@ export default function DashboardPage() {
               🛒 Compras
             </button>
             <button
-              onClick={() => router.push('/dispositivos')}
-              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
-            >
-              🔌 Dispositivos
-            </button>
-            <button
               onClick={() => router.push('/cajas')}
               className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
             >
@@ -145,6 +139,12 @@ export default function DashboardPage() {
                 className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
               >
                 📥 Importar
+              </button>
+              <button
+                onClick={() => router.push('/dispositivos')}
+                className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+              >
+                🔌 Dispositivos
               </button>
             </nav>
           </div>

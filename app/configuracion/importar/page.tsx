@@ -77,6 +77,7 @@ export default function ConfiguracionImportarPage() {
             <h3 className="text-sm font-semibold text-gray-400 mb-2 px-4">Configuración</h3>
             <nav className="space-y-2">
               <button onClick={() => router.push('/configuracion/importar')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors bg-gray-700">📥 Importar</button>
+              <button onClick={() => router.push('/dispositivos')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🔌 Dispositivos</button>
             </nav>
           </div>
           <div className="mt-8 pt-4 border-t border-gray-700">
