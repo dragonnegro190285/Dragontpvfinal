@@ -191,34 +191,34 @@ function DispositivosContent() {
             {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
 
             <div className="mb-6">
-              {/* Tabs de navegación */}
-              <div className="border-b border-gray-200">
-                <nav className="-mb-px flex space-x-8 overflow-x-auto">
+              {/* Tabs de navegación - grid de 2 filas */}
+              <div className="border-b border-gray-200 pb-4">
+                <div className="grid grid-cols-4 gap-2">
                   {tiposDispositivo.map((tipo) => {
                     const dispositivosTipo = dispositivos.filter(d => d.tipo === tipo.value)
                     return (
                       <button
                         key={tipo.value}
                         onClick={() => setTabActiva(tipo.value)}
-                        className={`flex items-center gap-2 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
+                        className={`flex items-center justify-center gap-2 whitespace-nowrap py-2 px-2 border-2 rounded-lg font-medium text-sm transition-all duration-200 ${
                           tabActiva === tipo.value
-                            ? 'border-blue-500 text-blue-600 py-4 px-3 text-base'
-                            : 'border-transparent text-gray-400 hover:text-gray-600 hover:border-gray-300 py-2 px-2 text-xs'
+                            ? 'border-blue-500 bg-blue-50 text-blue-600'
+                            : 'border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50'
                         }`}
                       >
-                        <span>{tipo.icon}</span>
-                        {tipo.label}
-                        <span className={`ml-1 px-2 py-0.5 rounded-full transition-all duration-200 ${
+                        <span className="text-lg">{tipo.icon}</span>
+                        <span className="text-xs">{tipo.label}</span>
+                        <span className={`ml-1 px-2 py-0.5 rounded-full text-xs transition-all duration-200 ${
                           tabActiva === tipo.value
-                            ? 'bg-blue-100 text-blue-800 text-xs'
-                            : 'bg-gray-100 text-gray-500 text-xs'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-gray-100 text-gray-600'
                         }`}>
                           {dispositivosTipo.length}
                         </span>
                       </button>
                     )
                   })}
-                </nav>
+                </div>
               </div>
 
               {/* Contenido de la tab activa */}
