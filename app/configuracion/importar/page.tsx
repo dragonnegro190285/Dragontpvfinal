@@ -18,7 +18,9 @@ export default function ConfiguracionImportarPage() {
 
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession()
+    console.log('Session en configuracion/importar:', session)
     if (!session) {
+      console.log('No hay sesión, redirigiendo a login')
       router.push('/login')
     }
   }
