@@ -190,7 +190,13 @@ export default function ImportarProveedoresPage() {
               <button onClick={() => router.push('/configuracion/importar')} className="text-gray-600 hover:text-gray-800">⬅</button>
               <h1 className="text-2xl font-bold">Importar Proveedores</h1>
             </div>
-            <div className="w-16"></div>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-full">
+                <span className="text-sm font-medium text-blue-800">
+                  Usuario Logueado
+                </span>
+              </div>
+            </div>
           </div>
         </div>
         

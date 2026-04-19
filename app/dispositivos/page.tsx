@@ -8,12 +8,12 @@ function DispositivosContent() {
   const router = useRouter()
   const [dispositivos, setDispositivos] = useState<Dispositivo[]>([])
   const [loading, setLoading] = useState(true)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
   const [error, setError] = useState('')
-  const [mostrarModal, setMostrarModal] = useState(false)
-  const [filtroTipo, setFiltroTipo] = useState('')
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   const [tabActiva, setTabActiva] = useState('lector_codigos')
+  const [mostrarModal, setMostrarModal] = useState(false)
   const [dispositivoEditando, setDispositivoEditando] = useState<Dispositivo | null>(null)
+  const [usuario, setUsuario] = useState<any>(null)
 
   const [formData, setFormData] = useState({
     codigo: '',
@@ -41,8 +41,21 @@ function DispositivosContent() {
     }
   }, [])
 
+  const loadUsuario = async () => {
+    try {
+      const response = await fetch('/api/check-table')
+      const data = await response.json()
+      if (data.usuario) {
+        setUsuario(data.usuario)
+      }
+    } catch (err) {
+      console.error('Error al cargar usuario:', err)
+    }
+  }
+
   useEffect(() => {
     loadDispositivos()
+    loadUsuario()
   }, [loadDispositivos])
 
   const handleGuardar = async () => {
@@ -144,10 +157,6 @@ function DispositivosContent() {
     { value: 'pantalla_touch', label: 'Pantalla Touch', icon: '🖥️' }
   ]
 
-  const dispositivosFiltrados = filtroTipo
-    ? dispositivos.filter(d => d.tipo === filtroTipo)
-    : dispositivos
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -189,7 +198,20 @@ function DispositivosContent() {
           <div className="flex items-center justify-between">
             <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-600 hover:text-gray-800 focus:outline-none">{sidebarOpen ? '◀' : '▶'} Menú</button>
             <h1 className="text-2xl font-bold">Gestión de Dispositivos</h1>
-            <div className="w-16"></div>
+            <div className="flex items-center gap-2">
+              {usuario && (
+                <div className="flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-full">
+                  <span className="text-sm font-medium text-blue-800">
+                    {usuario.nombre || 'Usuario'}
+                  </span>
+                  {usuario.roles?.nombre && (
+                    <span className="text-xs text-blue-600">
+                      ({usuario.roles.nombre})
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
         <div className="flex-1 p-4 md:p-8 overflow-x-auto">

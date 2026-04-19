@@ -171,7 +171,20 @@ export default function DashboardPage() {
               {sidebarOpen ? '◀' : '▶'} Menú
             </button>
             <h1 className="text-2xl font-bold">Dashboard</h1>
-            <div className="w-16"></div> {/* Espaciador para centrar */}
+            <div className="flex items-center gap-2">
+              {usuario && (
+                <div className="flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-full">
+                  <span className="text-sm font-medium text-blue-800">
+                    {usuario.nombre || 'Usuario'}
+                  </span>
+                  {usuario.roles?.nombre && (
+                    <span className="text-xs text-blue-600">
+                      ({usuario.roles.nombre})
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

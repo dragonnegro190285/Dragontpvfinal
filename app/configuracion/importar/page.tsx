@@ -90,11 +90,25 @@ export default function ConfiguracionImportarPage() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
+        {/* Header con botón de toggle */}
         <div className="bg-white shadow p-4">
           <div className="flex items-center justify-between">
             <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-600 hover:text-gray-800 focus:outline-none">{sidebarOpen ? '◀' : '▶'} Menú</button>
             <h1 className="text-2xl font-bold">Configuración - Importar</h1>
-            <div className="w-16"></div>
+            <div className="flex items-center gap-2">
+              {usuario && (
+                <div className="flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-full">
+                  <span className="text-sm font-medium text-blue-800">
+                    {usuario.nombre || 'Usuario'}
+                  </span>
+                  {usuario.roles?.nombre && (
+                    <span className="text-xs text-blue-600">
+                      ({usuario.roles.nombre})
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
         
