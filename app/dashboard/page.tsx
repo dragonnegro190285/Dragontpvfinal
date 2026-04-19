@@ -70,8 +70,8 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-100 flex">
       {/* Sidebar colapsable */}
-      <div className={`${sidebarOpen ? 'w-64' : 'w-0'} bg-gray-800 text-white transition-all duration-300 overflow-hidden`}>
-        <div className="p-4">
+      <div className={`${sidebarOpen ? 'w-64' : 'w-0'} bg-gray-800 text-white transition-all duration-300 overflow-hidden flex flex-col`}>
+        <div className="p-4 flex-1 overflow-y-auto">
           <h2 className="text-xl font-bold mb-4">Menú Principal</h2>
           <nav className="space-y-2">
             <button
