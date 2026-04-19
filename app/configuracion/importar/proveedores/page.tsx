@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
@@ -161,7 +161,7 @@ export default function ImportarProveedoresPage() {
           <nav className="space-y-2">
             <button onClick={() => router.push('/dashboard')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🏠 Dashboard</button>
             <button onClick={() => router.push('/productos')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">📦 Productos</button>
-            <button onClick={() => router.push('/proveedores')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors bg-gray-700">📦 Proveedores</button>
+            <button onClick={() => router.push('/proveedores')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">📦 Proveedores</button>
             <button onClick={() => router.push('/clientes')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">👤 Clientes</button>
             <button onClick={() => router.push('/compras')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🛒 Compras</button>
             <button onClick={() => router.push('/dispositivos')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🔌 Dispositivos</button>
@@ -172,11 +172,11 @@ export default function ImportarProveedoresPage() {
           <div className="mt-8 pt-4 border-t border-gray-700">
             <h3 className="text-sm font-semibold text-gray-400 mb-2 px-4">Configuración</h3>
             <nav className="space-y-2">
-              <button onClick={() => router.push('/importar-proveedores')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors bg-gray-700">📥 Importar Proveedores</button>
+              <button onClick={() => router.push('/configuracion/importar')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">📥 Importar</button>
             </nav>
           </div>
           <div className="mt-8 pt-4 border-t border-gray-700">
-            <button onClick={() => router.push('/dashboard')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🏠 Volver al Dashboard</button>
+            <button onClick={() => router.push('/configuracion/importar')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">⬅ Volver</button>
           </div>
         </div>
       </div>
@@ -186,7 +186,10 @@ export default function ImportarProveedoresPage() {
         <div className="bg-white shadow p-4">
           <div className="flex items-center justify-between">
             <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-600 hover:text-gray-800 focus:outline-none">{sidebarOpen ? '◀' : '▶'} Menú</button>
-            <h1 className="text-2xl font-bold">Importación de Proveedores</h1>
+            <div className="flex items-center gap-2">
+              <button onClick={() => router.push('/configuracion/importar')} className="text-gray-600 hover:text-gray-800">⬅</button>
+              <h1 className="text-2xl font-bold">Importar Proveedores</h1>
+            </div>
             <div className="w-16"></div>
           </div>
         </div>

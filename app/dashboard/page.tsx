@@ -141,10 +141,10 @@ export default function DashboardPage() {
             <h3 className="text-sm font-semibold text-gray-400 mb-2 px-4">Configuración</h3>
             <nav className="space-y-2">
               <button
-                onClick={() => router.push('/importar-proveedores')}
+                onClick={() => router.push('/configuracion/importar')}
                 className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
               >
-                📥 Importar Proveedores
+                📥 Importar
               </button>
             </nav>
           </div>
