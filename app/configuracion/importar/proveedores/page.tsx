@@ -37,44 +37,42 @@ export default function ImportarProveedoresPage() {
     loadUsuario()
   }, [])
 
-  const handleDescargarPlantilla = () => {
-    const headers = [
-      'nombre',
-      'rfc',
-      'direccion',
-      'telefono',
-      'email',
-      'contacto',
-      'observaciones'
-    ]
-    
-    const sampleData = [
-      ['Proveedor Ejemplo 1', 'RFC123456789', 'Dirección 1', '555-1234', 'proveedor1@email.com', 'Juan Pérez', 'Observaciones del proveedor 1'],
-      ['Proveedor Ejemplo 2', 'RFC987654321', 'Dirección 2', '555-5678', 'proveedor2@email.com', 'María García', 'Observaciones del proveedor 2']
-    ]
-    
-    const csvContent = [
-      headers.join(','),
-      ...sampleData.map(row => row.join(','))
-    ].join('\n')
-    
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const link = document.createElement('a')
-    const url = URL.createObjectURL(blob)
-    link.setAttribute('href', url)
-    link.setAttribute('download', 'plantilla_proveedores.csv')
-    link.style.visibility = 'hidden'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+  const handleDescargarPlantilla = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch('/api/plantilla-proveedores')
+      
+      if (!response.ok) {
+        throw new Error('Error al descargar la plantilla')
+      }
+      
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'plantilla-proveedores.xlsx'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+      
+      setSuccess('Plantilla descargada correctamente')
+    } catch (err: any) {
+      setError('Error al descargar la plantilla: ' + (err.message || 'Error desconocido'))
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
-    if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
-      setError('Por favor selecciona un archivo CSV válido')
+    const isCSV = file.type === 'text/csv' || file.name.endsWith('.csv')
+    const isXLSX = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file.name.endsWith('.xlsx')
+    
+    if (!isCSV && !isXLSX) {
+      setError('Por favor selecciona un archivo CSV o XLSX válido')
       return
     }
 
@@ -265,33 +263,34 @@ export default function ImportarProveedoresPage() {
                     <div className="mb-4">
                       <span className="text-4xl">📥</span>
                     </div>
-                    <h3 className="text-lg font-semibold mb-2">Descargar Plantilla</h3>
+                    <h3 className="text-lg font-semibold mb-4">Descargar Plantilla XLSX</h3>
                     <p className="text-sm text-gray-600 mb-4">
-                      Descarga la plantilla CSV con el formato correcto
+                      Descarga la plantilla con columnas y filtros automáticos
                     </p>
                     <button
                       onClick={handleDescargarPlantilla}
-                      className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors"
+                      disabled={loading}
+                      className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors disabled:opacity-50"
                     >
-                      Descargar Plantilla CSV
+                      Descargar Plantilla XLSX
                     </button>
                   </div>
-
+                  
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors">
                     <div className="mb-4">
                       <span className="text-4xl">📤</span>
                     </div>
-                    <h3 className="text-lg font-semibold mb-2">Subir Archivo CSV</h3>
+                    <h3 className="text-lg font-semibold mb-2">Subir Archivo CSV o XLSX</h3>
                     <p className="text-sm text-gray-600 mb-4">
-                      Sube el archivo CSV completado con los datos
+                      Sube el archivo CSV o XLSX completado con los datos
                     </p>
                     <input
                       type="file"
-                      accept=".csv"
+                      accept=".csv,.xlsx"
                       onChange={handleFileUpload}
                       disabled={loading}
                       id="csv-file-upload"
-                      aria-label="Subir archivo CSV"
+                      aria-label="Subir archivo CSV o XLSX"
                       className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                     />
                   </div>
