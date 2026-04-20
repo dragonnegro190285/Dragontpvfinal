@@ -57,25 +57,45 @@ export default function LoginPage() {
   const loadAllUsuariosFromSupabase = async () => {
     try {
       console.log('Iniciando carga de usuarios desde Supabase...')
+
+      // Primero probar consulta simple sin join
+      console.log('Probando consulta simple sin join...')
+      const { data: simpleData, error: simpleError } = await supabase
+        .from('usuarios')
+        .select('*')
+
+      console.log('Respuesta consulta simple:', { simpleData, simpleError })
+      console.log('Usuarios encontrados (simple):', simpleData?.length || 0)
+
+      if (simpleError) {
+        console.error('Error en consulta simple:', simpleError)
+        throw simpleError
+      }
+
+      // Si la simple funciona, probar con join
       const { data, error } = await supabase
         .from('usuarios')
         .select('*, roles(*)')
 
-      console.log('Respuesta de Supabase:', { data, error })
+      console.log('Respuesta de Supabase (con join):', { data, error })
 
       if (error) {
-        console.error('Error de Supabase:', error)
-        throw error
+        console.error('Error en consulta con join:', error)
+        // Si falla el join, usar los datos de la consulta simple
+        console.log('Usando datos de consulta simple sin roles')
+        setUsuarios(simpleData || [])
+      } else {
+        console.log('Usuarios encontrados (con join):', data?.length || 0)
+        setUsuarios(data || [])
       }
 
-      console.log('Usuarios encontrados:', data?.length || 0)
-      setUsuarios(data || [])
       setShowUsuarios(true)
 
       // Verificar y crear registros en usuario_rol si faltan
-      if (data && data.length > 0) {
+      const usuariosToProcess = data || simpleData || []
+      if (usuariosToProcess.length > 0) {
         console.log('Verificando registros en usuario_rol...')
-        for (const usuario of data) {
+        for (const usuario of usuariosToProcess) {
           console.log('Procesando usuario:', usuario.email, 'rol_id:', usuario.rol_id)
           if (usuario.rol_id) {
             const { data: existingRol, error: checkError } = await supabase
