@@ -157,8 +157,25 @@ export default function ImportarProveedoresPage() {
 
     try {
       let importados = 0
+      let duplicados = 0
       let errores = 0
+      const duplicadosDetallados: string[] = []
       const erroresDetallados: string[] = []
+
+      // Primero, obtener todos los proveedores existentes para validar duplicados
+      const { data: proveedoresExistentes, error: errorExistentes } = await supabase
+        .from('proveedores')
+        .select('nombre, rfc')
+
+      if (errorExistentes) {
+        setError('Error al verificar proveedores existentes: ' + errorExistentes.message)
+        setLoading(false)
+        return
+      }
+
+      // Crear un set de nombres y RFCs existentes para búsqueda rápida
+      const nombresExistentes = new Set(proveedoresExistentes?.map(p => p.nombre.toLowerCase().trim()) || [])
+      const rfcsExistentes = new Set(proveedoresExistentes?.map(p => p.rfc?.toLowerCase().trim()).filter(Boolean) || [])
 
       for (const proveedor of preview) {
         try {
@@ -166,6 +183,25 @@ export default function ImportarProveedoresPage() {
           if (!proveedor.nombre || proveedor.nombre.trim() === '') {
             erroresDetallados.push('Fila sin nombre')
             errores++
+            continue
+          }
+
+          const nombreNormalizado = proveedor.nombre.trim().toLowerCase()
+          const rfcNormalizado = proveedor.rfc ? proveedor.rfc.trim().toLowerCase() : null
+
+          // Verificar duplicados por nombre
+          if (nombresExistentes.has(nombreNormalizado)) {
+            console.log('Proveedor duplicado (nombre):', proveedor.nombre)
+            duplicadosDetallados.push(`${proveedor.nombre} (nombre duplicado)`)
+            duplicados++
+            continue
+          }
+
+          // Verificar duplicados por RFC si existe
+          if (rfcNormalizado && rfcsExistentes.has(rfcNormalizado)) {
+            console.log('Proveedor duplicado (RFC):', proveedor.nombre, rfcNormalizado)
+            duplicadosDetallados.push(`${proveedor.nombre} (RFC ${proveedor.rfc} duplicado)`)
+            duplicados++
             continue
           }
 
@@ -191,6 +227,11 @@ export default function ImportarProveedoresPage() {
             errores++
           } else {
             console.log('Proveedor importado exitosamente:', data)
+            // Agregar a los sets para evitar duplicados en la misma importación
+            nombresExistentes.add(nombreNormalizado)
+            if (rfcNormalizado) {
+              rfcsExistentes.add(rfcNormalizado)
+            }
             importados++
           }
         } catch (err: any) {
@@ -200,10 +241,34 @@ export default function ImportarProveedoresPage() {
         }
       }
 
+      // Generar informe detallado
+      let informe = `📊 INFORME DE IMPORTACIÓN\n\n`
+      informe += `✅ Importados: ${importados}\n`
+      informe += `⏭️  Duplicados (saltados): ${duplicados}\n`
+      informe += `❌ Errores: ${errores}\n`
+      informe += `📝 Total procesados: ${preview.length}\n\n`
+
+      if (duplicados > 0) {
+        informe += `⏭️  DUPLICADOS SALTADOS:\n`
+        duplicadosDetallados.forEach(d => {
+          informe += `  • ${d}\n`
+        })
+        informe += `\n`
+      }
+
+      if (errores > 0) {
+        informe += `❌ ERRORES:\n`
+        erroresDetallados.forEach(e => {
+          informe += `  • ${e}\n`
+        })
+      }
+
       if (importados > 0) {
-        setSuccess(`✅ Importación completada: ${importados} proveedor(es) importado(s) exitosamente.${errores > 0 ? ` ${errores} error(es).` : ''}`)
+        setSuccess(informe)
+      } else if (duplicados > 0) {
+        setError(`⏭️  Todos los registros eran duplicados. Se saltaron ${duplicados} registros.${errores > 0 ? ` Se encontraron ${errores} errores.` : ''}`)
       } else {
-        setError(`❌ Importación fallida: No se importaron proveedores. Errores: ${erroresDetallados.join('; ')}`)
+        setError(`❌ Importación fallida: No se importaron proveedores.\n\n${informe}`)
       }
       
       setShowPreview(false)
