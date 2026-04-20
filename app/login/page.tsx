@@ -56,46 +56,28 @@ export default function LoginPage() {
 
   const loadAllUsuariosFromSupabase = async () => {
     try {
-      console.log('Iniciando carga de usuarios desde Supabase...')
+      console.log('Iniciando carga de usuarios desde API...')
 
-      // Primero probar consulta simple sin join
-      console.log('Probando consulta simple sin join...')
-      const { data: simpleData, error: simpleError } = await supabase
-        .from('usuarios')
-        .select('*')
+      // Usar API route que usa SERVICE_ROLE_KEY para bypass RLS
+      const response = await fetch('/api/usuarios-public')
+      const data = await response.json()
 
-      console.log('Respuesta consulta simple:', { simpleData, simpleError })
-      console.log('Usuarios encontrados (simple):', simpleData?.length || 0)
+      console.log('Respuesta de API:', data)
 
-      if (simpleError) {
-        console.error('Error en consulta simple:', simpleError)
-        throw simpleError
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al cargar usuarios')
       }
 
-      // Si la simple funciona, probar con join
-      const { data, error } = await supabase
-        .from('usuarios')
-        .select('*, roles(*)')
+      const usuarios = data.usuarios || []
+      console.log('Usuarios encontrados:', usuarios.length)
 
-      console.log('Respuesta de Supabase (con join):', { data, error })
-
-      if (error) {
-        console.error('Error en consulta con join:', error)
-        // Si falla el join, usar los datos de la consulta simple
-        console.log('Usando datos de consulta simple sin roles')
-        setUsuarios(simpleData || [])
-      } else {
-        console.log('Usuarios encontrados (con join):', data?.length || 0)
-        setUsuarios(data || [])
-      }
-
+      setUsuarios(usuarios)
       setShowUsuarios(true)
 
       // Verificar y crear registros en usuario_rol si faltan
-      const usuariosToProcess = data || simpleData || []
-      if (usuariosToProcess.length > 0) {
+      if (usuarios.length > 0) {
         console.log('Verificando registros en usuario_rol...')
-        for (const usuario of usuariosToProcess) {
+        for (const usuario of usuarios) {
           console.log('Procesando usuario:', usuario.email, 'rol_id:', usuario.rol_id)
           if (usuario.rol_id) {
             const { data: existingRol, error: checkError } = await supabase
@@ -123,12 +105,8 @@ export default function LoginPage() {
         }
       }
     } catch (err: any) {
-      console.error('Error al cargar usuarios de Supabase:', err)
-      if (err.message?.includes('ERR_NAME_NOT_RESOLVED') || err.message?.includes('Failed to fetch')) {
-        setError('Error de DNS: No se puede conectar a Supabase. Este es un problema de tu proveedor de internet. Soluciones: 1) Cambiar servidor DNS a 8.8.8.8, 2) Usar VPN, 3) Esperar a que se resuelva el problema de red.')
-      } else {
-        setError('Error al cargar usuarios de Supabase: ' + (err.message || 'Error desconocido'))
-      }
+      console.error('Error al cargar usuarios:', err)
+      setError('Error al cargar usuarios: ' + (err.message || 'Error desconocido'))
     }
   }
 
