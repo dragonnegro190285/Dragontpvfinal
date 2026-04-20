@@ -17,7 +17,7 @@ export default function ImportarProductosPage() {
 
   useEffect(() => {
     checkAuth()
-  }, [])
+  }, [router])
 
   const checkAuth = async () => {
     try {
@@ -29,6 +29,7 @@ export default function ImportarProductosPage() {
         router.push('/login')
       }
     } catch (err) {
+      console.error('Error al verificar autenticación:', err)
       router.push('/login')
     }
   }
