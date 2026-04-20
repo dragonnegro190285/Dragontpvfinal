@@ -113,6 +113,12 @@ export default function DashboardPage() {
               🛒 Compras
             </button>
             <button
+              onClick={() => router.push('/ventas')}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              💳 Ventas
+            </button>
+            <button
               onClick={() => router.push('/cajas')}
               className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors"
             >
