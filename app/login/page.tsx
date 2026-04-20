@@ -59,7 +59,6 @@ export default function LoginPage() {
       const { data, error } = await supabase
         .from('usuarios')
         .select('*, roles(*)')
-        .order('created_at', { ascending: false })
 
       if (error) throw error
       setUsuarios(data || [])
