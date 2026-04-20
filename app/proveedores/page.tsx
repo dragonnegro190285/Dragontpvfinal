@@ -5,17 +5,38 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Proveedor } from '@/lib/types'
 import UsuarioBadge from '@/components/UsuarioBadge'
+import SidebarCompleto from '@/components/SidebarCompleto'
+import { supabase } from '@/lib/supabase'
 
 export default function ProveedoresPage() {
   const router = useRouter()
   const [proveedores, setProveedores] = useState<Proveedor[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     loadProveedores()
+    checkAdmin()
   }, [])
+
+  const checkAdmin = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data, error } = await supabase
+          .from('usuarios')
+          .select('*, roles(*)')
+          .eq('auth_id', user.id)
+          .single()
+        if (!error && data?.roles?.nombre === 'admin') {
+          setIsAdmin(true)
+        }
+      }
+    } catch (err) {
+      console.error('Error al verificar admin:', err)
+    }
+  }
 
   const loadProveedores = async () => {
     try {
@@ -61,30 +82,10 @@ export default function ProveedoresPage() {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      <div className={`${sidebarOpen ? 'w-64' : 'w-0'} bg-gray-800 text-white transition-all duration-300 overflow-hidden`}>
-        <div className="p-4">
-          <h2 className="text-xl font-bold mb-4">Menú Principal</h2>
-          <nav className="space-y-2">
-            <button onClick={() => router.push('/dashboard')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🏠 Dashboard</button>
-            <button onClick={() => router.push('/productos')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">📦 Productos</button>
-            <button onClick={() => router.push('/proveedores')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors bg-gray-700">📦 Proveedores</button>
-            <button onClick={() => router.push('/clientes')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">👤 Clientes</button>
-            <button onClick={() => router.push('/usuarios')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">👥 Usuarios</button>
-            <button onClick={() => router.push('/compras')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🛒 Compras</button>
-            <button onClick={() => router.push('/ventas')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">💳 Ventas</button>
-            <button onClick={() => router.push('/cajas')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">💰 Caja</button>
-            <button onClick={() => router.push('/empresa')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🏢 Empresa</button>
-            <button onClick={() => router.push('/permisos')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🔐 Permisos</button>
-          </nav>
-          <div className="mt-8 pt-4 border-t border-gray-700">
-            <button onClick={() => router.push('/dashboard')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🏠 Volver al Dashboard</button>
-          </div>
-        </div>
-      </div>
+      <SidebarCompleto isAdmin={isAdmin} currentPage="proveedores" />
       <div className="flex-1 flex flex-col">
         <div className="bg-white shadow p-4">
           <div className="flex items-center justify-between">
-            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-600 hover:text-gray-800 focus:outline-none">{sidebarOpen ? '◀' : '▶'} Menú</button>
             <h1 className="text-2xl font-bold">Gestión de Proveedores</h1>
             <UsuarioBadge />
           </div>
