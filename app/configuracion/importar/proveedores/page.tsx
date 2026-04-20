@@ -91,19 +91,19 @@ export default function ImportarProveedoresPage() {
         const arrayBuffer = await file.arrayBuffer()
         const workbook = XLSX.read(arrayBuffer, { type: 'array' })
         const worksheet = workbook.Sheets[workbook.SheetNames[0]]
-        const jsonData = XLSX.utils.sheet_to_json(worksheet)
+        const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[]
         
-        if (jsonData.length === 0) {
+        if (!jsonData || jsonData.length === 0) {
           setError('El archivo XLSX está vacío o no contiene datos válidos')
           setLoading(false)
           return
         }
 
         // Obtener encabezados del primer objeto
-        headers = Object.keys(jsonData[0]).map(h => h.toLowerCase().trim())
+        headers = Object.keys(jsonData[0] || {}).map(h => h.toLowerCase().trim())
         data = jsonData.map((row: any) => {
           const obj: any = {}
-          Object.keys(row).forEach(key => {
+          Object.keys(row || {}).forEach(key => {
             obj[key.toLowerCase().trim()] = row[key] || ''
           })
           return obj
