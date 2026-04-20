@@ -239,7 +239,7 @@ export default function ImportarClientesPage() {
             </button>
             <h1 className="text-2xl font-bold">Importar Clientes</h1>
           </div>
-          {usuario && <UsuarioBadge usuario={usuario} />}
+          <UsuarioBadge />
         </div>
 
         <div className="flex-1 overflow-auto p-6">
