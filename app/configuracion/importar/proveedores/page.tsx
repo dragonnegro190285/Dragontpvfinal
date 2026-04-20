@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import * as XLSX from 'xlsx'
 
 export default function ImportarProveedoresPage() {
   const router = useRouter()
@@ -82,39 +83,68 @@ export default function ImportarProveedoresPage() {
     setPreview([])
 
     try {
-      const text = await file.text()
-      const lines = text.split('\n').filter(line => line.trim())
-      
-      if (lines.length < 2) {
-        setError('El archivo CSV debe contener al menos una fila de datos (además de los encabezados)')
-        setLoading(false)
-        return
+      let data: any[] = []
+      let headers: string[] = []
+
+      if (isXLSX) {
+        // Leer archivo XLSX
+        const arrayBuffer = await file.arrayBuffer()
+        const workbook = XLSX.read(arrayBuffer, { type: 'array' })
+        const worksheet = workbook.Sheets[workbook.SheetNames[0]]
+        const jsonData = XLSX.utils.sheet_to_json(worksheet)
+        
+        if (jsonData.length === 0) {
+          setError('El archivo XLSX está vacío o no contiene datos válidos')
+          setLoading(false)
+          return
+        }
+
+        // Obtener encabezados del primer objeto
+        headers = Object.keys(jsonData[0]).map(h => h.toLowerCase().trim())
+        data = jsonData.map((row: any) => {
+          const obj: any = {}
+          Object.keys(row).forEach(key => {
+            obj[key.toLowerCase().trim()] = row[key] || ''
+          })
+          return obj
+        })
+      } else {
+        // Leer archivo CSV
+        const text = await file.text()
+        const lines = text.split('\n').filter(line => line.trim())
+        
+        if (lines.length < 2) {
+          setError('El archivo CSV debe contener al menos una fila de datos (además de los encabezados)')
+          setLoading(false)
+          return
+        }
+
+        headers = lines[0].split(',').map(h => h.trim().toLowerCase())
+        data = lines.slice(1).map(line => {
+          const values = line.split(',').map(v => v.trim())
+          const obj: any = {}
+          headers.forEach((header, index) => {
+            obj[header] = values[index] || ''
+          })
+          return obj
+        })
       }
 
-      const headers = lines[0].split(',').map(h => h.trim().toLowerCase())
+      // Validar encabezados obligatorios
       const requiredHeaders = ['nombre', 'rfc']
       const missingHeaders = requiredHeaders.filter(h => !headers.includes(h))
       
       if (missingHeaders.length > 0) {
-        setError(`Faltan los siguientes encabezados obligatorios: ${missingHeaders.join(', ')}`)
+        setError(`Faltan los siguientes encabezados obligatorios: ${missingHeaders.join(', ')}. Encabezados encontrados: ${headers.join(', ')}`)
         setLoading(false)
         return
       }
 
-      const data = lines.slice(1).map(line => {
-        const values = line.split(',').map(v => v.trim())
-        const obj: any = {}
-        headers.forEach((header, index) => {
-          obj[header] = values[index] || ''
-        })
-        return obj
-      })
-
       setPreview(data)
       setShowPreview(true)
       setSuccess(`Se encontraron ${data.length} proveedores para importar. Por favor revisa los datos antes de confirmar.`)
-    } catch (err) {
-      setError('Error al leer el archivo CSV. Por favor verifica el formato.')
+    } catch (err: any) {
+      setError('Error al leer el archivo. Por favor verifica el formato: ' + (err.message || 'Error desconocido'))
     } finally {
       setLoading(false)
     }
