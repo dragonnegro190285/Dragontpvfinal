@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { supabase } from '@/lib/supabase'
 import * as XLSX from 'xlsx'
 import UsuarioBadge from '@/components/UsuarioBadge'
 
@@ -15,24 +16,28 @@ export default function ImportarClientesPage() {
   const [showPreview, setShowPreview] = useState(false)
   const [usuario, setUsuario] = useState<any>(null)
 
-  useEffect(() => {
-    checkAuth()
-  }, [router])
-
-  const checkAuth = async () => {
+  const loadUsuario = async () => {
     try {
-      const response = await fetch('/api/usuarios-public')
-      const data = await response.json()
-      if (data.usuario) {
-        setUsuario(data.usuario)
-      } else {
-        router.push('/login')
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (user) {
+        const { data, error } = await supabase
+          .from('usuarios')
+          .select('*, roles(*)')
+          .eq('auth_id', user.id)
+          .single()
+
+        if (error) throw error
+        setUsuario(data)
       }
     } catch (err) {
-      console.error('Error al verificar autenticación:', err)
-      router.push('/login')
+      console.error('Error al cargar usuario:', err)
     }
   }
+
+  useEffect(() => {
+    loadUsuario()
+  }, [])
 
   const handleDescargarPlantilla = async () => {
     try {
