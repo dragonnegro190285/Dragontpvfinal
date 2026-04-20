@@ -156,92 +156,22 @@ export default function ImportarProveedoresPage() {
     setSuccess('')
 
     try {
-      let importados = 0
-      let duplicados = 0
-      let errores = 0
-      const duplicadosDetallados: string[] = []
-      const erroresDetallados: string[] = []
+      // Usar API route con SERVICE_ROLE_KEY para bypass de RLS
+      const response = await fetch('/api/importar-proveedores', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ proveedores: preview })
+      })
 
-      // Primero, obtener todos los proveedores existentes para validar duplicados
-      const { data: proveedoresExistentes, error: errorExistentes } = await supabase
-        .from('proveedores')
-        .select('razon_social, rfc')
+      const result = await response.json()
 
-      if (errorExistentes) {
-        setError('Error al verificar proveedores existentes: ' + errorExistentes.message)
+      if (!response.ok) {
+        setError('Error al importar proveedores: ' + (result.error || 'Error desconocido'))
         setLoading(false)
         return
       }
 
-      // Crear un set de nombres y RFCs existentes para búsqueda rápida
-      const nombresExistentes = new Set(proveedoresExistentes?.map(p => p.razon_social.toLowerCase().trim()) || [])
-      const rfcsExistentes = new Set(proveedoresExistentes?.map(p => p.rfc?.toLowerCase().trim()).filter(Boolean) || [])
-
-      for (const proveedor of preview) {
-        try {
-          // Validar que nombre no esté vacío
-          if (!proveedor.nombre || proveedor.nombre.trim() === '') {
-            erroresDetallados.push('Fila sin nombre')
-            errores++
-            continue
-          }
-
-          const nombreNormalizado = proveedor.nombre.trim().toLowerCase()
-          const rfcNormalizado = proveedor.rfc ? proveedor.rfc.trim().toLowerCase() : null
-
-          // Verificar duplicados por nombre
-          if (nombresExistentes.has(nombreNormalizado)) {
-            console.log('Proveedor duplicado (nombre):', proveedor.nombre)
-            duplicadosDetallados.push(`${proveedor.nombre} (nombre duplicado)`)
-            duplicados++
-            continue
-          }
-
-          // Verificar duplicados por RFC si existe
-          if (rfcNormalizado && rfcsExistentes.has(rfcNormalizado)) {
-            console.log('Proveedor duplicado (RFC):', proveedor.nombre, rfcNormalizado)
-            duplicadosDetallados.push(`${proveedor.nombre} (RFC ${proveedor.rfc} duplicado)`)
-            duplicados++
-            continue
-          }
-
-          console.log('Importando proveedor:', proveedor)
-
-          const { data, error } = await supabase
-            .from('proveedores')
-            .insert({
-              razon_social: proveedor.nombre.trim(),
-              codigo_proveedor: `PROV-${Date.now()}-${Math.random().toString(36).substring(7).toUpperCase()}`,
-              rfc: proveedor.rfc ? proveedor.rfc.trim() : null,
-              direccion_fiscal: proveedor.direccion ? proveedor.direccion.trim() : null,
-              telefono: proveedor.telefono ? proveedor.telefono.trim() : null,
-              correo_electronico: proveedor.email ? proveedor.email.trim() : null,
-              persona_contacto: proveedor.contacto ? proveedor.contacto.trim() : null,
-              condiciones_pago: proveedor.condiciones_pago ? proveedor.condiciones_pago.trim() : null,
-              activo: true
-            })
-            .select()
-            .single()
-
-          if (error) {
-            console.error('Error al importar proveedor:', proveedor.nombre, error)
-            erroresDetallados.push(`${proveedor.nombre}: ${error.message}`)
-            errores++
-          } else {
-            console.log('Proveedor importado exitosamente:', data)
-            // Agregar a los sets para evitar duplicados en la misma importación
-            nombresExistentes.add(nombreNormalizado)
-            if (rfcNormalizado) {
-              rfcsExistentes.add(rfcNormalizado)
-            }
-            importados++
-          }
-        } catch (err: any) {
-          console.error('Error al procesar proveedor:', err)
-          erroresDetallados.push(`${proveedor.nombre}: ${err.message}`)
-          errores++
-        }
-      }
+      const { importados, duplicados, errores, duplicadosDetallados, erroresDetallados } = result
 
       // Generar informe detallado
       let informe = `📊 INFORME DE IMPORTACIÓN\n\n`
@@ -252,7 +182,7 @@ export default function ImportarProveedoresPage() {
 
       if (duplicados > 0) {
         informe += `⏭️  DUPLICADOS SALTADOS:\n`
-        duplicadosDetallados.forEach(d => {
+        duplicadosDetallados.forEach((d: string) => {
           informe += `  • ${d}\n`
         })
         informe += `\n`
@@ -260,7 +190,7 @@ export default function ImportarProveedoresPage() {
 
       if (errores > 0) {
         informe += `❌ ERRORES:\n`
-        erroresDetallados.forEach(e => {
+        erroresDetallados.forEach((e: string) => {
           informe += `  • ${e}\n`
         })
       }
