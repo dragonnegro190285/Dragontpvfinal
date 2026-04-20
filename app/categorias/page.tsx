@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import UsuarioBadge from '@/components/UsuarioBadge'
+import SidebarCompleto from '@/components/SidebarCompleto'
 
 interface Categoria {
   id: string
@@ -21,6 +22,7 @@ export default function CategoriasPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [usuario, setUsuario] = useState<any>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [formData, setFormData] = useState({
@@ -33,6 +35,12 @@ export default function CategoriasPage() {
     loadUsuario()
     loadCategorias()
   }, [])
+
+  useEffect(() => {
+    if (usuario?.roles?.nombre === 'admin') {
+      setIsAdmin(true)
+    }
+  }, [usuario])
 
   const loadUsuario = async () => {
     try {
@@ -47,6 +55,9 @@ export default function CategoriasPage() {
 
         if (error) throw error
         setUsuario(data)
+        if (data?.roles?.nombre === 'admin') {
+          setIsAdmin(true)
+        }
       }
     } catch (err) {
       console.error('Error al cargar usuario:', err)
@@ -152,43 +163,10 @@ export default function CategoriasPage() {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'w-64' : 'w-0'} bg-gray-800 text-white transition-all duration-300 overflow-hidden flex flex-col`}>
-        <div className="p-4 flex-1 overflow-y-auto">
-          <h2 className="text-xl font-bold mb-4">Menú Principal</h2>
-          <nav className="space-y-2">
-            <button onClick={() => router.push('/dashboard')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🏠 Dashboard</button>
-            <button onClick={() => router.push('/productos')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">📦 Productos</button>
-            <button onClick={() => router.push('/proveedores')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">📦 Proveedores</button>
-            <button onClick={() => router.push('/clientes')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">👤 Clientes</button>
-            <button onClick={() => router.push('/compras')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🛒 Compras</button>
-            <button onClick={() => router.push('/cajas')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">💰 Caja</button>
-            <button onClick={() => router.push('/empresa')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🏢 Empresa</button>
-            <button onClick={() => router.push('/permisos')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🔐 Permisos</button>
-            <button onClick={() => router.push('/marcas')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🏷️ Marcas</button>
-            <button onClick={() => router.push('/categorias')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors bg-gray-700">📂 Categorías</button>
-          </nav>
-        </div>
-        <button
-          onClick={() => router.push('/dashboard')}
-          className="w-full px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-t"
-        >
-          Volver al Dashboard
-        </button>
-      </div>
-
-      {/* Main Content */}
+      <SidebarCompleto isAdmin={isAdmin} currentPage="categorias" />
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="bg-white shadow p-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 hover:bg-gray-100 rounded"
-            >
-              ☰
-            </button>
-            <h1 className="text-2xl font-bold">Gestión de Categorías</h1>
-          </div>
+          <h1 className="text-2xl font-bold">Gestión de Categorías</h1>
           <UsuarioBadge />
         </div>
 

@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Venta, Cliente, Producto } from '@/lib/types'
 import UsuarioBadge from '@/components/UsuarioBadge'
+import SidebarCompleto from '@/components/SidebarCompleto'
+import { supabase } from '@/lib/supabase'
 
 interface Role {
   id: string
@@ -20,6 +22,25 @@ function VentasContent() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [filtroEstado, setFiltroEstado] = useState('')
   const [filtroCliente, setFiltroCliente] = useState('')
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  const checkAdmin = useCallback(async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data, error } = await supabase
+          .from('usuarios')
+          .select('*, roles(*)')
+          .eq('auth_id', user.id)
+          .single()
+        if (!error && data?.roles?.nombre === 'admin') {
+          setIsAdmin(true)
+        }
+      }
+    } catch (err) {
+      console.error('Error al verificar admin:', err)
+    }
+  }, [])
 
   const loadVentas = useCallback(async () => {
     try {
@@ -42,7 +63,8 @@ function VentasContent() {
     loadVentas()
     loadClientes()
     loadProductos()
-  }, [loadVentas])
+    checkAdmin()
+  }, [loadVentas, checkAdmin])
 
   const loadClientes = async () => {
     try {
@@ -92,42 +114,10 @@ function VentasContent() {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      <div className={`${sidebarOpen ? 'w-64' : 'w-0'} bg-gray-800 text-white transition-all duration-300 overflow-hidden flex flex-col`}>
-        <div className="p-4 flex-1 overflow-y-auto">
-          <h2 className="text-xl font-bold mb-4">Menú Principal</h2>
-          <nav className="space-y-2">
-            <button onClick={() => router.push('/dashboard')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🏠 Dashboard</button>
-            <button onClick={() => router.push('/productos')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">📦 Productos</button>
-            <button onClick={() => router.push('/proveedores')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">📦 Proveedores</button>
-            <button onClick={() => router.push('/clientes')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">👤 Clientes</button>
-            <button onClick={() => router.push('/compras')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🛒 Compras</button>
-            <button onClick={() => router.push('/ventas')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors bg-gray-700">💳 Ventas</button>
-            <button onClick={() => router.push('/cajas')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">💰 Caja</button>
-            <button onClick={() => router.push('/empresa')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🏢 Empresa</button>
-            <button onClick={() => router.push('/permisos')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🔐 Permisos</button>
-            <button onClick={() => router.push('/marcas')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">🏷️ Marcas</button>
-            <button onClick={() => router.push('/categorias')} className="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition-colors">📂 Categorías</button>
-          </nav>
-        </div>
-        <button
-          onClick={() => router.push('/dashboard')}
-          className="w-full px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-t"
-        >
-          Volver al Dashboard
-        </button>
-      </div>
-
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <SidebarCompleto isAdmin={isAdmin} currentPage="ventas" />
+      <div className="flex-1 flex flex-col">
         <div className="bg-white shadow p-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 hover:bg-gray-100 rounded"
-            >
-              ☰
-            </button>
-            <h1 className="text-2xl font-bold">Gestión de Ventas</h1>
-          </div>
+          <h1 className="text-2xl font-bold">Gestión de Ventas</h1>
           <UsuarioBadge />
         </div>
 
