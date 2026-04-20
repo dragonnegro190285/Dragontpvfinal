@@ -247,3 +247,61 @@ export interface CajaMovimiento {
   created_at: string
   usuario?: Usuario
 }
+
+// Tipos para Módulo de Ventas
+export interface Venta {
+  id: string
+  numero_venta: string
+  cliente_id: string
+  usuario_id: string
+  fecha_venta: string
+  subtotal: number
+  iva_porcentaje: number
+  iva_monto: number
+  descuento_porcentaje: number
+  descuento_monto: number
+  total: number
+  estado: 'pendiente' | 'completada' | 'cancelada' | 'parcial'
+  observaciones?: string
+  forma_pago_id?: string
+  impuesto_id?: string
+  numero_factura?: string
+  condicion_pago?: 'contado' | '30_dias' | '60_dias' | '90_dias'
+  creado_at: string
+  actualizado_at: string
+  cliente?: Cliente
+  usuario?: Usuario
+  forma_pago?: FormaPago
+  impuesto?: Impuesto
+  detalles?: VentaDetalle[]
+}
+
+export interface VentaDetalle {
+  id: string
+  venta_id: string
+  producto_id: string
+  cantidad: number
+  precio_unitario: number
+  descuento_porcentaje: number
+  descuento_monto: number
+  subtotal: number
+  iva_porcentaje: number
+  iva_monto: number
+  total: number
+  observaciones?: string
+  creado_at: string
+  producto?: Producto
+}
+
+export interface VentaPago {
+  id: string
+  venta_id: string
+  usuario_id: string
+  monto: number
+  metodo_pago: 'efectivo' | 'transferencia' | 'cheque' | 'tarjeta' | 'credito'
+  referencia?: string
+  fecha_pago: string
+  observaciones?: string
+  creado_at: string
+  usuario?: Usuario
+}
