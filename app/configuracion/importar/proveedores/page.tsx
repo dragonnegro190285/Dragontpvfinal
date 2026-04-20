@@ -165,7 +165,7 @@ export default function ImportarProveedoresPage() {
       // Primero, obtener todos los proveedores existentes para validar duplicados
       const { data: proveedoresExistentes, error: errorExistentes } = await supabase
         .from('proveedores')
-        .select('nombre, rfc')
+        .select('razon_social, rfc')
 
       if (errorExistentes) {
         setError('Error al verificar proveedores existentes: ' + errorExistentes.message)
@@ -174,7 +174,7 @@ export default function ImportarProveedoresPage() {
       }
 
       // Crear un set de nombres y RFCs existentes para búsqueda rápida
-      const nombresExistentes = new Set(proveedoresExistentes?.map(p => p.nombre.toLowerCase().trim()) || [])
+      const nombresExistentes = new Set(proveedoresExistentes?.map(p => p.razon_social.toLowerCase().trim()) || [])
       const rfcsExistentes = new Set(proveedoresExistentes?.map(p => p.rfc?.toLowerCase().trim()).filter(Boolean) || [])
 
       for (const proveedor of preview) {
