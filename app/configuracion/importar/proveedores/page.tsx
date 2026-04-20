@@ -210,13 +210,15 @@ export default function ImportarProveedoresPage() {
           const { data, error } = await supabase
             .from('proveedores')
             .insert({
-              nombre: proveedor.nombre.trim(),
+              razon_social: proveedor.nombre.trim(),
+              codigo_proveedor: `PROV-${Date.now()}-${Math.random().toString(36).substring(7).toUpperCase()}`,
               rfc: proveedor.rfc ? proveedor.rfc.trim() : null,
-              direccion: proveedor.direccion ? proveedor.direccion.trim() : null,
+              direccion_fiscal: proveedor.direccion ? proveedor.direccion.trim() : null,
               telefono: proveedor.telefono ? proveedor.telefono.trim() : null,
-              email: proveedor.email ? proveedor.email.trim() : null,
-              contacto: proveedor.contacto ? proveedor.contacto.trim() : null,
-              observaciones: proveedor.observaciones ? proveedor.observaciones.trim() : null
+              correo_electronico: proveedor.email ? proveedor.email.trim() : null,
+              persona_contacto: proveedor.contacto ? proveedor.contacto.trim() : null,
+              condiciones_pago: proveedor.condiciones_pago ? proveedor.condiciones_pago.trim() : null,
+              activo: true
             })
             .select()
             .single()
