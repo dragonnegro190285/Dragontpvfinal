@@ -162,9 +162,9 @@ export default function LoginPage() {
           {hasAdmin ? 'TPV Online - Login' : 'Crear Primer Administrador'}
         </h1>
 
-        <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-4">
-          <p className="text-sm text-yellow-800">
-            ⚠️ <strong>Nota:</strong> Si experimentas errores de conexión con Supabase, es un problema temporal de DNS. Soluciones: Cambiar DNS a 8.8.8.8, usar VPN, o esperar.
+        <div className="bg-green-50 border border-green-200 rounded-md p-3 mb-4">
+          <p className="text-sm text-green-800">
+            ✅ <strong>Estado:</strong> Proyecto de Supabase reactivo. El sistema está funcionando correctamente.
           </p>
         </div>
 
