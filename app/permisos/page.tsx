@@ -628,14 +628,14 @@ export default function PermisosPage() {
               </div>
 
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
+                <table className="min-w-full divide-y divide-gray-200 text-sm">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Módulo
                       </th>
                       {data.acciones.map(accion => (
-                        <th key={accion} className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th key={accion} className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                           {accion.charAt(0).toUpperCase() + accion.slice(1)}
                         </th>
                       ))}
@@ -644,7 +644,7 @@ export default function PermisosPage() {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {data.modulos.map(modulo => (
                       <tr key={modulo}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <td className="px-2 py-2 whitespace-nowrap text-xs font-medium text-gray-900">
                           {modulo.charAt(0).toUpperCase() + modulo.slice(1)}
                         </td>
                         {data.acciones.map(accion => {
@@ -652,7 +652,7 @@ export default function PermisosPage() {
                           const isChecked = checkboxStates[checkboxKey] || false
                           const inputId = `permiso-${selectedRol}-${modulo}-${accion}`
                           return (
-                            <td key={accion} className="px-6 py-4 whitespace-nowrap text-center">
+                            <td key={accion} className="px-2 py-2 whitespace-nowrap text-center">
                               <label htmlFor={inputId} className="sr-only">
                                 Permiso {accion} para {modulo}
                               </label>
