@@ -10,6 +10,7 @@ interface Usuario {
   nombre: string
   apellido?: string
   roles?: { nombre: string }
+  activo?: boolean
 }
 
 export default function LoginPage() {
@@ -23,6 +24,7 @@ export default function LoginPage() {
   const [hasAdmin, setHasAdmin] = useState<boolean | null>(null)
   const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [selectedUser, setSelectedUser] = useState<Usuario | null>(null)
+  const [showUsuarios, setShowUsuarios] = useState(false)
 
   useEffect(() => {
     checkAdminExists()
@@ -49,6 +51,22 @@ export default function LoginPage() {
       setUsuarios(data.usuarios || [])
     } catch (err) {
       console.error('Error al cargar usuarios:', err)
+    }
+  }
+
+  const loadAllUsuariosFromSupabase = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('usuarios')
+        .select('*, roles(*)')
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      setUsuarios(data || [])
+      setShowUsuarios(true)
+    } catch (err) {
+      console.error('Error al cargar usuarios de Supabase:', err)
+      setError('Error al cargar usuarios de Supabase')
     }
   }
 
@@ -147,6 +165,36 @@ export default function LoginPage() {
           </div>
         )}
 
+        <button
+          type="button"
+          onClick={loadAllUsuariosFromSupabase}
+          className="w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors mb-4"
+        >
+          🔍 Detectar Usuarios Existentes en Supabase
+        </button>
+
+        {showUsuarios && usuarios.length > 0 && (
+          <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+            <h3 className="font-semibold text-blue-800 mb-2">Usuarios Detectados ({usuarios.length}):</h3>
+            <div className="space-y-2 max-h-40 overflow-y-auto">
+              {usuarios.map((usuario) => (
+                <div key={usuario.id} className="text-sm bg-white p-2 rounded border border-blue-100">
+                  <div><strong>Nombre:</strong> {usuario.nombre} {usuario.apellido || ''}</div>
+                  <div><strong>Email:</strong> {usuario.email}</div>
+                  <div><strong>Rol:</strong> {usuario.roles?.nombre || 'Sin rol'}</div>
+                  <div><strong>Estado:</strong> {usuario.activo ? 'Activo' : 'Inactivo'}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {showUsuarios && usuarios.length === 0 && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4">
+            <p className="text-sm text-yellow-800">No se detectaron usuarios en Supabase</p>
+          </div>
+        )}
+
         <form onSubmit={hasAdmin ? handleLogin : handleCreateAdmin} className="space-y-4">
           {!hasAdmin && (
             <>
@@ -234,6 +282,7 @@ export default function LoginPage() {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
               aria-label="Contraseña"
+              autoComplete="current-password"
             />
           </div>
 
