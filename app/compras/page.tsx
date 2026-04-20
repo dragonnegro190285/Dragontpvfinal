@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Compra, Proveedor, Producto } from '@/lib/types'
+import UsuarioBadge from '@/components/UsuarioBadge'
 
 interface Role {
   id: string
@@ -115,7 +116,7 @@ function ComprasContent() {
           <div className="flex items-center justify-between">
             <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-600 hover:text-gray-800 focus:outline-none">{sidebarOpen ? '◀' : '▶'} Menú</button>
             <h1 className="text-2xl font-bold">Gestión de Compras</h1>
-            <div className="w-16"></div>
+            <UsuarioBadge />
           </div>
         </div>
         <div className="flex-1 p-4 md:p-8">

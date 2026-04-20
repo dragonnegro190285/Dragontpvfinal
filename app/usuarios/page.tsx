@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Usuario } from '@/lib/types'
+import UsuarioBadge from '@/components/UsuarioBadge'
 
 interface Role {
   id: string
@@ -236,7 +237,7 @@ function UsuariosContent() {
           <div className="flex items-center justify-between">
             <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-600 hover:text-gray-800 focus:outline-none">{sidebarOpen ? '◀' : '▶'} Menú</button>
             <h1 className="text-2xl font-bold">Gestión de Usuarios</h1>
-            <div className="w-16"></div>
+            <UsuarioBadge />
           </div>
         </div>
         <div className="flex-1 p-4 md:p-8">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import UsuarioBadge from '@/components/UsuarioBadge'
 
 export default function MarcasPage() {
   const router = useRouter()
@@ -202,7 +203,8 @@ export default function MarcasPage() {
     <div className="container mx-auto px-4 py-4 md:py-8">
       <div className="bg-white rounded-lg shadow p-4 md:p-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <h1 className="text-xl md:text-2xl font-bold">Gestión de Marcas</h1>
+          <h1 className="text-2xl font-bold">Gestión de Marcas</h1>
+          <UsuarioBadge />
           <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
             <input
               type="text"

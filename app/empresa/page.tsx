@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/navigation'
+import UsuarioBadge from '@/components/UsuarioBadge'
 
 interface Empresa {
   id?: string
@@ -406,7 +407,7 @@ export default function EmpresaPage() {
               {sidebarOpen ? '◀' : '▶'} Menú
             </button>
             <h1 className="text-2xl font-bold">Configuración de Empresa</h1>
-            <div className="w-16"></div> {/* Espaciador para centrar */}
+            <UsuarioBadge /> {/* Espaciador para centrar */}
           </div>
         </div>
 

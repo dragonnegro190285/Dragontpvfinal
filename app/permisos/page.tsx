@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
+import UsuarioBadge from '@/components/UsuarioBadge'
 
 interface Permiso {
   id: string
@@ -556,7 +557,7 @@ export default function PermisosPage() {
               {sidebarOpen ? '◀' : '▶'} Menú
             </button>
             <h1 className="text-2xl font-bold">Gestión de Permisos</h1>
-            <div className="w-16"></div> {/* Espaciador para centrar */}
+            <UsuarioBadge /> {/* Espaciador para centrar */}
           </div>
         </div>
 

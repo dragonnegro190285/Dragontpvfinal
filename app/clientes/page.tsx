@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Cliente } from '@/lib/types'
+import UsuarioBadge from '@/components/UsuarioBadge'
 
 export default function ClientesPage() {
   const router = useRouter()
@@ -84,7 +85,7 @@ export default function ClientesPage() {
           <div className="flex items-center justify-between">
             <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-600 hover:text-gray-800 focus:outline-none">{sidebarOpen ? '◀' : '▶'} Menú</button>
             <h1 className="text-2xl font-bold">Gestión de Clientes</h1>
-            <div className="w-16"></div>
+            <UsuarioBadge />
           </div>
         </div>
         <div className="flex-1 p-4 md:p-8">
