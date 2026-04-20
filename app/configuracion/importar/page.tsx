@@ -12,7 +12,7 @@ export default function ConfiguracionImportarPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
   useEffect(() => {
-    checkAuth()
+    // checkAuth() // Temporalmente deshabilitado debido a problemas de DNS con Supabase
     loadUsuario()
   }, [])
 
