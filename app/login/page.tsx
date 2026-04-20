@@ -64,9 +64,13 @@ export default function LoginPage() {
       if (error) throw error
       setUsuarios(data || [])
       setShowUsuarios(true)
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error al cargar usuarios de Supabase:', err)
-      setError('Error al cargar usuarios de Supabase')
+      if (err.message?.includes('ERR_NAME_NOT_RESOLVED') || err.message?.includes('Failed to fetch')) {
+        setError('Error de DNS: No se puede conectar a Supabase. Este es un problema de tu proveedor de internet. Soluciones: 1) Cambiar servidor DNS a 8.8.8.8, 2) Usar VPN, 3) Esperar a que se resuelva el problema de red.')
+      } else {
+        setError('Error al cargar usuarios de Supabase: ' + (err.message || 'Error desconocido'))
+      }
     }
   }
 
@@ -158,7 +162,13 @@ export default function LoginPage() {
         <h1 className="text-xl md:text-2xl font-bold text-center mb-6">
           {hasAdmin ? 'TPV Online - Login' : 'Crear Primer Administrador'}
         </h1>
-        
+
+        <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-4">
+          <p className="text-sm text-yellow-800">
+            ⚠️ <strong>Nota:</strong> Si experimentas errores de conexión con Supabase, es un problema temporal de DNS. Soluciones: Cambiar DNS a 8.8.8.8, usar VPN, o esperar.
+          </p>
+        </div>
+
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
             {error}
@@ -268,6 +278,7 @@ export default function LoginPage() {
               disabled={hasAdmin}
               readOnly={hasAdmin}
               aria-label="Email"
+              autoComplete="username"
             />
           </div>
 
