@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
@@ -12,6 +12,30 @@ export default function ImportarProveedoresPage() {
   const [success, setSuccess] = useState('')
   const [preview, setPreview] = useState<any[]>([])
   const [showPreview, setShowPreview] = useState(false)
+  const [usuario, setUsuario] = useState<any>(null)
+
+  const loadUsuario = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (user) {
+        const { data, error } = await supabase
+          .from('usuarios')
+          .select('*, roles(*)')
+          .eq('auth_id', user.id)
+          .single()
+
+        if (error) throw error
+        setUsuario(data)
+      }
+    } catch (err) {
+      console.error('Error al cargar usuario:', err)
+    }
+  }
+
+  useEffect(() => {
+    loadUsuario()
+  }, [])
 
   const handleDescargarPlantilla = () => {
     const headers = [
@@ -191,14 +215,18 @@ export default function ImportarProveedoresPage() {
               <h1 className="text-2xl font-bold">Importar Proveedores</h1>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex flex-col items-end bg-blue-50 px-4 py-2 rounded-lg">
-                <span className="text-sm font-semibold text-blue-800">
-                  Usuario Logueado
-                </span>
-                <span className="text-xs text-blue-600">
-                  Activo
-                </span>
-              </div>
+              {usuario && (
+                <div className="flex flex-col items-end bg-blue-50 px-4 py-2 rounded-lg">
+                  <span className="text-sm font-semibold text-blue-800">
+                    {usuario.nombre || 'Usuario'}
+                  </span>
+                  {usuario.roles?.nombre && (
+                    <span className="text-xs text-blue-600">
+                      {usuario.roles.nombre}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
