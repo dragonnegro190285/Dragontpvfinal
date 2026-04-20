@@ -63,6 +63,30 @@ export default function LoginPage() {
       if (error) throw error
       setUsuarios(data || [])
       setShowUsuarios(true)
+
+      // Verificar y crear registros en usuario_rol si faltan
+      if (data && data.length > 0) {
+        for (const usuario of data) {
+          if (usuario.rol_id) {
+            const { data: existingRol, error: checkError } = await supabase
+              .from('usuario_rol')
+              .select('*')
+              .eq('usuario_id', usuario.id)
+              .eq('rol_id', usuario.rol_id)
+              .single()
+
+            if (checkError || !existingRol) {
+              // Insertar registro en usuario_rol
+              await supabase
+                .from('usuario_rol')
+                .insert({
+                  usuario_id: usuario.id,
+                  rol_id: usuario.rol_id
+                })
+            }
+          }
+        }
+      }
     } catch (err: any) {
       console.error('Error al cargar usuarios de Supabase:', err)
       if (err.message?.includes('ERR_NAME_NOT_RESOLVED') || err.message?.includes('Failed to fetch')) {
