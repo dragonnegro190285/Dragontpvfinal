@@ -158,40 +158,58 @@ export default function ImportarProveedoresPage() {
     try {
       let importados = 0
       let errores = 0
+      const erroresDetallados: string[] = []
 
       for (const proveedor of preview) {
         try {
+          // Validar que nombre no esté vacío
+          if (!proveedor.nombre || proveedor.nombre.trim() === '') {
+            erroresDetallados.push('Fila sin nombre')
+            errores++
+            continue
+          }
+
+          console.log('Importando proveedor:', proveedor)
+
           const { data, error } = await supabase
             .from('proveedores')
             .insert({
-              nombre: proveedor.nombre,
-              rfc: proveedor.rfc || null,
-              direccion: proveedor.direccion || null,
-              telefono: proveedor.telefono || null,
-              email: proveedor.email || null,
-              contacto: proveedor.contacto || null,
-              observaciones: proveedor.observaciones || null
+              nombre: proveedor.nombre.trim(),
+              rfc: proveedor.rfc ? proveedor.rfc.trim() : null,
+              direccion: proveedor.direccion ? proveedor.direccion.trim() : null,
+              telefono: proveedor.telefono ? proveedor.telefono.trim() : null,
+              email: proveedor.email ? proveedor.email.trim() : null,
+              contacto: proveedor.contacto ? proveedor.contacto.trim() : null,
+              observaciones: proveedor.observaciones ? proveedor.observaciones.trim() : null
             })
             .select()
             .single()
 
           if (error) {
-            console.error('Error al importar proveedor:', error)
+            console.error('Error al importar proveedor:', proveedor.nombre, error)
+            erroresDetallados.push(`${proveedor.nombre}: ${error.message}`)
             errores++
           } else {
+            console.log('Proveedor importado exitosamente:', data)
             importados++
           }
-        } catch (err) {
+        } catch (err: any) {
           console.error('Error al procesar proveedor:', err)
+          erroresDetallados.push(`${proveedor.nombre}: ${err.message}`)
           errores++
         }
       }
 
-      setSuccess(`Importación completada: ${importados} proveedores importados exitosamente, ${errores} errores.`)
+      if (importados > 0) {
+        setSuccess(`✅ Importación completada: ${importados} proveedor(es) importado(s) exitosamente.${errores > 0 ? ` ${errores} error(es).` : ''}`)
+      } else {
+        setError(`❌ Importación fallida: No se importaron proveedores. Errores: ${erroresDetallados.join('; ')}`)
+      }
+      
       setShowPreview(false)
       setPreview([])
-    } catch (err) {
-      setError('Error al importar proveedores. Por favor intenta nuevamente.')
+    } catch (err: any) {
+      setError('Error al importar proveedores: ' + (err.message || 'Error desconocido'))
     } finally {
       setLoading(false)
     }
