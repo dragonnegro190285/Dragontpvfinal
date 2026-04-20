@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Producto } from '@/lib/types'
+import UsuarioBadge from '@/components/UsuarioBadge'
 
 export default function ProductosPage() {
   const router = useRouter()
@@ -142,7 +143,7 @@ export default function ProductosPage() {
               {sidebarOpen ? '◀' : '▶'} Menú
             </button>
             <h1 className="text-2xl font-bold">Gestión de Productos</h1>
-            <div className="w-16"></div> {/* Espaciador para centrar */}
+            <UsuarioBadge />
           </div>
         </div>
 
