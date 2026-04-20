@@ -56,17 +56,27 @@ export default function LoginPage() {
 
   const loadAllUsuariosFromSupabase = async () => {
     try {
+      console.log('Iniciando carga de usuarios desde Supabase...')
       const { data, error } = await supabase
         .from('usuarios')
         .select('*, roles(*)')
 
-      if (error) throw error
+      console.log('Respuesta de Supabase:', { data, error })
+
+      if (error) {
+        console.error('Error de Supabase:', error)
+        throw error
+      }
+
+      console.log('Usuarios encontrados:', data?.length || 0)
       setUsuarios(data || [])
       setShowUsuarios(true)
 
       // Verificar y crear registros en usuario_rol si faltan
       if (data && data.length > 0) {
+        console.log('Verificando registros en usuario_rol...')
         for (const usuario of data) {
+          console.log('Procesando usuario:', usuario.email, 'rol_id:', usuario.rol_id)
           if (usuario.rol_id) {
             const { data: existingRol, error: checkError } = await supabase
               .from('usuario_rol')
@@ -75,14 +85,19 @@ export default function LoginPage() {
               .eq('rol_id', usuario.rol_id)
               .single()
 
+            console.log('Registro usuario_rol existente:', existingRol, 'Error:', checkError)
+
             if (checkError || !existingRol) {
+              console.log('Insertando registro en usuario_rol para:', usuario.email)
               // Insertar registro en usuario_rol
-              await supabase
+              const { error: insertError } = await supabase
                 .from('usuario_rol')
                 .insert({
                   usuario_id: usuario.id,
                   rol_id: usuario.rol_id
                 })
+
+              console.log('Resultado de inserción:', insertError || 'Éxito')
             }
           }
         }
