@@ -130,27 +130,33 @@ export default function ConfiguracionImportarPage() {
                 </div>
               </div>
 
-              {/* Productos - Placeholder */}
-              <div className="border-2 border-gray-200 rounded-lg p-6 opacity-50">
+              {/* Productos */}
+              <div 
+                onClick={() => router.push('/configuracion/importar/productos')}
+                className="border-2 border-gray-200 rounded-lg p-6 hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all duration-200"
+              >
                 <div className="text-4xl mb-4">📦</div>
                 <h3 className="text-lg font-semibold mb-2">Productos</h3>
                 <p className="text-sm text-gray-600">
-                  Importar productos masivamente (Próximamente)
+                  Importar productos masivamente desde archivo CSV o XLSX
                 </p>
-                <div className="mt-4 text-gray-400 text-sm font-medium">
-                  Próximamente
+                <div className="mt-4 text-blue-600 text-sm font-medium">
+                  Importar Productos →
                 </div>
               </div>
 
-              {/* Clientes - Placeholder */}
-              <div className="border-2 border-gray-200 rounded-lg p-6 opacity-50">
+              {/* Clientes */}
+              <div 
+                onClick={() => router.push('/configuracion/importar/clientes')}
+                className="border-2 border-gray-200 rounded-lg p-6 hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all duration-200"
+              >
                 <div className="text-4xl mb-4">👤</div>
                 <h3 className="text-lg font-semibold mb-2">Clientes</h3>
                 <p className="text-sm text-gray-600">
-                  Importar clientes masivamente (Próximamente)
+                  Importar clientes masivamente desde archivo CSV o XLSX
                 </p>
-                <div className="mt-4 text-gray-400 text-sm font-medium">
-                  Próximamente
+                <div className="mt-4 text-blue-600 text-sm font-medium">
+                  Importar Clientes →
                 </div>
               </div>
             </div>
