@@ -472,7 +472,7 @@ export default function PermisosPage() {
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar colapsable */}
-      <div className={`${sidebarOpen ? 'w-64' : 'w-0'} bg-gray-800 text-white transition-all duration-300 overflow-hidden`}>
+      <div className={`${sidebarOpen ? 'w-64' : 'w-0'} bg-gray-800 text-white transition-all duration-300 overflow-y-auto flex flex-col`}>
         <div className="p-4">
           <h2 className="text-xl font-bold mb-4">Configuración</h2>
           <nav className="space-y-2">
